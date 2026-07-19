@@ -971,7 +971,7 @@ async function loadRoomsRail(){
 
 let replyingTo = null;
 async function loadRoomMessages(roomId){
-  const { data: msgs } = await sb.from('chat_messages').select('*, profiles(username), reply:reply_to_id(id, content, profiles(username))').eq('room_id', roomId).order('created_at').limit(100);
+  const { data: msgs } = await sb.from('chat_messages').select('*, profiles!sender_id(username), reply:reply_to_id(id, content, profiles!sender_id(username))').eq('room_id', roomId).order('created_at').limit(100);
   renderMessages(msgs||[]);
 }
 
@@ -1141,21 +1141,38 @@ async function renderAdmin(container){
     <div class="view" style="max-width:900px">
       <div class="view-header"><h1>لوحة التحكم</h1></div>
       <div class="admin-tabs">
-        <div class="admin-tab active" data-tab="rooms" onclick="switchAdminTab('rooms')">طلبات الغرف</div>
+        <div class="admin-tab active" data-tab="overview" onclick="switchAdminTab('overview')">نظرة عامة</div>
+        <div class="admin-tab" data-tab="rooms" onclick="switchAdminTab('rooms')">طلبات الغرف</div>
         <div class="admin-tab" data-tab="reports" onclick="switchAdminTab('reports')">البلاغات</div>
         <div class="admin-tab" data-tab="users" onclick="switchAdminTab('users')">المستخدمين</div>
       </div>
       <div id="adminContent"></div>
     </div>`;
-  switchAdminTab('rooms');
+  switchAdminTab('overview');
 }
 
 async function switchAdminTab(tab){
   document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   const el = document.getElementById('adminContent');
   el.innerHTML = '<div class="empty-state">جاري التحميل...</div>';
-  if(tab==='rooms'){
-    const { data: rooms } = await sb.from('chat_rooms').select('id, name, description, creator_id, created_at, profiles(username)').eq('status','pending').order('created_at');
+  if(tab==='overview'){
+    const [{count:users},{count:posts},{count:articles},{count:rooms},{count:pendingRooms},{count:pendingReports},{count:banned}] = await Promise.all([
+      sb.from('profiles').select('id',{count:'exact',head:true}),
+      sb.from('posts').select('id',{count:'exact',head:true}).eq('is_removed',false),
+      sb.from('articles').select('id',{count:'exact',head:true}).eq('is_draft',false),
+      sb.from('chat_rooms').select('id',{count:'exact',head:true}).eq('status','approved'),
+      sb.from('chat_rooms').select('id',{count:'exact',head:true}).eq('status','pending'),
+      sb.from('reports').select('id',{count:'exact',head:true}).eq('status','pending'),
+      sb.from('profiles').select('id',{count:'exact',head:true}).eq('is_banned',true),
+    ]);
+    const stat = (n,l)=>`<div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center"><div style="font-family:var(--font-mono);font-size:24px;font-weight:600">${n??0}</div><div style="font-size:12px;color:var(--ink-faint);margin-top:4px">${l}</div></div>`;
+    el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
+      ${stat(users,'مستخدم')}${stat(posts,'منشور')}${stat(articles,'مقال منشور')}${stat(rooms,'غرفة مفعّلة')}
+      ${stat(pendingRooms,'طلب غرفة معلّق')}${stat(pendingReports,'بلاغ معلّق')}${stat(banned,'مستخدم محظور')}
+    </div>`;
+  } else if(tab==='rooms'){
+    const { data: rooms, error } = await sb.from('chat_rooms').select('id, name, description, creator_id, created_at, profiles!creator_id(username)').eq('status','pending').order('created_at');
+    if(error){ el.innerHTML = `<div class="empty-state" style="color:var(--red)">خطأ: ${escapeHtml(error.message)}</div>`; toast('خطأ في تحميل الطلبات: '+error.message, 'error'); return; }
     el.innerHTML = (rooms&&rooms.length) ? rooms.map(r=>`
       <div class="room-card">
         <div class="room-info"><div class="name">${escapeHtml(r.name)} ${r.creator_id ? `<span id="pc-${r.id}"></span>`:''}</div><div class="desc">${escapeHtml(r.description||'')} — طلب بواسطة @${r.profiles?.username}</div></div>
@@ -1164,7 +1181,8 @@ async function switchAdminTab(tab){
         <button class="btn btn-danger btn-sm" onclick="reviewRoom('${r.id}','rejected')">رفض</button>
       </div>`).join('') : `<div class="empty-state">مفيش طلبات جديدة</div>`;
   } else if(tab==='reports'){
-    const { data: reports } = await sb.from('reports').select('*, profiles!reports_reporter_id_fkey(username)').eq('status','pending').order('created_at');
+    const { data: reports, error } = await sb.from('reports').select('*, profiles!reports_reporter_id_fkey(username)').eq('status','pending').order('created_at');
+    if(error){ el.innerHTML = `<div class="empty-state" style="color:var(--red)">خطأ: ${escapeHtml(error.message)}</div>`; toast('خطأ في تحميل البلاغات: '+error.message, 'error'); return; }
     el.innerHTML = (reports&&reports.length) ? reports.map(r=>`
       <div class="room-card">
         <div class="room-info"><div class="name">بلاغ على ${r.target_type}</div><div class="desc">${escapeHtml(r.reason)} — بواسطة @${r.profiles?.username}</div></div>
@@ -1172,7 +1190,8 @@ async function switchAdminTab(tab){
         <button class="btn btn-danger btn-sm" onclick="removeReportedContent('${r.id}','${r.target_type}','${r.target_id}')">حذف المحتوى</button>
       </div>`).join('') : `<div class="empty-state">مفيش بلاغات جديدة</div>`;
   } else if(tab==='users'){
-    const { data: users } = await sb.from('profiles').select('*').order('created_at', {ascending:false}).limit(50);
+    const { data: users, error } = await sb.from('profiles').select('*').order('created_at', {ascending:false}).limit(50);
+    if(error){ el.innerHTML = `<div class="empty-state" style="color:var(--red)">خطأ: ${escapeHtml(error.message)}</div>`; toast('خطأ في تحميل المستخدمين: '+error.message, 'error'); return; }
     el.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">` + (users||[]).map(u=>`
       <div class="room-card">
         <div class="room-info">
