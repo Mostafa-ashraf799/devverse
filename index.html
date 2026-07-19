@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arab Community — أكبر مجتمع عربي للتقنية</title>
+<title>DevVerse — أكبر مجتمع عربي للتقنية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -16,9 +16,9 @@
   --ink:#E7E9EE;
   --ink-dim:#8B93A7;
   --ink-faint:#5B6478;
-  --amber:#E8A33D;
-  --amber-dim:#B8822F;
-  --teal:#3DDC97;
+  --amber:#4F8FFF;
+  --amber-dim:#3A6FD6;
+  --teal:#B8C4D9;
   --red:#E85D5D;
   --font-display:'El Messiri', sans-serif;
   --font-body:'IBM Plex Sans Arabic', sans-serif;
@@ -51,7 +51,7 @@ button{font-family:var(--font-body); cursor:pointer;}
 }
 .btn:hover{background:var(--surface-hover); border-color:var(--ink-faint);}
 .btn-primary{background:var(--amber); color:#0B0E14; border-color:var(--amber);}
-.btn-primary:hover{background:#f0b155; border-color:#f0b155;}
+.btn-primary:hover{background:#6FA5FF; border-color:#6FA5FF;}
 .btn-ghost{background:transparent; border-color:transparent;}
 .btn-ghost:hover{background:var(--surface);}
 .btn-sm{padding:6px 14px; font-size:13px;}
@@ -148,7 +148,7 @@ button{font-family:var(--font-body); cursor:pointer;}
 .sidebar-footer{margin-top:auto; padding:12px 20px 0; border-top:1px solid var(--border);}
 .mini-profile{display:flex; align-items:center; gap:10px; padding:10px 0; cursor:pointer;}
 .avatar{
-  width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--amber),var(--red));
+  width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--amber),var(--teal));
   display:flex; align-items:center; justify-content:center; font-weight:700; color:#0B0E14; flex-shrink:0; font-size:14px;
 }
 .mini-profile .name{font-size:13px; font-weight:600;}
@@ -257,7 +257,7 @@ button{font-family:var(--font-body); cursor:pointer;}
 
 .profile-header{background:var(--bg-elevated); border:1px solid var(--border); border-radius:14px; padding:24px; margin-bottom:20px;}
 .profile-top{display:flex; align-items:center; gap:16px; margin-bottom:16px;}
-.avatar-lg{width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,var(--amber),var(--red)); display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:700; color:#0B0E14;}
+.avatar-lg{width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,var(--amber),var(--teal)); display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:700; color:#0B0E14;}
 .profile-stats{display:flex; gap:24px; margin-top:14px; font-family:var(--font-mono);}
 .profile-stats .n{font-size:18px; font-weight:600;}
 .profile-stats .l{font-size:11px; color:var(--ink-faint);}
@@ -304,7 +304,7 @@ button{font-family:var(--font-body); cursor:pointer;}
 <!-- ============ LANDING ============ -->
 <div id="landing">
   <nav class="landing-nav">
-    <div class="logo">Arab<span class="bracket">::</span>Community</div>
+    <div class="logo">Dev<span class="bracket">::</span>Verse</div>
     <div class="landing-nav-actions">
       <button class="btn" onclick="openAuth('login')">تسجيل الدخول</button>
       <button class="btn btn-primary" onclick="openAuth('signup')">إنشاء حساب</button>
@@ -353,6 +353,8 @@ button{font-family:var(--font-body); cursor:pointer;}
       <div class="field"><label>البريد الإلكتروني</label><input type="email" id="loginEmail"></div>
       <div class="field"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
       <button class="btn btn-primary" style="width:100%" onclick="doLogin()">دخول</button>
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--border)"></div>أو<div style="flex:1;height:1px;background:var(--border)"></div></div>
+      <button class="btn" style="width:100%" onclick="doGoogleAuth()">🔵 الدخول بحساب جوجل</button>
       <div class="modal-switch">مش عندك حساب؟ <a onclick="openAuth('signup')">إنشاء حساب</a></div>
     </div>
     <div id="signupForm" style="display:none">
@@ -364,7 +366,18 @@ button{font-family:var(--font-body); cursor:pointer;}
       <div class="field"><label>البريد الإلكتروني</label><input type="email" id="signupEmail"></div>
       <div class="field"><label>كلمة المرور</label><input type="password" id="signupPassword" placeholder="6 أحرف على الأقل"></div>
       <button class="btn btn-primary" style="width:100%" onclick="doSignup()">إنشاء الحساب</button>
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--border)"></div>أو<div style="flex:1;height:1px;background:var(--border)"></div></div>
+      <button class="btn" style="width:100%" onclick="doGoogleAuth()">🔵 التسجيل بحساب جوجل</button>
       <div class="modal-switch">عندك حساب؟ <a onclick="openAuth('login')">تسجيل الدخول</a></div>
+    </div>
+    <div id="confirmForm" style="display:none">
+      <h2>تحقق من إيميلك 📩</h2>
+      <div class="sub" id="confirmSub">بعتنالك لينك تأكيد</div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px; font-size:13px; color:var(--ink-dim); margin-bottom:16px">
+        دوس على اللينك اللي وصلك في الإيميل عشان تفعّل حسابك، وبعدها ارجع سجّل دخول عادي.
+      </div>
+      <button class="btn" style="width:100%" onclick="resendConfirmCode()">إعادة إرسال اللينك</button>
+      <div class="modal-switch">فعّلت حسابك؟ <a onclick="openAuth('login')">تسجيل الدخول</a></div>
     </div>
   </div>
 </div>
@@ -372,13 +385,13 @@ button{font-family:var(--font-body); cursor:pointer;}
 <!-- ============ APP SHELL ============ -->
 <div id="app">
   <aside class="sidebar">
-    <div class="sidebar-logo"><div class="logo" style="font-size:18px">Arab<span class="bracket">::</span>Community</div></div>
+    <div class="sidebar-logo"><div class="logo" style="font-size:18px">Dev<span class="bracket">::</span>Verse</div></div>
     <div class="nav-section">
       <div class="nav-item active" data-view="feed" onclick="nav('feed')">🏠 الرئيسية</div>
       <div class="nav-item" data-view="articles" onclick="nav('articles')">📝 المقالات</div>
       <div class="nav-item" data-view="rooms" onclick="nav('rooms')">💬 غرف الدردشة</div>
       <div class="nav-item" data-view="profile" onclick="nav('profile')">👤 ملفي الشخصي</div>
-      <div class="nav-item" data-view="admin" id="adminNavItem" onclick="nav('admin')" style="display:none">🛡️ لوحة التحكم</div>
+      <div class="nav-item" data-view="admin" id="adminNavItem" onclick="nav('admin')" style="display:none">🛡️ لوحة التحكم <span class="badge" id="adminBadge" style="display:none">0</span></div>
     </div>
     <div class="nav-section">
       <div class="nav-label">الأقسام</div>
@@ -397,10 +410,14 @@ button{font-family:var(--font-body); cursor:pointer;}
     <div class="topbar">
       <div class="search-box">
         <span class="icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="ابحث عن منشورات، مقالات، مستخدمين..." oninput="handleSearch(this.value)">
+        <input type="text" id="searchInput" placeholder="ابحث عن منشورات، مقالات، مستخدمين..." oninput="handleSearch(this.value)" onblur="setTimeout(()=>document.getElementById('searchResults').style.display='none', 200)">
+        <div id="searchResults" style="display:none; position:absolute; top:110%; right:0; left:0; background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; max-height:400px; overflow-y:auto; z-index:50; box-shadow:0 12px 30px rgba(0,0,0,.4)"></div>
       </div>
       <div class="topbar-actions">
-        <button class="icon-btn" onclick="toggleNotifications()">🔔<span class="notif-dot" id="notifDot" style="display:none"></span></button>
+        <div style="position:relative">
+          <button class="icon-btn" onclick="toggleNotifications()">🔔<span class="notif-dot" id="notifDot" style="display:none"></span></button>
+          <div id="notifPanel" style="display:none; position:absolute; top:110%; left:0; width:320px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; max-height:420px; overflow-y:auto; z-index:60; box-shadow:0 12px 30px rgba(0,0,0,.4)"></div>
+        </div>
       </div>
     </div>
     <div id="viewContainer"></div>
@@ -439,6 +456,7 @@ let currentProfile = null;
 let categories = [];
 let activeCategoryFilter = null;
 let activeRoomId = null;
+let activeRoomCreatorId = null;
 let roomChannel = null;
 
 /* ================= TOAST ================= */
@@ -453,11 +471,11 @@ function toast(msg, type=''){
 
 /* ================= LANDING TERMINAL ANIMATION ================= */
 const fakeLog = [
-  {p:'~/community', c:'new_post --category ai', o:'✓ نُشر: "أفضل مكتبات NLP عربي 2026"'},
-  {p:'~/community', c:'join --room cybersecurity', o:'✓ بانتظار موافقة الأدمن...'},
-  {p:'~/community', c:'article publish', o:'✓ تم نشر: "مقدمة في Rust للمبتدئين"'},
-  {p:'~/community', c:'follow @sara_dev', o:'✓ بدأت متابعة sara_dev'},
-  {p:'~/community', c:'ai explain --file main.py', o:'✓ تم شرح الكود بواسطة المساعد الذكي'},
+  {p:'~/devverse', c:'new_post --category ai', o:'✓ نُشر: "أفضل مكتبات NLP عربي 2026"'},
+  {p:'~/devverse', c:'join --room cybersecurity', o:'✓ بانتظار موافقة الأدمن...'},
+  {p:'~/devverse', c:'article publish', o:'✓ تم نشر: "مقدمة في Rust للمبتدئين"'},
+  {p:'~/devverse', c:'follow @sara_dev', o:'✓ بدأت متابعة sara_dev'},
+  {p:'~/devverse', c:'ai explain --file main.py', o:'✓ تم شرح الكود بواسطة المساعد الذكي'},
 ];
 let logIdx = 0;
 function typeTerminalLine(){
@@ -483,9 +501,11 @@ function openAuth(which){
   document.getElementById('authOverlay').classList.add('active');
   document.getElementById('loginForm').style.display = which==='login' ? 'block':'none';
   document.getElementById('signupForm').style.display = which==='signup' ? 'block':'none';
+  document.getElementById('confirmForm').style.display = which==='confirm' ? 'block':'none';
 }
 function closeAuth(){ document.getElementById('authOverlay').classList.remove('active'); }
 
+let pendingConfirmEmail = null;
 async function doSignup(){
   const username = document.getElementById('signupUsername').value.trim();
   const full_name = document.getElementById('signupFullname').value.trim();
@@ -499,12 +519,19 @@ async function doSignup(){
   }
   const { data, error } = await sb.auth.signUp({
     email, password,
-    options:{ data:{ username, full_name } }
+    options:{ data:{ username, full_name }, emailRedirectTo: window.location.origin + window.location.pathname }
   });
   if(error){ errEl.textContent = translateError(error.message); errEl.style.display='block'; return; }
-  toast('تم إنشاء الحساب بنجاح!', 'success');
-  closeAuth();
-  await initSession();
+  pendingConfirmEmail = email;
+  document.getElementById('confirmSub').textContent = `بعتنالك لينك تأكيد على ${email} — افتح إيميلك ودوس عليه عشان تفعّل حسابك`;
+  openAuth('confirm');
+}
+
+async function resendConfirmCode(){
+  if(!pendingConfirmEmail){ toast('من فضلك سجّل حساب الأول', 'error'); return; }
+  const { error } = await sb.auth.resend({ type: 'signup', email: pendingConfirmEmail, options:{ emailRedirectTo: window.location.origin + window.location.pathname } });
+  if(error){ toast('تعذر إعادة الإرسال: '+error.message, 'error'); return; }
+  toast('تم إرسال لينك جديد', 'success');
 }
 
 async function doLogin(){
@@ -516,6 +543,14 @@ async function doLogin(){
   if(error){ errEl.textContent = translateError(error.message); errEl.style.display='block'; return; }
   closeAuth();
   await initSession();
+}
+
+async function doGoogleAuth(){
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href }
+  });
+  if(error){ toast('تعذر بدء الدخول بجوجل: '+error.message, 'error'); }
 }
 
 async function doLogout(){
@@ -545,12 +580,25 @@ async function initSession(){
   document.getElementById('miniName').textContent = profile.full_name || profile.username;
   document.getElementById('miniRole').textContent = profile.role;
   document.getElementById('miniAvatar').textContent = (profile.username||'?')[0].toUpperCase();
+  if(profile.avatar_file_id) loadAvatarInto('miniAvatar', profile.avatar_file_id);
   if(['owner','super_admin','admin','moderator'].includes(profile.role)){
     document.getElementById('adminNavItem').style.display = 'flex';
   }
   await loadCategories();
   nav('feed');
   checkNotifications();
+  if(['owner','super_admin','admin','moderator'].includes(profile.role)) checkAdminBadge();
+}
+
+async function checkAdminBadge(){
+  const [{count:pendingRooms}, {count:pendingReports}] = await Promise.all([
+    sb.from('chat_rooms').select('id', {count:'exact', head:true}).eq('status','pending'),
+    sb.from('reports').select('*', {count:'exact', head:true}).eq('status','pending'),
+  ]);
+  const total = (pendingRooms||0) + (pendingReports||0);
+  const badge = document.getElementById('adminBadge');
+  if(total > 0){ badge.style.display='inline-block'; badge.textContent = total; }
+  else{ badge.style.display='none'; }
 }
 
 /* ================= CATEGORIES ================= */
@@ -570,7 +618,7 @@ async function loadLandingStats(){
     sb.from('profiles').select('*', {count:'exact', head:true}),
     sb.from('posts').select('*', {count:'exact', head:true}),
     sb.from('articles').select('*', {count:'exact', head:true}).eq('is_draft', false),
-    sb.from('chat_rooms').select('*', {count:'exact', head:true}).eq('status','approved'),
+    sb.from('chat_rooms').select('id', {count:'exact', head:true}).eq('status','approved'),
   ]);
   document.getElementById('statUsers').textContent = u ?? 0;
   document.getElementById('statPosts').textContent = p ?? 0;
@@ -584,16 +632,25 @@ function filterByCategory(catId){
 }
 
 /* ================= NAV / ROUTER ================= */
+let viewedProfileId = null;
 function nav(view){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const navEl = document.querySelector(`.nav-item[data-view="${view}"]`);
   if(navEl) navEl.classList.add('active');
   const c = document.getElementById('viewContainer');
+  if(view==='profile') viewedProfileId = null; // clicking the nav item always means "my own profile"
   if(view==='feed') renderFeed(c);
   else if(view==='articles') renderArticles(c);
   else if(view==='rooms') renderRooms(c);
-  else if(view==='profile') renderProfile(c);
+  else if(view==='profile') renderProfile(c, currentUser.id);
   else if(view==='admin') renderAdmin(c);
+}
+
+function viewProfile(userId){
+  if(!userId) return;
+  viewedProfileId = userId;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  renderProfile(document.getElementById('viewContainer'), userId);
 }
 
 /* ================= FEED ================= */
@@ -691,7 +748,7 @@ async function submitPost(){
 }
 
 async function loadPosts(){
-  let q = sb.from('posts').select('*, profiles!posts_author_id_fkey(username, full_name, role), categories(name_ar)').eq('is_removed', false).order('created_at', {ascending:false}).limit(30);
+  let q = sb.from('posts').select('*, profiles!posts_author_id_fkey(username, full_name, role, avatar_file_id), categories(name_ar)').eq('is_removed', false).order('created_at', {ascending:false}).limit(30);
   if(activeCategoryFilter) q = q.eq('category_id', activeCategoryFilter);
   const { data: posts, error } = await q;
   const listEl = document.getElementById('postsList');
@@ -709,8 +766,8 @@ async function loadPosts(){
     const initials = (p.profiles?.username||'?')[0].toUpperCase();
     el.innerHTML = `
       <div class="post-head">
-        <div class="avatar" style="width:32px;height:32px;font-size:12px">${initials}</div>
-        <div><div class="name">${author}</div><div class="meta">@${p.profiles?.username||''} · ${timeAgo(p.created_at)}</div></div>
+        <div class="avatar" style="width:32px;height:32px;font-size:12px;cursor:pointer" onclick="viewProfile('${p.author_id}')" id="avatar-post-${p.id}">${initials}</div>
+        <div style="cursor:pointer" onclick="viewProfile('${p.author_id}')"><div class="name">${author}</div><div class="meta">@${p.profiles?.username||''} · ${timeAgo(p.created_at)}</div></div>
         ${p.categories ? `<div class="post-cat">${p.categories.name_ar}</div>` : ''}
       </div>
       <div class="post-content ${p.post_type==='code'?'code':''}">${escapeHtml(p.content||'')}</div>
@@ -718,12 +775,20 @@ async function loadPosts(){
       <div class="post-actions">
         <div class="act ${likedSet.has(p.id)?'liked':''}" onclick="toggleLike('${p.id}', this)">❤️ <span id="likecount-${p.id}">‎</span></div>
         <div class="act" onclick="toggleComments('${p.id}')">💬 تعليق</div>
+        ${(p.author_id===currentUser.id || ['owner','super_admin','admin','moderator'].includes(currentProfile.role)) ? `<div class="act" style="color:var(--red)" onclick="deletePost('${p.id}')">🗑️ حذف</div>` : ''}
       </div>
       <div class="comments-box" id="comments-${p.id}"></div>`;
     listEl.appendChild(el);
+    if(p.profiles?.avatar_file_id) loadAvatarInto(`avatar-post-${p.id}`, p.profiles.avatar_file_id);
     if(p.telegram_file_id) loadPostFile(p.id, p.post_type, p.telegram_file_id);
     loadLikeCount(p.id);
   }
+}
+
+async function loadAvatarInto(elId, fileId){
+  const url = await getTelegramFileBlobUrl(fileId);
+  const el = document.getElementById(elId);
+  if(el && url){ el.style.backgroundImage = `url(${url})`; el.style.backgroundSize='cover'; el.style.backgroundPosition='center'; el.textContent=''; }
 }
 
 async function loadPostFile(postId, type, fileId){
@@ -738,6 +803,14 @@ async function loadLikeCount(postId){
   const { count } = await sb.from('post_likes').select('*', {count:'exact', head:true}).eq('post_id', postId);
   const elx = document.getElementById(`likecount-${postId}`);
   if(elx) elx.textContent = count || 0;
+}
+
+async function deletePost(postId){
+  if(!confirm('متأكد إنك عايز تحذف المنشور ده؟')) return;
+  const { error } = await sb.from('posts').update({ is_removed: true }).eq('id', postId);
+  if(error){ toast('تعذر الحذف: '+error.message, 'error'); return; }
+  toast('تم حذف المنشور', 'success');
+  loadPosts();
 }
 
 async function toggleLike(postId, el){
@@ -758,7 +831,7 @@ async function toggleComments(postId){
   if(!box.classList.contains('open')) return;
   box.innerHTML = `<div class="empty-state" style="padding:10px">جاري التحميل...</div>`;
   const { data: comments } = await sb.from('post_comments').select('*, profiles(username)').eq('post_id', postId).eq('is_removed', false).order('created_at');
-  box.innerHTML = (comments||[]).map(c=>`<div class="comment"><b class="name">@${c.profiles?.username||''}</b> ${escapeHtml(c.content)}</div>`).join('')
+  box.innerHTML = (comments||[]).map(c=>`<div class="comment"><b class="name" style="cursor:pointer" onclick="viewProfile('${c.author_id}')">@${c.profiles?.username||''}</b> ${escapeHtml(c.content)}</div>`).join('')
     + `<div class="comment-input"><input type="text" placeholder="اكتب تعليق..." onkeydown="if(event.key==='Enter')submitComment('${postId}', this)"></div>`;
 }
 
@@ -816,25 +889,44 @@ async function renderRooms(container){
       </div>
       <div id="roomsList"><div class="empty-state">جاري التحميل...</div></div>
     </div>`;
-  const { data: rooms, error } = await sb.from('chat_rooms').select('*, categories(name_ar)').order('created_at', {ascending:false});
+  const { data: rooms, error } = await sb.from('chat_rooms').select('id, name, description, category_id, creator_id, status, created_at, categories(name_ar)').order('created_at', {ascending:false});
   const listEl = document.getElementById('roomsList');
   if(error || !rooms?.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">💬</div>لسه مفيش غرف — اطلب أول غرفة!</div>`; return; }
   listEl.innerHTML = rooms.map(r=>`
     <div class="room-card">
       <div class="room-info">
-        <div class="name">${escapeHtml(r.name)} ${r.categories?`<span class="post-cat">${r.categories.name_ar}</span>`:''}</div>
+        <div class="name">${escapeHtml(r.name)} <span id="lock-${r.id}"></span> ${r.categories?`<span class="post-cat">${r.categories.name_ar}</span>`:''}</div>
         <div class="desc">${escapeHtml(r.description||'')}</div>
       </div>
       <span class="status-pill ${r.status}">${r.status==='pending'?'بانتظار الموافقة':r.status==='approved'?'مفعّلة':'مرفوضة'}</span>
-      ${r.status==='approved' ? `<button class="btn btn-sm" onclick="openRoomChat('${r.id}','${escapeHtml(r.name)}')">دخول</button>` : ''}
+      ${r.status==='approved' ? `<button class="btn btn-sm" onclick="attemptJoinRoom('${r.id}','${escapeHtml(r.name)}')">دخول</button>` : ''}
     </div>`).join('');
+  rooms.filter(r=>r.status==='approved').forEach(async r=>{
+    const { data: hasPass } = await sb.rpc('room_has_passcode', { p_room_id: r.id });
+    const lockEl = document.getElementById(`lock-${r.id}`);
+    if(lockEl && hasPass) lockEl.textContent = '🔒';
+  });
+}
+
+async function attemptJoinRoom(roomId, roomName){
+  const isAdmin = ['owner','super_admin','admin','moderator'].includes(currentProfile.role);
+  const { data: hasPass } = await sb.rpc('room_has_passcode', { p_room_id: roomId });
+  let passcode = null;
+  if(hasPass && !isAdmin){
+    passcode = prompt(`غرفة "${roomName}" محمية بكلمة سر:`);
+    if(passcode === null) return;
+  }
+  const { error } = await sb.rpc('join_chat_room', { p_room_id: roomId, p_passcode: passcode });
+  if(error){ toast('تعذر الدخول: '+(error.message.includes('wrong passcode')?'كلمة السر غلط':error.message), 'error'); return; }
+  openRoomChat(roomId, roomName);
 }
 
 function requestNewRoom(){
   const name = prompt('اسم الغرفة:');
   if(!name) return;
   const description = prompt('وصف قصير للغرفة:') || '';
-  sb.from('chat_rooms').insert({ name, description, creator_id: currentUser.id, status:'pending' })
+  const passcode = prompt('كلمة سر للغرفة (اختياري — سيبها فاضية لو مش عايز):') || null;
+  sb.from('chat_rooms').insert({ name, description, creator_id: currentUser.id, status:'pending', passcode: passcode || null })
     .then(({error})=>{
       if(error){ toast('خطأ: '+error.message, 'error'); return; }
       toast('تم إرسال الطلب — بانتظار موافقة الأدمن', 'success');
@@ -844,7 +936,9 @@ function requestNewRoom(){
 
 async function openRoomChat(roomId, roomName){
   activeRoomId = roomId;
-  await sb.from('chat_room_members').upsert({ room_id: roomId, user_id: currentUser.id }, { onConflict:'room_id,user_id' });
+  replyingTo = null;
+  const { data: roomInfo } = await sb.from('chat_rooms').select('creator_id').eq('id', roomId).single();
+  activeRoomCreatorId = roomInfo?.creator_id || null;
   const c = document.getElementById('viewContainer');
   c.innerHTML = `
     <div class="chat-view">
@@ -852,9 +946,13 @@ async function openRoomChat(roomId, roomName){
       <div style="flex:1;display:flex;flex-direction:column">
         <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:600">${roomName}</div>
         <div class="chat-messages" id="chatMessages"></div>
+        <div id="replyBar" style="display:none;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border-top:1px solid var(--border);font-size:12px;color:var(--ink-dim)">
+          <span id="replyBarText" style="flex:1"></span>
+          <button class="icon-btn" style="width:24px;height:24px" onclick="cancelReply()">×</button>
+        </div>
         <div class="chat-input-bar">
           <label class="file-label">📎<input type="file" id="chatFile" style="display:none" onchange="sendChatFile(this)"></label>
-          <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+          <input type="text" id="chatInput" placeholder="اكتب رسالة... (اضغط على رسالة عشان ترد عليها)" onkeydown="if(event.key==='Enter')sendChatMessage()">
           <button class="btn btn-primary btn-sm" onclick="sendChatMessage()">إرسال</button>
         </div>
       </div>
@@ -865,26 +963,56 @@ async function openRoomChat(roomId, roomName){
 }
 
 async function loadRoomsRail(){
-  const { data: rooms } = await sb.from('chat_rooms').select('*').eq('status','approved');
+  const { data: rooms } = await sb.from('chat_rooms').select('id, name, creator_id').eq('status','approved');
   document.getElementById('roomsRail').innerHTML = (rooms||[]).map(r=>
-    `<div class="room-item ${r.id===activeRoomId?'active':''}" onclick="openRoomChat('${r.id}','${escapeHtml(r.name)}')">${escapeHtml(r.name)}</div>`
+    `<div class="room-item ${r.id===activeRoomId?'active':''}" onclick="attemptJoinRoom('${r.id}','${escapeHtml(r.name)}')">${escapeHtml(r.name)}</div>`
   ).join('');
 }
 
+let replyingTo = null;
 async function loadRoomMessages(roomId){
-  const { data: msgs } = await sb.from('chat_messages').select('*, profiles(username)').eq('room_id', roomId).order('created_at').limit(100);
+  const { data: msgs } = await sb.from('chat_messages').select('*, profiles(username), reply:reply_to_id(id, content, profiles(username))').eq('room_id', roomId).order('created_at').limit(100);
   renderMessages(msgs||[]);
+}
+
+function canDeleteMessage(m){
+  return m.sender_id === currentUser.id
+    || ['owner','super_admin','admin','moderator'].includes(currentProfile.role)
+    || (activeRoomCreatorId && activeRoomCreatorId === currentUser.id);
 }
 
 function renderMessages(msgs){
   const box = document.getElementById('chatMessages');
   if(!box) return;
   box.innerHTML = msgs.map(m=>`
-    <div class="msg ${m.sender_id===currentUser.id?'mine':''}">
-      <div class="sender">@${m.profiles?.username||''}</div>
-      ${escapeHtml(m.content||'')}
+    <div class="msg ${m.sender_id===currentUser.id?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setReplyTarget('${m.id}', '${escapeHtml((m.profiles?.username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||'').slice(0,60)).replace(/'/g,"\\'")}')"`}>
+      <div class="sender"><span style="cursor:pointer" onclick="event.stopPropagation();viewProfile('${m.sender_id}')">@${m.profiles?.username||''}</span> <span style="color:var(--ink-faint);font-weight:400">· ${timeAgo(m.created_at)}</span>
+        ${(!m.is_removed && canDeleteMessage(m)) ? `<span style="float:left;cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteMessage('${m.id}')" title="حذف الرسالة">🗑️</span>` : ''}
+      </div>
+      ${m.is_removed ? `<i style="color:var(--ink-faint)">تم حذف هذه الرسالة</i>` : `
+        ${m.reply ? `<div style="border-right:3px solid var(--amber);padding-right:8px;margin-bottom:6px;opacity:.75;font-size:12px">@${m.reply.profiles?.username||''}: ${escapeHtml((m.reply.content||'').slice(0,50))}</div>` : ''}
+        ${escapeHtml(m.content||'')}
+      `}
     </div>`).join('');
   box.scrollTop = box.scrollHeight;
+}
+
+async function deleteMessage(msgId){
+  if(!confirm('تحذف الرسالة دي؟')) return;
+  const { error } = await sb.from('chat_messages').update({ is_removed: true }).eq('id', msgId);
+  if(error){ toast('تعذر الحذف: '+error.message, 'error'); return; }
+  loadRoomMessages(activeRoomId);
+}
+
+function setReplyTarget(msgId, username, preview){
+  replyingTo = msgId;
+  const bar = document.getElementById('replyBar');
+  if(bar){ bar.style.display='flex'; document.getElementById('replyBarText').textContent = `رد على @${username}: ${preview}`; }
+}
+function cancelReply(){
+  replyingTo = null;
+  const bar = document.getElementById('replyBar');
+  if(bar) bar.style.display='none';
 }
 
 function subscribeToRoom(roomId){
@@ -899,9 +1027,10 @@ async function sendChatMessage(){
   const input = document.getElementById('chatInput');
   const content = input.value.trim();
   if(!content || !activeRoomId) return;
-  const { error } = await sb.from('chat_messages').insert({ room_id: activeRoomId, sender_id: currentUser.id, content, message_type:'text' });
+  const { error } = await sb.from('chat_messages').insert({ room_id: activeRoomId, sender_id: currentUser.id, content, message_type:'text', reply_to_id: replyingTo });
   if(error){ toast('تعذر الإرسال', 'error'); return; }
   input.value='';
+  cancelReply();
   loadRoomMessages(activeRoomId);
 }
 
@@ -920,34 +1049,77 @@ async function sendChatFile(input){
 }
 
 /* ================= PROFILE ================= */
-async function renderProfile(container){
-  const p = currentProfile;
+async function renderProfile(container, userId){
+  const isOwn = userId === currentUser.id;
+  let p;
+  if(isOwn){ p = currentProfile; }
+  else{
+    const { data, error } = await sb.from('profiles').select('*').eq('id', userId).single();
+    if(error || !data){ container.innerHTML = `<div class="view"><div class="empty-state">تعذر تحميل هذا المستخدم</div></div>`; return; }
+    p = data;
+  }
+
+  let isFollowing = false;
+  if(!isOwn){
+    const { data: f } = await sb.from('user_follows').select('*').eq('follower_id', currentUser.id).eq('following_id', p.id).maybeSingle();
+    isFollowing = !!f;
+  }
+
   container.innerHTML = `
     <div class="view">
       <div class="profile-header">
         <div class="profile-top">
-          <div class="avatar-lg">${(p.username||'?')[0].toUpperCase()}</div>
+          <div class="avatar-lg" id="profileAvatarLg" style="position:relative;cursor:${isOwn?'pointer':'default'}" ${isOwn?'onclick="document.getElementById(\'avatarUploadInput\').click()"':''}>${(p.username||'?')[0].toUpperCase()}</div>
           <div>
             <h2 style="font-family:var(--font-display);font-size:22px">${escapeHtml(p.full_name||p.username)}</h2>
             <div style="color:var(--ink-faint);font-family:var(--font-mono);font-size:13px">@${p.username} · ${p.role}</div>
           </div>
+          ${isOwn ? `<input type="file" id="avatarUploadInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)">` : ''}
         </div>
-        <div style="color:var(--ink-dim);font-size:14px">${escapeHtml(p.bio||'مفيش نبذة لسه — اضغط تعديل عشان تضيف واحدة')}</div>
+        <div style="color:var(--ink-dim);font-size:14px">${escapeHtml(p.bio||(isOwn?'مفيش نبذة لسه — اضغط تعديل عشان تضيف واحدة':''))}</div>
         <div class="profile-stats">
           <div><div class="n">${p.xp}</div><div class="l">XP</div></div>
           <div><div class="n">${p.level}</div><div class="l">Level</div></div>
           <div><div class="n">${p.reputation}</div><div class="l">Reputation</div></div>
         </div>
         <div style="margin-top:12px">${(p.skills||[]).map(s=>`<span class="tag">${escapeHtml(s)}</span>`).join('') || '<span style="color:var(--ink-faint);font-size:12px">مفيش مهارات مضافة</span>'}</div>
-        <button class="btn btn-sm" style="margin-top:16px" onclick="editProfile()">تعديل الملف الشخصي</button>
+        ${isOwn
+          ? `<button class="btn btn-sm" style="margin-top:16px" onclick="editProfile()">تعديل الملف الشخصي</button>`
+          : `<button class="btn btn-sm ${isFollowing?'':'btn-primary'}" style="margin-top:16px" onclick="toggleFollow('${p.id}', ${isFollowing})">${isFollowing?'إلغاء المتابعة':'متابعة'}</button>`}
       </div>
-      <div class="view-header"><h1 style="font-size:18px">منشوراتي</h1></div>
+      <div class="view-header"><h1 style="font-size:18px">${isOwn?'منشوراتي':'المنشورات'}</h1></div>
       <div id="myPostsList"><div class="empty-state">جاري التحميل...</div></div>
     </div>`;
-  const { data: posts } = await sb.from('posts').select('*').eq('author_id', p.id).order('created_at', {ascending:false});
+
+  if(p.avatar_file_id) loadAvatarInto('profileAvatarLg', p.avatar_file_id);
+
+  const { data: posts } = await sb.from('posts').select('*').eq('author_id', p.id).eq('is_removed', false).order('created_at', {ascending:false});
   document.getElementById('myPostsList').innerHTML = (posts&&posts.length) ? posts.map(post=>`
     <div class="post-card"><div class="post-content">${escapeHtml(post.content||'')}</div><div class="meta" style="font-family:var(--font-mono);font-size:12px;color:var(--ink-faint)">${timeAgo(post.created_at)}</div></div>
-  `).join('') : `<div class="empty-state">لسه معملتش أي منشورات</div>`;
+  `).join('') : `<div class="empty-state">${isOwn?'لسه معملتش أي منشورات':'مفيش منشورات لسه'}</div>`;
+}
+
+async function uploadAvatar(input){
+  const file = input.files[0];
+  if(!file) return;
+  try{
+    const up = await uploadToTelegram(file, 'photo');
+    const { error } = await sb.from('profiles').update({ avatar_file_id: up.file_id }).eq('id', currentUser.id);
+    if(error) throw error;
+    currentProfile.avatar_file_id = up.file_id;
+    toast('تم تحديث الصورة الشخصية', 'success');
+    loadAvatarInto('profileAvatarLg', up.file_id);
+    loadAvatarInto('miniAvatar', up.file_id);
+  }catch(e){ toast('فشل رفع الصورة: '+e.message, 'error'); }
+}
+
+async function toggleFollow(targetId, currentlyFollowing){
+  if(currentlyFollowing){
+    await sb.from('user_follows').delete().eq('follower_id', currentUser.id).eq('following_id', targetId);
+  }else{
+    await sb.from('user_follows').insert({ follower_id: currentUser.id, following_id: targetId });
+  }
+  renderProfile(document.getElementById('viewContainer'), targetId);
 }
 
 function editProfile(){
@@ -983,10 +1155,11 @@ async function switchAdminTab(tab){
   const el = document.getElementById('adminContent');
   el.innerHTML = '<div class="empty-state">جاري التحميل...</div>';
   if(tab==='rooms'){
-    const { data: rooms } = await sb.from('chat_rooms').select('*, profiles(username)').eq('status','pending').order('created_at');
+    const { data: rooms } = await sb.from('chat_rooms').select('id, name, description, creator_id, created_at, profiles(username)').eq('status','pending').order('created_at');
     el.innerHTML = (rooms&&rooms.length) ? rooms.map(r=>`
       <div class="room-card">
-        <div class="room-info"><div class="name">${escapeHtml(r.name)}</div><div class="desc">${escapeHtml(r.description||'')} — طلب بواسطة @${r.profiles?.username}</div></div>
+        <div class="room-info"><div class="name">${escapeHtml(r.name)} ${r.creator_id ? `<span id="pc-${r.id}"></span>`:''}</div><div class="desc">${escapeHtml(r.description||'')} — طلب بواسطة @${r.profiles?.username}</div></div>
+        <button class="btn btn-sm" onclick="viewRoomPasscode('${r.id}')">🔑 كلمة السر</button>
         <button class="btn btn-sm" style="background:var(--teal);border-color:var(--teal);color:#0B0E14" onclick="reviewRoom('${r.id}','approved')">قبول</button>
         <button class="btn btn-danger btn-sm" onclick="reviewRoom('${r.id}','rejected')">رفض</button>
       </div>`).join('') : `<div class="empty-state">مفيش طلبات جديدة</div>`;
@@ -996,18 +1169,54 @@ async function switchAdminTab(tab){
       <div class="room-card">
         <div class="room-info"><div class="name">بلاغ على ${r.target_type}</div><div class="desc">${escapeHtml(r.reason)} — بواسطة @${r.profiles?.username}</div></div>
         <button class="btn btn-sm" onclick="reviewReport('${r.id}','dismissed')">تجاهل</button>
-        <button class="btn btn-danger btn-sm" onclick="reviewReport('${r.id}','actioned')">اتخاذ إجراء</button>
+        <button class="btn btn-danger btn-sm" onclick="removeReportedContent('${r.id}','${r.target_type}','${r.target_id}')">حذف المحتوى</button>
       </div>`).join('') : `<div class="empty-state">مفيش بلاغات جديدة</div>`;
   } else if(tab==='users'){
     const { data: users } = await sb.from('profiles').select('*').order('created_at', {ascending:false}).limit(50);
     el.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">` + (users||[]).map(u=>`
       <div class="room-card">
-        <div class="room-info"><div class="name">${escapeHtml(u.full_name||u.username)} <span style="color:var(--ink-faint);font-size:12px">@${u.username}</span></div><div class="desc">${u.role} · XP ${u.xp}</div></div>
-        <select class="chip-select" onchange="changeUserRole('${u.id}', this.value)">
-          ${['new_member','member','premium','mentor','verified_expert','moderator','admin'].map(r=>`<option value="${r}" ${r===u.role?'selected':''}>${r}</option>`).join('')}
-        </select>
+        <div class="room-info">
+          <div class="name">${escapeHtml(u.full_name||u.username)} <span style="color:var(--ink-faint);font-size:12px">@${u.username}</span> ${u.is_banned?'<span class="status-pill rejected">محظور</span>':''}</div>
+          <div class="desc">${u.role} · XP ${u.xp}</div>
+        </div>
+        ${u.role!=='owner' ? `
+          <select class="chip-select" onchange="changeUserRole('${u.id}', this.value)">
+            ${['new_member','member','premium','mentor','verified_expert','moderator','admin'].map(r=>`<option value="${r}" ${r===u.role?'selected':''}>${r}</option>`).join('')}
+          </select>
+          <button class="btn btn-sm" onclick="toggleBanUser('${u.id}', ${u.is_banned})">${u.is_banned?'فك الحظر':'حظر'}</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteUserAccount('${u.id}', '${escapeHtml(u.username)}')">حذف نهائي</button>
+        ` : `<span style="color:var(--ink-faint);font-size:12px">حساب المالك — محمي</span>`}
       </div>`).join('') + `</div>`;
   }
+}
+
+async function viewRoomPasscode(roomId){
+  const { data, error } = await sb.rpc('get_room_passcode', { p_room_id: roomId });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  alert(data ? `كلمة سر الغرفة: ${data}` : 'الغرفة دي بدون كلمة سر');
+}
+
+async function toggleBanUser(userId, currentlyBanned){
+  const { error } = await sb.rpc('admin_set_ban', { p_user_id: userId, p_banned: !currentlyBanned });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast(currentlyBanned ? 'تم فك الحظر' : 'تم حظر المستخدم', 'success');
+  switchAdminTab('users');
+}
+
+async function deleteUserAccount(userId, username){
+  if(!confirm(`متأكد إنك عايز تمسح حساب @${username} نهائيًا؟ الإجراء ده مينفعش يترجع.`)) return;
+  try{
+    const { data:{ session } } = await sb.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/admin-user-actions`, {
+      method:'POST',
+      headers:{ 'Authorization':`Bearer ${session.access_token}`, 'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json' },
+      body: JSON.stringify({ action:'delete', target_user_id: userId })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'فشل الحذف');
+    toast('تم حذف الحساب نهائيًا', 'success');
+    switchAdminTab('users');
+  }catch(e){ toast('خطأ: '+e.message, 'error'); }
 }
 
 async function reviewRoom(roomId, status){
@@ -1015,12 +1224,22 @@ async function reviewRoom(roomId, status){
   if(error){ toast('خطأ: '+error.message, 'error'); return; }
   toast(status==='approved'?'تم قبول الغرفة':'تم رفض الغرفة', 'success');
   switchAdminTab('rooms');
+  checkAdminBadge();
 }
 
 async function reviewReport(reportId, status){
   const { error } = await sb.from('reports').update({ status, reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq('id', reportId);
   if(error){ toast('خطأ: '+error.message, 'error'); return; }
   toast('تم تحديث البلاغ', 'success');
+  switchAdminTab('reports');
+}
+
+async function removeReportedContent(reportId, targetType, targetId){
+  if(!confirm('هتحذف المحتوى المُبلّغ عنه ده نهائيًا من الموقع؟')) return;
+  const { error: rpcError } = await sb.rpc('admin_remove_reported_content', { p_target_type: targetType, p_target_id: targetId });
+  if(rpcError){ toast('خطأ: '+rpcError.message, 'error'); return; }
+  await sb.from('reports').update({ status:'actioned', reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq('id', reportId);
+  toast('تم حذف المحتوى', 'success');
   switchAdminTab('reports');
 }
 
@@ -1036,25 +1255,76 @@ async function checkNotifications(){
   document.getElementById('notifDot').style.display = count > 0 ? 'block' : 'none';
 }
 
+let lastNotifications = [];
 async function toggleNotifications(){
-  const { data: notifs } = await sb.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at',{ascending:false}).limit(10);
-  if(!notifs || !notifs.length){ toast('مفيش إشعارات جديدة'); return; }
-  alert(notifs.map(n=>n.content).join('\n\n'));
+  const panel = document.getElementById('notifPanel');
+  if(panel.style.display==='block'){ panel.style.display='none'; return; }
+  const { data: notifs } = await sb.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at',{ascending:false}).limit(20);
+  lastNotifications = notifs || [];
+  if(!lastNotifications.length){
+    panel.innerHTML = `<div style="padding:16px;color:var(--ink-faint);font-size:13px;text-align:center">مفيش إشعارات</div>`;
+  }else{
+    panel.innerHTML = lastNotifications.map(n=>`
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;${n.is_read?'opacity:.6':''}" onclick="handleNotificationClick('${n.id}')">
+        <div style="font-size:13px">${escapeHtml(n.content)}</div>
+        <div style="font-size:11px;color:var(--ink-faint);font-family:var(--font-mono);margin-top:3px">${timeAgo(n.created_at)}</div>
+      </div>`).join('');
+  }
+  panel.style.display='block';
   await sb.from('notifications').update({ is_read:true }).eq('user_id', currentUser.id);
   checkNotifications();
+  if(['owner','super_admin','admin','moderator'].includes(currentProfile.role)) checkAdminBadge();
+}
+
+function handleNotificationClick(id){
+  const n = lastNotifications.find(x=>x.id===id);
+  document.getElementById('notifPanel').style.display='none';
+  if(!n) return;
+  if(n.type==='system' && n.content.includes('طلب غرفة')){
+    nav('admin');
+    setTimeout(()=>switchAdminTab('rooms'), 50);
+  }else if(n.type==='room_approved' || n.type==='room_rejected'){
+    nav('rooms');
+  }
 }
 
 /* ================= SEARCH ================= */
 let searchTimeout;
 function handleSearch(q){
   clearTimeout(searchTimeout);
-  if(!q.trim()) return;
+  const box = document.getElementById('searchResults');
+  if(!q.trim()){ box.style.display='none'; return; }
   searchTimeout = setTimeout(async ()=>{
-    const { data: posts } = await sb.from('posts').select('id, content').textSearch('search_vector', q, {config:'arabic'}).limit(5);
-    const { data: articles } = await sb.from('articles').select('id, title').textSearch('search_vector', q, {config:'arabic'}).limit(5);
-    const total = (posts?.length||0) + (articles?.length||0);
-    toast(`لقينا ${total} نتيجة لـ "${q}"`);
-  }, 600);
+    const [{data:users}, {data:posts}, {data:articles}] = await Promise.all([
+      sb.from('profiles').select('id, username, full_name, avatar_file_id').or(`username.ilike.%${q}%,full_name.ilike.%${q}%`).limit(5),
+      sb.from('posts').select('id, content').textSearch('search_vector', q, {config:'arabic', type:'plain'}).eq('is_removed', false).limit(5),
+      sb.from('articles').select('id, title').textSearch('search_vector', q, {config:'arabic', type:'plain'}).eq('is_draft', false).limit(5),
+    ]);
+    const noResults = !(users?.length || posts?.length || articles?.length);
+    if(noResults){
+      box.innerHTML = `<div style="padding:16px;color:var(--ink-faint);font-size:13px;text-align:center">مفيش نتائج لـ "${escapeHtml(q)}"</div>`;
+      box.style.display='block'; return;
+    }
+    let html = '';
+    if(users?.length){
+      html += `<div style="padding:8px 14px;font-size:11px;color:var(--ink-faint);font-family:var(--font-mono)">مستخدمين</div>`;
+      html += users.map(u=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer" onmousedown="viewProfile('${u.id}')">
+          <div class="avatar" style="width:30px;height:30px;font-size:12px">${(u.username||'?')[0].toUpperCase()}</div>
+          <div><div style="font-size:13px;font-weight:600">${escapeHtml(u.full_name||u.username)}</div><div style="font-size:11px;color:var(--ink-faint)">@${escapeHtml(u.username)}</div></div>
+        </div>`).join('');
+    }
+    if(posts?.length){
+      html += `<div style="padding:8px 14px;font-size:11px;color:var(--ink-faint);font-family:var(--font-mono);border-top:1px solid var(--border)">منشورات</div>`;
+      html += posts.map(p=>`<div style="padding:8px 14px;font-size:13px;color:var(--ink-dim)">${escapeHtml((p.content||'').slice(0,70))}</div>`).join('');
+    }
+    if(articles?.length){
+      html += `<div style="padding:8px 14px;font-size:11px;color:var(--ink-faint);font-family:var(--font-mono);border-top:1px solid var(--border)">مقالات</div>`;
+      html += articles.map(a=>`<div style="padding:8px 14px;font-size:13px;color:var(--ink-dim);cursor:pointer" onmousedown="nav('articles')">${escapeHtml(a.title)}</div>`).join('');
+    }
+    box.innerHTML = html;
+    box.style.display='block';
+  }, 400);
 }
 
 /* ================= AI ASSISTANT ================= */
