@@ -24,6 +24,22 @@
   --font-body:'IBM Plex Sans Arabic', sans-serif;
   --font-mono:'JetBrains Mono', monospace;
 }
+body.light-mode{
+  --bg:#F3F5F9;
+  --bg-elevated:#FFFFFF;
+  --surface:#EBEEF3;
+  --surface-hover:#E1E5EC;
+  --border:#D7DCE5;
+  --ink:#161B26;
+  --ink-dim:#525C70;
+  --ink-faint:#8891A3;
+  --amber:#3D74E0;
+  --amber-dim:#2C5BC2;
+  --teal:#5C6B85;
+  --red:#D6473F;
+}
+body.light-mode .terminal-line.out{color:var(--ink-faint);}
+body.light-mode .btn-primary{color:#fff;}
 *{box-sizing:border-box; margin:0; padding:0;}
 body{
   background:var(--bg); color:var(--ink); font-family:var(--font-body);
@@ -296,7 +312,22 @@ button{font-family:var(--font-body); cursor:pointer;}
 .admin-tab{padding:10px 16px; font-size:13px; color:var(--ink-dim); border-bottom:2px solid transparent; cursor:pointer;}
 .admin-tab.active{color:var(--amber); border-color:var(--amber);}
 
-.profile-header{background:var(--bg-elevated); border:1px solid var(--border); border-radius:14px; padding:24px; margin-bottom:20px;}
+.profile-header{background:var(--bg-elevated); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:20px;}
+.profile-cover{height:140px; background:linear-gradient(135deg, var(--surface), var(--bg-elevated)); background-size:cover; background-position:center; position:relative; cursor:pointer;}
+.profile-cover .cover-hint{position:absolute; bottom:8px; left:8px; font-size:11px; background:rgba(0,0,0,.5); color:#fff; padding:3px 8px; border-radius:6px;}
+.profile-body{padding:24px;}
+.social-links{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+.social-links a{font-size:12px; background:var(--surface); border:1px solid var(--border); padding:5px 10px; border-radius:6px; color:var(--ink-dim);}
+.social-links a:hover{color:var(--amber);}
+.portfolio-grid, .gallery-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px;}
+.portfolio-card{background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; padding:14px;}
+.portfolio-card h4{font-size:14px; margin-bottom:4px;}
+.portfolio-card p{font-size:12px; color:var(--ink-dim);}
+.portfolio-card a{font-size:11px; color:var(--amber);}
+.gallery-thumb{width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; border:1px solid var(--border);}
+.profile-tabs{display:flex; gap:6px; margin-bottom:16px; border-bottom:1px solid var(--border);}
+.profile-tab{padding:8px 14px; font-size:13px; color:var(--ink-dim); border-bottom:2px solid transparent; cursor:pointer;}
+.profile-tab.active{color:var(--amber); border-color:var(--amber);}
 .profile-top{display:flex; align-items:center; gap:16px; margin-bottom:16px;}
 .avatar-lg{width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,var(--amber),var(--teal)); display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:700; color:#0B0E14;}
 .profile-stats{display:flex; gap:24px; margin-top:14px; font-family:var(--font-mono);}
@@ -365,6 +396,7 @@ button{font-family:var(--font-body); cursor:pointer;}
   <nav class="landing-nav">
     <div class="logo">Dev<span class="bracket">::</span>Verse</div>
     <div class="landing-nav-actions">
+      <button class="icon-btn" id="themeToggleBtnLanding" onclick="toggleTheme()" title="الوضع الفاتح/الليلي">🌙</button>
       <button class="btn" onclick="openAuth('login')">تسجيل الدخول</button>
       <button class="btn btn-primary" onclick="openAuth('signup')">إنشاء حساب</button>
     </div>
@@ -529,6 +561,7 @@ button{font-family:var(--font-body); cursor:pointer;}
         <div id="searchResults" style="display:none; position:absolute; top:110%; right:0; left:0; background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; max-height:400px; overflow-y:auto; z-index:50; box-shadow:0 12px 30px rgba(0,0,0,.4)"></div>
       </div>
       <div class="topbar-actions">
+        <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="الوضع الفاتح/الليلي">🌙</button>
         <div style="position:relative">
           <button class="icon-btn" onclick="toggleNotifications()">🔔<span class="notif-dot" id="notifDot" style="display:none"></span></button>
           <div id="notifPanel" style="display:none; position:absolute; top:110%; left:0; width:320px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; max-height:420px; overflow-y:auto; z-index:60; box-shadow:0 12px 30px rgba(0,0,0,.4)"></div>
@@ -1282,14 +1315,16 @@ async function openRoomChat(roomId, roomName){
         <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:600;display:flex;align-items:center;gap:10px">
           <button class="btn btn-sm" onclick="nav('rooms')">→</button> ${escapeHtml(roomName)}
         </div>
+        <div id="pinnedBanner"></div>
         <div class="chat-messages" id="chatMessages"></div>
+        <div id="typingIndicator" style="padding:4px 20px;font-size:12px;color:var(--ink-faint);min-height:20px"></div>
         <div id="replyBar" style="display:none;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border-top:1px solid var(--border);font-size:12px;color:var(--ink-dim)">
           <span id="replyBarText" style="flex:1"></span>
           <button class="icon-btn" style="width:24px;height:24px" onclick="cancelReply()">×</button>
         </div>
         <div class="chat-input-bar">
           <label class="file-label">📎<input type="file" id="chatFile" style="display:none" onchange="sendChatFile(this)"></label>
-          <input type="text" id="chatInput" placeholder="اكتب رسالة... (اضغط على رسالة عشان ترد عليها)" onkeydown="if(event.key==='Enter')sendChatMessage()">
+          <input type="text" id="chatInput" placeholder="اكتب رسالة... (اضغط على رسالة عشان ترد عليها)" oninput="broadcastTyping()" onkeydown="if(event.key==='Enter')sendChatMessage()">
           <button class="btn btn-primary btn-sm" onclick="sendChatMessage()">إرسال</button>
         </div>
       </div>
@@ -1297,6 +1332,7 @@ async function openRoomChat(roomId, roomName){
   loadRoomsRail();
   loadRoomMessages(roomId);
   subscribeToRoom(roomId);
+  subscribeToTyping(roomId);
 }
 
 async function loadRoomsRail(){
@@ -1310,6 +1346,23 @@ let replyingTo = null;
 async function loadRoomMessages(roomId){
   const { data: msgs } = await sb.from('chat_messages').select('*, profiles!sender_id(username), reply:reply_to_id(id, content, profiles!sender_id(username))').eq('room_id', roomId).order('created_at').limit(100);
   renderMessages(msgs||[]);
+  renderPinnedBanner(msgs||[]);
+}
+
+function renderPinnedBanner(msgs){
+  const banner = document.getElementById('pinnedBanner');
+  if(!banner) return;
+  const pinned = msgs.filter(m=>m.is_pinned && !m.is_removed);
+  if(!pinned.length){ banner.innerHTML=''; return; }
+  const last = pinned[pinned.length-1];
+  banner.innerHTML = `<div style="padding:8px 20px;background:rgba(79,143,255,.08);border-bottom:1px solid var(--border);font-size:12px;display:flex;align-items:center;gap:8px">
+    <span>📌</span><span style="flex:1">${escapeHtml((last.content||'').slice(0,80))}</span>
+    <span style="cursor:pointer;color:var(--ink-faint)" onclick="togglePinMessage('${last.id}', false)">إلغاء التثبيت</span>
+  </div>`;
+}
+
+function canModerateRoom(){
+  return ['owner','super_admin','admin','moderator'].includes(currentProfile.role) || (activeRoomCreatorId && activeRoomCreatorId === currentUser.id);
 }
 
 function canDeleteMessage(m){
@@ -1323,8 +1376,12 @@ function renderMessages(msgs){
   if(!box) return;
   box.innerHTML = msgs.map(m=>`
     <div class="msg ${m.sender_id===currentUser.id?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setReplyTarget('${m.id}', '${escapeHtml((m.profiles?.username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||'').slice(0,60)).replace(/'/g,"\\'")}')"`}>
-      <div class="sender"><span style="cursor:pointer" onclick="event.stopPropagation();viewProfile('${m.sender_id}')">@${m.profiles?.username||''}</span> <span style="color:var(--ink-faint);font-weight:400">· ${timeAgo(m.created_at)}</span>
-        ${(!m.is_removed && canDeleteMessage(m)) ? `<span style="float:left;cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteMessage('${m.id}')" title="حذف الرسالة">🗑️</span>` : ''}
+      <div class="sender"><span style="cursor:pointer" onclick="event.stopPropagation();viewProfile('${m.sender_id}')">@${m.profiles?.username||''}</span> <span style="color:var(--ink-faint);font-weight:400">· ${timeAgo(m.created_at)}${m.edited_at?' · (معدّلة)':''}</span>
+        ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
+          ${canModerateRoom() ? `<span style="cursor:pointer" onclick="event.stopPropagation();togglePinMessage('${m.id}', ${!m.is_pinned})" title="${m.is_pinned?'إلغاء التثبيت':'تثبيت'}">${m.is_pinned?'📌':'📍'}</span>` : ''}
+          ${m.sender_id===currentUser.id ? `<span style="cursor:pointer" onclick="event.stopPropagation();editMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل">✏️</span>` : ''}
+          ${canDeleteMessage(m) ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteMessage('${m.id}')" title="حذف الرسالة">🗑️</span>` : ''}
+        </span>` : ''}
       </div>
       ${m.is_removed ? `<i style="color:var(--ink-faint)">تم حذف هذه الرسالة</i>` : `
         ${m.reply ? `<div style="border-right:3px solid var(--amber);padding-right:8px;margin-bottom:6px;opacity:.75;font-size:12px">@${m.reply.profiles?.username||''}: ${escapeHtml((m.reply.content||'').slice(0,50))}</div>` : ''}
@@ -1332,6 +1389,20 @@ function renderMessages(msgs){
       `}
     </div>`).join('');
   box.scrollTop = box.scrollHeight;
+}
+
+async function togglePinMessage(msgId, pinTo){
+  const { error } = await sb.from('chat_messages').update({ is_pinned: pinTo }).eq('id', msgId);
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  loadRoomMessages(activeRoomId);
+}
+
+async function editMessage(msgId, currentContent){
+  const newContent = prompt('عدّل رسالتك:', currentContent);
+  if(newContent===null || !newContent.trim() || newContent===currentContent) return;
+  const { error } = await sb.from('chat_messages').update({ content: newContent.trim(), edited_at: new Date().toISOString() }).eq('id', msgId);
+  if(error){ toast('تعذر التعديل: '+error.message, 'error'); return; }
+  loadRoomMessages(activeRoomId);
 }
 
 async function deleteMessage(msgId){
@@ -1358,6 +1429,37 @@ function subscribeToRoom(roomId){
     .on('postgres_changes', { event:'INSERT', schema:'public', table:'chat_messages', filter:`room_id=eq.${roomId}` }, ()=>{
       loadRoomMessages(roomId);
     }).subscribe();
+}
+
+let typingChannel = null;
+let typingTimeout = null;
+let typingUsers = new Map();
+function subscribeToTyping(roomId){
+  if(typingChannel) sb.removeChannel(typingChannel);
+  typingUsers = new Map();
+  typingChannel = sb.channel('typing-'+roomId)
+    .on('broadcast', { event:'typing' }, (payload)=>{
+      const { user_id, username } = payload.payload;
+      if(user_id === currentUser.id) return;
+      typingUsers.set(user_id, username);
+      renderTypingIndicator();
+      clearTimeout(typingUsers.get('_timeout_'+user_id));
+      const t = setTimeout(()=>{ typingUsers.delete(user_id); renderTypingIndicator(); }, 3000);
+      typingUsers.set('_timeout_'+user_id, t);
+    }).subscribe();
+}
+
+function renderTypingIndicator(){
+  const el = document.getElementById('typingIndicator');
+  if(!el) return;
+  const names = [...typingUsers.entries()].filter(([k])=>!k.startsWith('_timeout_')).map(([,v])=>v);
+  el.textContent = names.length ? `${names.join('، ')} بيكتب...` : '';
+}
+
+function broadcastTyping(){
+  if(!typingChannel || !activeRoomId) return;
+  clearTimeout(typingTimeout);
+  typingChannel.send({ type:'broadcast', event:'typing', payload:{ user_id: currentUser.id, username: currentProfile.username } });
 }
 
 async function sendChatMessage(){
@@ -1401,40 +1503,170 @@ async function renderProfile(container, userId){
     const { data: f } = await sb.from('user_follows').select('*').eq('follower_id', currentUser.id).eq('following_id', p.id).maybeSingle();
     isFollowing = !!f;
   }
+  const [{count:followers}, {count:following}] = await Promise.all([
+    sb.from('user_follows').select('*',{count:'exact',head:true}).eq('following_id', p.id),
+    sb.from('user_follows').select('*',{count:'exact',head:true}).eq('follower_id', p.id),
+  ]);
+
+  const links = [
+    p.github_url ? `<a href="${escapeHtml(p.github_url)}" target="_blank">GitHub</a>` : '',
+    p.linkedin_url ? `<a href="${escapeHtml(p.linkedin_url)}" target="_blank">LinkedIn</a>` : '',
+    p.portfolio_url ? `<a href="${escapeHtml(p.portfolio_url)}" target="_blank">Portfolio</a>` : '',
+    p.website_url ? `<a href="${escapeHtml(p.website_url)}" target="_blank">Website</a>` : '',
+  ].filter(Boolean).join('');
 
   container.innerHTML = `
     <div class="view">
       <div class="profile-header">
-        <div class="profile-top">
-          <div class="avatar-lg" id="profileAvatarLg" style="position:relative;cursor:${isOwn?'pointer':'default'}" ${isOwn?'onclick="document.getElementById(\'avatarUploadInput\').click()"':''}>${(p.username||'?')[0].toUpperCase()}</div>
-          <div>
-            <h2 style="font-family:var(--font-display);font-size:22px">${escapeHtml(p.full_name||p.username)}</h2>
-            <div style="color:var(--ink-faint);font-family:var(--font-mono);font-size:13px">@${p.username} · ${p.role}</div>
+        <div class="profile-cover" id="profileCover" ${isOwn?'onclick="document.getElementById(\'coverUploadInput\').click()"':''}>
+          ${isOwn ? `<span class="cover-hint">📷 غيّر صورة الغلاف</span><input type="file" id="coverUploadInput" accept="image/*" style="display:none" onchange="uploadCover(this)">` : ''}
+        </div>
+        <div class="profile-body">
+          <div class="profile-top">
+            <div class="avatar-lg" id="profileAvatarLg" style="position:relative;cursor:${isOwn?'pointer':'default'}" ${isOwn?'onclick="document.getElementById(\'avatarUploadInput\').click()"':''}>${(p.username||'?')[0].toUpperCase()}</div>
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:22px">${escapeHtml(p.full_name||p.username)}</h2>
+              <div style="color:var(--ink-faint);font-family:var(--font-mono);font-size:13px">@${p.username} · ${p.role}</div>
+            </div>
+            ${isOwn ? `<input type="file" id="avatarUploadInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)">` : ''}
           </div>
-          ${isOwn ? `<input type="file" id="avatarUploadInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)">` : ''}
+          <div style="color:var(--ink-dim);font-size:14px">${escapeHtml(p.bio||(isOwn?'مفيش نبذة لسه — اضغط تعديل عشان تضيف واحدة':''))}</div>
+          ${links ? `<div class="social-links">${links}</div>` : ''}
+          <div class="profile-stats">
+            <div><div class="n">${p.xp}</div><div class="l">XP</div></div>
+            <div><div class="n">${p.level}</div><div class="l">Level</div></div>
+            <div><div class="n">${p.reputation}</div><div class="l">Reputation</div></div>
+            <div><div class="n">${followers||0}</div><div class="l">متابِع</div></div>
+            <div><div class="n">${following||0}</div><div class="l">يتابع</div></div>
+          </div>
+          <div style="margin-top:12px">${(p.skills||[]).map(s=>`<span class="tag">${escapeHtml(s)}</span>`).join('') || '<span style="color:var(--ink-faint);font-size:12px">مفيش مهارات مضافة</span>'}</div>
+          ${isOwn
+            ? `<button class="btn btn-sm" style="margin-top:16px" onclick="editProfile()">تعديل الملف الشخصي</button>`
+            : `<button class="btn btn-sm ${isFollowing?'':'btn-primary'}" style="margin-top:16px" onclick="toggleFollow('${p.id}', ${isFollowing})">${isFollowing?'إلغاء المتابعة':'متابعة'}</button>
+               <button class="btn btn-sm" style="margin-top:16px" onclick="openDmConversation('${p.id}','${escapeHtml(p.username)}')">✉️ رسالة</button>`}
         </div>
-        <div style="color:var(--ink-dim);font-size:14px">${escapeHtml(p.bio||(isOwn?'مفيش نبذة لسه — اضغط تعديل عشان تضيف واحدة':''))}</div>
-        <div class="profile-stats">
-          <div><div class="n">${p.xp}</div><div class="l">XP</div></div>
-          <div><div class="n">${p.level}</div><div class="l">Level</div></div>
-          <div><div class="n">${p.reputation}</div><div class="l">Reputation</div></div>
-        </div>
-        <div style="margin-top:12px">${(p.skills||[]).map(s=>`<span class="tag">${escapeHtml(s)}</span>`).join('') || '<span style="color:var(--ink-faint);font-size:12px">مفيش مهارات مضافة</span>'}</div>
-        ${isOwn
-          ? `<button class="btn btn-sm" style="margin-top:16px" onclick="editProfile()">تعديل الملف الشخصي</button>`
-          : `<button class="btn btn-sm ${isFollowing?'':'btn-primary'}" style="margin-top:16px" onclick="toggleFollow('${p.id}', ${isFollowing})">${isFollowing?'إلغاء المتابعة':'متابعة'}</button>
-             <button class="btn btn-sm" style="margin-top:16px" onclick="openDmConversation('${p.id}','${escapeHtml(p.username)}')">✉️ رسالة</button>`}
       </div>
-      <div class="view-header"><h1 style="font-size:18px">${isOwn?'منشوراتي':'المنشورات'}</h1></div>
-      <div id="myPostsList"><div class="empty-state">جاري التحميل...</div></div>
+      <div class="profile-tabs">
+        <div class="profile-tab active" data-ptab="posts" onclick="switchProfileTab('posts','${p.id}',${isOwn})">المنشورات</div>
+        <div class="profile-tab" data-ptab="portfolio" onclick="switchProfileTab('portfolio','${p.id}',${isOwn})">معرض المشاريع</div>
+        <div class="profile-tab" data-ptab="gallery" onclick="switchProfileTab('gallery','${p.id}',${isOwn})">معرض الصور</div>
+        <div class="profile-tab" data-ptab="activity" onclick="switchProfileTab('activity','${p.id}',${isOwn})">النشاط</div>
+      </div>
+      <div id="profileTabContent"><div class="empty-state">جاري التحميل...</div></div>
     </div>`;
 
   if(p.avatar_file_id) loadAvatarInto('profileAvatarLg', p.avatar_file_id);
+  if(p.cover_file_id) loadCoverInto('profileCover', p.cover_file_id);
+  switchProfileTab('posts', p.id, isOwn);
+}
 
-  const { data: posts } = await sb.from('posts').select('*').eq('author_id', p.id).eq('is_removed', false).order('created_at', {ascending:false});
-  document.getElementById('myPostsList').innerHTML = (posts&&posts.length) ? posts.map(post=>`
-    <div class="post-card"><div class="post-content">${escapeHtml(post.content||'')}</div><div class="meta" style="font-family:var(--font-mono);font-size:12px;color:var(--ink-faint)">${timeAgo(post.created_at)}</div></div>
-  `).join('') : `<div class="empty-state">${isOwn?'لسه معملتش أي منشورات':'مفيش منشورات لسه'}</div>`;
+async function loadCoverInto(elId, fileId){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const cached = getCachedFile(fileId);
+  if(cached){ el.style.backgroundImage = `url(${cached})`; el.style.backgroundSize='cover'; el.style.backgroundPosition='center'; return; }
+  const url = await getTelegramFileBlobUrl(fileId);
+  if(url) { el.style.backgroundImage = `url(${url})`; el.style.backgroundSize='cover'; el.style.backgroundPosition='center'; }
+}
+
+async function uploadCover(input){
+  const file = input.files[0];
+  if(!file) return;
+  try{
+    const up = await uploadToTelegram(file, 'photo');
+    const { error } = await sb.from('profiles').update({ cover_file_id: up.file_id }).eq('id', currentUser.id);
+    if(error) throw error;
+    currentProfile.cover_file_id = up.file_id;
+    toast('تم تحديث صورة الغلاف', 'success');
+    loadCoverInto('profileCover', up.file_id);
+  }catch(e){ toast('فشل رفع صورة الغلاف: '+e.message, 'error'); }
+}
+
+async function switchProfileTab(tab, userId, isOwn){
+  document.querySelectorAll('.profile-tab').forEach(t=>t.classList.toggle('active', t.dataset.ptab===tab));
+  const el = document.getElementById('profileTabContent');
+  el.innerHTML = '<div class="empty-state">جاري التحميل...</div>';
+
+  if(tab==='posts'){
+    const { data: posts } = await sb.from('posts').select('*').eq('author_id', userId).eq('is_removed', false).order('created_at', {ascending:false});
+    el.innerHTML = (posts&&posts.length) ? posts.map(post=>`
+      <div class="post-card"><div class="post-content">${escapeHtml(post.content||'')}</div><div class="meta" style="font-family:var(--font-mono);font-size:12px;color:var(--ink-faint)">${timeAgo(post.created_at)}</div></div>
+    `).join('') : `<div class="empty-state">${isOwn?'لسه معملتش أي منشورات':'مفيش منشورات لسه'}</div>`;
+
+  } else if(tab==='portfolio'){
+    const { data: items } = await sb.from('portfolio_items').select('*').eq('user_id', userId).order('sort_order');
+    el.innerHTML = (isOwn ? `<button class="btn btn-sm" style="margin-bottom:14px" onclick="addPortfolioItem('${userId}')">+ إضافة مشروع</button>` : '') +
+      `<div class="portfolio-grid">${(items||[]).map(it=>`
+        <div class="portfolio-card">
+          <h4>${escapeHtml(it.title)}</h4>
+          <p>${escapeHtml(it.description||'')}</p>
+          ${it.project_url?`<a href="${escapeHtml(it.project_url)}" target="_blank">عرض المشروع ↗</a>`:''}
+          ${isOwn?`<div style="margin-top:8px"><span style="font-size:11px;color:var(--red);cursor:pointer" onclick="deletePortfolioItem('${it.id}','${userId}')">حذف</span></div>`:''}
+        </div>`).join('') || '<div class="empty-state">لسه مفيش مشاريع مضافة</div>'}</div>`;
+
+  } else if(tab==='gallery'){
+    const { data: items } = await sb.from('gallery_items').select('*').eq('user_id', userId).order('created_at',{ascending:false});
+    el.innerHTML = (isOwn ? `<button class="btn btn-sm" style="margin-bottom:14px" onclick="document.getElementById('galleryUploadInput').click()">+ رفع صورة</button><input type="file" id="galleryUploadInput" accept="image/*" style="display:none" onchange="addGalleryItem(this,'${userId}')">` : '') +
+      `<div class="gallery-grid" id="galleryGrid">${(items&&items.length) ? items.map(it=>`<div id="gal-${it.id}"></div>`).join('') : '<div class="empty-state">لسه مفيش صور</div>'}</div>`;
+    (items||[]).forEach(it=>loadGalleryThumb(it.id, it.image_file_id, isOwn));
+
+  } else if(tab==='activity'){
+    const [{data:posts},{data:articles}] = await Promise.all([
+      sb.from('posts').select('id, content, created_at').eq('author_id', userId).eq('is_removed', false).order('created_at',{ascending:false}).limit(15),
+      sb.from('articles').select('id, title, created_at').eq('author_id', userId).eq('is_draft', false).order('created_at',{ascending:false}).limit(15),
+    ]);
+    const events = [
+      ...(posts||[]).map(p=>({type:'post', time:p.created_at, text:'نشر: '+(p.content||'').slice(0,60)})),
+      ...(articles||[]).map(a=>({type:'article', time:a.created_at, text:'كتب مقال: '+a.title})),
+    ].sort((a,b)=>new Date(b.time)-new Date(a.time));
+    el.innerHTML = events.length ? events.map(e=>`
+      <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <span>${e.type==='post'?'📝':'📰'}</span><div style="flex:1">${escapeHtml(e.text)}</div><span style="color:var(--ink-faint);font-size:11px;font-family:var(--font-mono)">${timeAgo(e.time)}</span>
+      </div>`).join('') : `<div class="empty-state">لسه مفيش نشاط</div>`;
+  }
+}
+
+async function addPortfolioItem(userId){
+  const title = prompt('اسم المشروع:');
+  if(!title) return;
+  const description = prompt('وصف قصير:') || '';
+  const project_url = prompt('رابط المشروع (اختياري):') || null;
+  const { error } = await sb.from('portfolio_items').insert({ user_id: currentUser.id, title, description, project_url });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم إضافة المشروع', 'success');
+  switchProfileTab('portfolio', userId, true);
+}
+
+async function deletePortfolioItem(itemId, userId){
+  if(!confirm('تحذف المشروع ده؟')) return;
+  await sb.from('portfolio_items').delete().eq('id', itemId);
+  switchProfileTab('portfolio', userId, true);
+}
+
+async function addGalleryItem(input, userId){
+  const file = input.files[0];
+  if(!file) return;
+  try{
+    const up = await uploadToTelegram(file, 'photo');
+    const { error } = await sb.from('gallery_items').insert({ user_id: currentUser.id, image_file_id: up.file_id });
+    if(error) throw error;
+    toast('تمت الإضافة', 'success');
+    switchProfileTab('gallery', userId, true);
+  }catch(e){ toast('فشل الرفع: '+e.message, 'error'); }
+}
+
+async function loadGalleryThumb(itemId, fileId, isOwn){
+  const url = getCachedFile(fileId) || await getTelegramFileBlobUrl(fileId);
+  if(url && !getCachedFile(fileId)){ /* post/gallery images aren't persisted to cache to save quota, only fetched */ }
+  const holder = document.getElementById(`gal-${itemId}`);
+  if(!holder || !url) return;
+  holder.innerHTML = `<img class="gallery-thumb" src="${url}">${isOwn?`<div style="text-align:center;font-size:11px;color:var(--red);cursor:pointer;margin-top:2px" onclick="deleteGalleryItem('${itemId}')">حذف</div>`:''}`;
+}
+
+async function deleteGalleryItem(itemId){
+  if(!confirm('تحذف الصورة دي؟')) return;
+  await sb.from('gallery_items').delete().eq('id', itemId);
+  document.getElementById(`gal-${itemId}`)?.parentElement?.removeChild(document.getElementById(`gal-${itemId}`));
 }
 
 async function uploadAvatar(input){
@@ -1465,9 +1697,12 @@ function editProfile(){
   if(bio===null) return;
   const skillsStr = prompt('مهاراتك (افصل بفاصلة):', (currentProfile.skills||[]).join(', ')) || '';
   const skills = skillsStr.split(',').map(s=>s.trim()).filter(Boolean);
-  sb.from('profiles').update({ bio, skills }).eq('id', currentUser.id).then(({error})=>{
+  const github_url = prompt('رابط GitHub (اختياري):', currentProfile.github_url||'') || null;
+  const linkedin_url = prompt('رابط LinkedIn (اختياري):', currentProfile.linkedin_url||'') || null;
+  const portfolio_url = prompt('رابط Portfolio (اختياري):', currentProfile.portfolio_url||'') || null;
+  sb.from('profiles').update({ bio, skills, github_url, linkedin_url, portfolio_url }).eq('id', currentUser.id).then(({error})=>{
     if(error){ toast('خطأ: '+error.message, 'error'); return; }
-    currentProfile.bio = bio; currentProfile.skills = skills;
+    Object.assign(currentProfile, { bio, skills, github_url, linkedin_url, portfolio_url });
     toast('تم تحديث الملف الشخصي', 'success');
     nav('profile');
   });
@@ -1838,6 +2073,24 @@ function timeAgo(iso){
 }
 
 /* ================= BOOTSTRAP ================= */
+/* ================= THEME ================= */
+function toggleTheme(){
+  const isLight = document.body.classList.toggle('light-mode');
+  try{ localStorage.setItem('dv-theme', isLight ? 'light' : 'dark'); }catch(e){}
+  const icon = isLight ? '☀️' : '🌙';
+  const btn1 = document.getElementById('themeToggleBtn'); if(btn1) btn1.textContent = icon;
+  const btn2 = document.getElementById('themeToggleBtnLanding'); if(btn2) btn2.textContent = icon;
+}
+(function applySavedTheme(){
+  let saved = null;
+  try{ saved = localStorage.getItem('dv-theme'); }catch(e){}
+  if(saved === 'light'){
+    document.body.classList.add('light-mode');
+    const btn1 = document.getElementById('themeToggleBtn'); if(btn1) btn1.textContent = '☀️';
+    const btn2 = document.getElementById('themeToggleBtnLanding'); if(btn2) btn2.textContent = '☀️';
+  }
+})();
+
 loadCategoriesForLanding();
 async function loadCategoriesForLanding(){
   const { data } = await sb.from('categories').select('*').order('sort_order');
