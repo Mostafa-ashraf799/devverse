@@ -166,6 +166,21 @@ button{font-family:var(--font-body); cursor:pointer;}
 }
 .field input:focus, .field textarea:focus, .field select:focus{outline:2px solid var(--amber); border-color:var(--amber);}
 .modal-error{color:var(--red); font-size:13px; margin-bottom:12px; display:none;}
+
+/* ---------- Upload Progress Modal ---------- */
+.upload-modal{
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:14px;
+  padding:28px; width:340px; max-width:90vw; text-align:center;
+}
+.upload-modal .fname{font-size:13px; color:var(--ink-dim); margin-bottom:16px; word-break:break-all;}
+.upload-progress-track{
+  width:100%; height:10px; background:var(--surface); border-radius:6px; overflow:hidden; margin-bottom:10px;
+}
+.upload-progress-fill{
+  height:100%; width:0%; background:var(--amber); border-radius:6px; transition:width .15s ease;
+}
+.upload-progress-pct{font-family:var(--font-mono, monospace); font-size:18px; font-weight:700; color:var(--amber);}
+.upload-progress-status{font-size:12px; color:var(--ink-faint); margin-top:6px;}
 .modal-switch{text-align:center; margin-top:16px; font-size:13px; color:var(--ink-dim);}
 .modal-switch a{color:var(--amber); font-weight:600;}
 .modal-close{position:absolute; top:16px; left:16px; color:var(--ink-faint); font-size:20px; background:none; border:none;}
@@ -303,6 +318,21 @@ button{font-family:var(--font-body); cursor:pointer;}
 .msg.mine .sender span{color:rgba(255,255,255,.75) !important;}
 .chat-input-bar{display:flex; gap:8px; padding:16px; border-top:1px solid var(--border); background:var(--bg-elevated);}
 .chat-input-bar input{flex:1; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:10px 16px; color:var(--ink);}
+
+.msg-row{display:flex; align-items:flex-end; gap:8px; max-width:100%;}
+.msg-row.mine{flex-direction:row-reverse; align-self:flex-start;}
+.msg-avatar{width:28px; height:28px; border-radius:50%; flex-shrink:0; cursor:pointer;
+  background:linear-gradient(135deg,var(--amber),var(--teal)); display:flex; align-items:center; justify-content:center;
+  font-weight:700; color:#0B0E14; font-size:11px;}
+.msg-media img, .msg-media video{max-width:220px; border-radius:10px; display:block; margin-top:4px;}
+.msg-voice{display:flex; align-items:center; gap:8px; min-width:180px;}
+.msg-voice audio{height:32px; max-width:190px;}
+.mic-btn{font-size:12px; color:var(--ink-faint); cursor:pointer; padding:6px 10px;}
+.mic-btn.recording{color:var(--red); animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.record-bar{display:none; align-items:center; gap:10px; padding:8px 16px; background:rgba(232,93,93,.08); border-top:1px solid var(--border); font-size:13px; color:var(--red);}
+.record-bar.active{display:flex;}
+.record-dot{width:8px; height:8px; border-radius:50%; background:var(--red); animation:pulse 1s infinite;}
 
 .empty-state{text-align:center; padding:60px 20px; color:var(--ink-faint);}
 .empty-state .icon{font-size:40px; margin-bottom:12px;}
@@ -499,8 +529,19 @@ button{font-family:var(--font-body); cursor:pointer;}
       <div class="field"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
       <button class="btn btn-primary" style="width:100%" onclick="doLogin()">دخول</button>
       <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--border)"></div>أو<div style="flex:1;height:1px;background:var(--border)"></div></div>
-      <button class="btn" style="width:100%" onclick="doGoogleAuth()">🔵 الدخول بحساب جوجل</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGoogleAuth()">🔵 الدخول بحساب جوجل</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGithubAuth()">⚫ الدخول بحساب GitHub</button>
+      <button class="btn" style="width:100%" onclick="openAuth('magic')">✉️ الدخول بلينك سحري (بدون باسورد)</button>
       <div class="modal-switch">مش عندك حساب؟ <a onclick="openAuth('signup')">إنشاء حساب</a></div>
+    </div>
+    <div id="magicForm" style="display:none">
+      <h2>الدخول بلينك سحري</h2>
+      <div class="sub">هنبعتلك لينك دخول على إيميلك، من غير باسورد</div>
+      <div class="modal-error" id="magicError"></div>
+      <div class="field"><label>اسم المستخدم</label><input type="text" id="magicUsername" placeholder="بدون مسافات (لأول مرة بس)"></div>
+      <div class="field"><label>البريد الإلكتروني</label><input type="email" id="magicEmail"></div>
+      <button class="btn btn-primary" style="width:100%" onclick="doMagicLink()">ابعت اللينك</button>
+      <div class="modal-switch">رجوع لـ <a onclick="openAuth('login')">تسجيل الدخول</a></div>
     </div>
     <div id="signupForm" style="display:none">
       <h2>إنشاء حساب</h2>
@@ -512,7 +553,9 @@ button{font-family:var(--font-body); cursor:pointer;}
       <div class="field"><label>كلمة المرور</label><input type="password" id="signupPassword" placeholder="6 أحرف على الأقل"></div>
       <button class="btn btn-primary" style="width:100%" onclick="doSignup()">إنشاء الحساب</button>
       <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--border)"></div>أو<div style="flex:1;height:1px;background:var(--border)"></div></div>
-      <button class="btn" style="width:100%" onclick="doGoogleAuth()">🔵 التسجيل بحساب جوجل</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGoogleAuth()">🔵 التسجيل بحساب جوجل</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGithubAuth()">⚫ التسجيل بحساب GitHub</button>
+      <button class="btn" style="width:100%" onclick="openAuth('magic')">✉️ التسجيل بلينك سحري (بدون باسورد)</button>
       <div class="modal-switch">عندك حساب؟ <a onclick="openAuth('login')">تسجيل الدخول</a></div>
     </div>
     <div id="confirmForm" style="display:none">
@@ -527,6 +570,17 @@ button{font-family:var(--font-body); cursor:pointer;}
   </div>
 </div>
 
+<!-- ============ UPLOAD PROGRESS MODAL ============ -->
+<div class="modal-overlay" id="uploadOverlay">
+  <div class="upload-modal">
+    <div class="fname" id="uploadFileName"></div>
+    <div class="upload-progress-track"><div class="upload-progress-fill" id="uploadProgressFill"></div></div>
+    <div class="upload-progress-pct" id="uploadProgressPct">0%</div>
+    <div class="upload-progress-status" id="uploadProgressStatus">جاري الرفع...</div>
+  </div>
+</div>
+
+
 <!-- ============ APP SHELL ============ -->
 <div id="app">
   <aside class="sidebar">
@@ -534,8 +588,8 @@ button{font-family:var(--font-body); cursor:pointer;}
     <div class="nav-section">
       <div class="nav-item active" data-view="feed" onclick="nav('feed')">🏠 الرئيسية</div>
       <div class="nav-item" data-view="articles" onclick="nav('articles')">📝 المقالات</div>
-      <div class="nav-item" data-view="rooms" onclick="nav('rooms')">💬 غرف الدردشة</div>
-      <div class="nav-item" data-view="messages" onclick="nav('messages')">✉️ الرسائل الخاصة</div>
+      <div class="nav-item" data-view="rooms" onclick="nav('rooms')">💬 غرف الدردشة <span class="badge" id="roomsBadge" style="display:none">0</span></div>
+      <div class="nav-item" data-view="messages" onclick="nav('messages')">✉️ الرسائل الخاصة <span class="badge" id="dmBadge" style="display:none">0</span></div>
       <div class="nav-item" data-view="bookmarks" onclick="nav('bookmarks')">🔖 المحفوظات</div>
       <div class="nav-item" data-view="profile" onclick="nav('profile')">👤 ملفي الشخصي</div>
       <div class="nav-item" data-view="admin" id="adminNavItem" onclick="nav('admin')" style="display:none">🛡️ لوحة التحكم <span class="badge" id="adminBadge" style="display:none">0</span></div>
@@ -574,7 +628,7 @@ button{font-family:var(--font-body); cursor:pointer;}
 
 <nav class="island-nav">
   <div class="island-item nav-item active" data-view="feed" onclick="nav('feed')"><span class="ic">🏠</span>الرئيسية</div>
-  <div class="island-item nav-item" data-view="rooms" onclick="nav('rooms')"><span class="ic">💬</span>غرف</div>
+  <div class="island-item nav-item" data-view="rooms" onclick="nav('rooms')"><span class="ic">💬</span>غرف<span class="badge" id="roomsBadgeMobile" style="display:none">0</span></div>
   <div class="island-item nav-item" data-view="articles" onclick="nav('articles')"><span class="ic">📝</span>مقالات</div>
   <div class="island-item nav-item" data-view="profile" onclick="nav('profile')"><span class="ic">👤</span>ملفي</div>
   <div class="island-item" onclick="toggleMoreSheet()"><span class="ic">⋯</span>المزيد<span class="dot" id="moreDot"></span></div>
@@ -585,7 +639,7 @@ button{font-family:var(--font-body); cursor:pointer;}
     <h2 style="font-size:18px; margin-bottom:14px">المزيد</h2>
     <div class="nav-item" onclick="toggleMoreSheet(); toggleAiPanel()" style="margin-bottom:6px">✨ المساعد الذكي</div>
     <div class="nav-item" id="adminNavItemMobile" onclick="toggleMoreSheet(); nav('admin')" style="display:none; margin-bottom:6px">🛡️ لوحة التحكم</div>
-    <div class="nav-item" onclick="toggleMoreSheet(); nav('messages')" style="margin-bottom:6px">✉️ الرسائل الخاصة</div>
+    <div class="nav-item" onclick="toggleMoreSheet(); nav('messages')" style="margin-bottom:6px">✉️ الرسائل الخاصة <span class="badge" id="dmBadgeMobile" style="display:none">0</span></div>
     <div class="nav-item" onclick="toggleMoreSheet(); nav('bookmarks')" style="margin-bottom:6px">🔖 المحفوظات</div>
     <div class="nav-label" style="margin-top:10px">الأقسام</div>
     <div id="mobileCategories" style="max-height:220px; overflow-y:auto; margin-bottom:14px"></div>
@@ -673,6 +727,7 @@ function openAuth(which){
   document.getElementById('loginForm').style.display = which==='login' ? 'block':'none';
   document.getElementById('signupForm').style.display = which==='signup' ? 'block':'none';
   document.getElementById('confirmForm').style.display = which==='confirm' ? 'block':'none';
+  document.getElementById('magicForm').style.display = which==='magic' ? 'block':'none';
 }
 function closeAuth(){ document.getElementById('authOverlay').classList.remove('active'); }
 
@@ -724,9 +779,35 @@ async function doGoogleAuth(){
   if(error){ toast('تعذر بدء الدخول بجوجل: '+error.message, 'error'); }
 }
 
+async function doGithubAuth(){
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'github',
+    options: { redirectTo: window.location.href }
+  });
+  if(error){ toast('تعذر بدء الدخول بـ GitHub: '+error.message, 'error'); }
+}
+
+async function doMagicLink(){
+  const email = document.getElementById('magicEmail').value.trim();
+  const username = document.getElementById('magicUsername').value.trim();
+  const errEl = document.getElementById('magicError');
+  errEl.style.display='none';
+  if(!email){ errEl.textContent = 'من فضلك اكتب إيميلك'; errEl.style.display='block'; return; }
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: window.location.origin + window.location.pathname,
+      data: username ? { username } : undefined
+    }
+  });
+  if(error){ errEl.textContent = translateError(error.message); errEl.style.display='block'; return; }
+  toast('بعتنالك لينك الدخول على إيميلك، افتحه ودوس عليه', 'success');
+}
+
 async function doLogout(){
   await sb.auth.signOut();
   currentUser = null; currentProfile = null;
+  if(unreadBadgesInterval){ clearInterval(unreadBadgesInterval); unreadBadgesInterval = null; }
   document.getElementById('app').classList.remove('active');
   document.getElementById('landing').style.display = 'flex';
 }
@@ -760,6 +841,32 @@ async function initSession(){
   nav('feed');
   checkNotifications();
   if(['owner','super_admin','admin','moderator'].includes(profile.role)) checkAdminBadge();
+  checkUnreadBadges();
+  if(unreadBadgesInterval) clearInterval(unreadBadgesInterval);
+  unreadBadgesInterval = setInterval(checkUnreadBadges, 20000);
+}
+
+let unreadBadgesInterval = null;
+
+async function checkUnreadBadges(){
+  const [{data:roomCount}, {data:dmCount}] = await Promise.all([
+    sb.rpc('get_unread_room_count'),
+    sb.rpc('get_unread_dm_count'),
+  ]);
+  const rc = roomCount || 0;
+  const dc = dmCount || 0;
+  for(const id of ['roomsBadge','roomsBadgeMobile']){
+    const el = document.getElementById(id);
+    if(!el) continue;
+    if(rc > 0){ el.style.display='inline-block'; el.textContent = rc; }
+    else{ el.style.display='none'; }
+  }
+  for(const id of ['dmBadge','dmBadgeMobile']){
+    const el = document.getElementById(id);
+    if(!el) continue;
+    if(dc > 0){ el.style.display='inline-block'; el.textContent = dc; }
+    else{ el.style.display='none'; }
+  }
 }
 
 async function checkAdminBadge(){
@@ -878,19 +985,53 @@ function handlePostFileChosen(input){
   document.getElementById('postFileLabel').textContent = pendingPostFile ? pendingPostFile.name : '';
 }
 
+function showUploadProgress(file){
+  document.getElementById('uploadFileName').textContent = file.name;
+  document.getElementById('uploadProgressFill').style.width = '0%';
+  document.getElementById('uploadProgressPct').textContent = '0%';
+  document.getElementById('uploadProgressStatus').textContent = 'جاري الرفع...';
+  document.getElementById('uploadOverlay').classList.add('active');
+}
+function updateUploadProgress(pct){
+  document.getElementById('uploadProgressFill').style.width = pct + '%';
+  document.getElementById('uploadProgressPct').textContent = pct + '%';
+  if(pct >= 100) document.getElementById('uploadProgressStatus').textContent = 'جاري المعالجة...';
+}
+function hideUploadProgress(){
+  document.getElementById('uploadOverlay').classList.remove('active');
+}
+
 async function uploadToTelegram(file, kind){
   const form = new FormData();
   form.append('file', file);
   form.append('kind', kind);
   const { data:{ session } } = await sb.auth.getSession();
-  const res = await fetch(`${SUPABASE_URL}/functions/v1/telegram-upload`, {
-    method:'POST',
-    headers:{ 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON_KEY },
-    body: form
-  });
-  const data = await res.json();
-  if(!res.ok) throw new Error(data.error || 'فشل رفع الملف');
-  return data;
+  showUploadProgress(file);
+  try{
+    const data = await new Promise((resolve, reject)=>{
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${SUPABASE_URL}/functions/v1/telegram-upload`);
+      xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+      xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+      xhr.upload.onprogress = (e)=>{
+        if(e.lengthComputable){
+          const pct = Math.round((e.loaded / e.total) * 100);
+          updateUploadProgress(pct);
+        }
+      };
+      xhr.onload = ()=>{
+        let parsed;
+        try{ parsed = JSON.parse(xhr.responseText); }catch(e){ parsed = null; }
+        if(xhr.status >= 200 && xhr.status < 300 && parsed){ resolve(parsed); }
+        else{ reject(new Error(parsed?.error || 'فشل رفع الملف')); }
+      };
+      xhr.onerror = ()=> reject(new Error('فشل رفع الملف — تأكد من اتصال الإنترنت'));
+      xhr.send(form);
+    });
+    return data;
+  } finally {
+    hideUploadProgress();
+  }
 }
 
 async function getTelegramFileBlobUrl(file_id){
@@ -1322,8 +1463,13 @@ async function openRoomChat(roomId, roomName){
           <span id="replyBarText" style="flex:1"></span>
           <button class="icon-btn" style="width:24px;height:24px" onclick="cancelReply()">×</button>
         </div>
+        <div id="roomRecordBar" class="record-bar"><span class="record-dot"></span><span id="roomRecordTime">0:00</span> جاري التسجيل...
+          <button class="btn btn-sm" onclick="cancelVoiceRecording('room')">إلغاء</button>
+          <button class="btn btn-primary btn-sm" onclick="stopVoiceRecording('room')">إرسال</button>
+        </div>
         <div class="chat-input-bar">
           <label class="file-label">📎<input type="file" id="chatFile" style="display:none" onchange="sendChatFile(this)"></label>
+          <span class="mic-btn" id="roomMicBtn" onclick="startVoiceRecording('room')">🎤</span>
           <input type="text" id="chatInput" placeholder="اكتب رسالة... (اضغط على رسالة عشان ترد عليها)" oninput="broadcastTyping()" onkeydown="if(event.key==='Enter')sendChatMessage()">
           <button class="btn btn-primary btn-sm" onclick="sendChatMessage()">إرسال</button>
         </div>
@@ -1333,6 +1479,7 @@ async function openRoomChat(roomId, roomName){
   loadRoomMessages(roomId);
   subscribeToRoom(roomId);
   subscribeToTyping(roomId);
+  sb.rpc('mark_room_read', { p_room_id: roomId }).then(()=>checkUnreadBadges());
 }
 
 async function loadRoomsRail(){
@@ -1344,7 +1491,7 @@ async function loadRoomsRail(){
 
 let replyingTo = null;
 async function loadRoomMessages(roomId){
-  const { data: msgs } = await sb.from('chat_messages').select('*, profiles!sender_id(username), reply:reply_to_id(id, content, profiles!sender_id(username))').eq('room_id', roomId).order('created_at').limit(100);
+  const { data: msgs } = await sb.from('chat_messages').select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))').eq('room_id', roomId).order('created_at').limit(100);
   renderMessages(msgs||[]);
   renderPinnedBanner(msgs||[]);
 }
@@ -1374,21 +1521,77 @@ function canDeleteMessage(m){
 function renderMessages(msgs){
   const box = document.getElementById('chatMessages');
   if(!box) return;
-  box.innerHTML = msgs.map(m=>`
-    <div class="msg ${m.sender_id===currentUser.id?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setReplyTarget('${m.id}', '${escapeHtml((m.profiles?.username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||'').slice(0,60)).replace(/'/g,"\\'")}')"`}>
-      <div class="sender"><span style="cursor:pointer" onclick="event.stopPropagation();viewProfile('${m.sender_id}')">@${m.profiles?.username||''}</span> <span style="color:var(--ink-faint);font-weight:400">· ${timeAgo(m.created_at)}${m.edited_at?' · (معدّلة)':''}</span>
-        ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
-          ${canModerateRoom() ? `<span style="cursor:pointer" onclick="event.stopPropagation();togglePinMessage('${m.id}', ${!m.is_pinned})" title="${m.is_pinned?'إلغاء التثبيت':'تثبيت'}">${m.is_pinned?'📌':'📍'}</span>` : ''}
-          ${m.sender_id===currentUser.id ? `<span style="cursor:pointer" onclick="event.stopPropagation();editMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل">✏️</span>` : ''}
-          ${canDeleteMessage(m) ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteMessage('${m.id}')" title="حذف الرسالة">🗑️</span>` : ''}
-        </span>` : ''}
-      </div>
-      ${m.is_removed ? `<i style="color:var(--ink-faint)">تم حذف هذه الرسالة</i>` : `
-        ${m.reply ? `<div style="border-right:3px solid var(--amber);padding-right:8px;margin-bottom:6px;opacity:.75;font-size:12px">@${m.reply.profiles?.username||''}: ${escapeHtml((m.reply.content||'').slice(0,50))}</div>` : ''}
-        ${escapeHtml(m.content||'')}
-      `}
-    </div>`).join('');
+  box.innerHTML = msgs.map(m=>renderOneMessage(m, m.profiles?.username, m.profiles?.avatar_file_id)).join('');
   box.scrollTop = box.scrollHeight;
+  msgs.forEach(m=>{
+    if(m.profiles?.avatar_file_id) loadAvatarInto(`msgav-${m.id}`, m.profiles.avatar_file_id);
+    if(!m.is_removed && m.telegram_file_id) loadMessageMedia(m);
+  });
+}
+
+function renderOneMessage(m, username, avatarFileId){
+  const mine = m.sender_id===currentUser.id;
+  const initials = (username||'?')[0]?.toUpperCase()||'?';
+  return `
+    <div class="msg-row ${mine?'mine':''}">
+      <div class="msg-avatar" id="msgav-${m.id}" onclick="viewProfile('${m.sender_id}')">${initials}</div>
+      <div class="msg ${mine?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setReplyTarget('${m.id}', '${escapeHtml((username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||(m.message_type==='voice'?'رسالة صوتية':m.content)||'').slice(0,60)).replace(/'/g,"\\'")}')"`}>
+        <div class="sender"><span style="cursor:pointer" onclick="event.stopPropagation();viewProfile('${m.sender_id}')">@${username||''}</span> <span style="color:var(--ink-faint);font-weight:400">· ${timeAgo(m.created_at)}${m.edited_at?' · (معدّلة)':''}</span>
+          ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
+            ${(m.room_id && canModerateRoom()) ? `<span style="cursor:pointer" onclick="event.stopPropagation();togglePinMessage('${m.id}', ${!m.is_pinned})" title="${m.is_pinned?'إلغاء التثبيت':'تثبيت'}">${m.is_pinned?'📌':'📍'}</span>` : ''}
+            ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل">✏️</span>` : ''}
+            ${canDeleteMessage(m) ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteMessage('${m.id}')" title="حذف الرسالة">🗑️</span>` : ''}
+          </span>` : ''}
+        </div>
+        ${m.is_removed ? `<i style="color:var(--ink-faint)">تم حذف هذه الرسالة</i>` : `
+          ${m.reply ? `<div style="border-right:3px solid var(--amber);padding-right:8px;margin-bottom:6px;opacity:.75;font-size:12px">@${m.reply.profiles?.username||''}: ${escapeHtml((m.reply.content||'').slice(0,50))}</div>` : ''}
+          ${renderMessageBody(m)}
+        `}
+      </div>
+    </div>`;
+}
+
+function renderMessageBody(m){
+  if(m.message_type==='voice'){
+    return `<div class="msg-voice" id="msgmedia-${m.id}">🎤 <span style="font-size:12px;color:var(--ink-faint)">${m.duration_seconds?formatDuration(m.duration_seconds):''}</span></div>`;
+  }
+  if(m.message_type==='image'){
+    return `<div class="msg-media" id="msgmedia-${m.id}">${escapeHtml(m.content||'')}</div>`;
+  }
+  if(m.message_type==='video'){
+    return `<div class="msg-media" id="msgmedia-${m.id}">${escapeHtml(m.content||'')}</div>`;
+  }
+  if(m.message_type==='document'){
+    return `<div id="msgmedia-${m.id}">📎 ${escapeHtml(m.content||'ملف')}</div>`;
+  }
+  return escapeHtml(m.content||'');
+}
+
+function formatDuration(sec){
+  const m = Math.floor(sec/60), s = sec%60;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+async function loadMessageMedia(m){
+  const el = document.getElementById(`msgmedia-${m.id}`);
+  if(!el) return;
+  const cached = getCachedFile(m.telegram_file_id);
+  const url = cached || await getTelegramFileBlobUrl(m.telegram_file_id);
+  if(!url) return;
+  if(!cached && m.message_type!=='voice'){
+    try{
+      const res = await fetch(url); const blob = await res.blob();
+      const dataUrl = await blobToDataURL(blob);
+      setCachedFile(m.telegram_file_id, dataUrl);
+    }catch(e){ /* best-effort caching only */ }
+  }
+  if(m.message_type==='voice'){
+    el.innerHTML = `<audio controls src="${url}"></audio> <span style="font-size:12px;color:var(--ink-faint)">${m.duration_seconds?formatDuration(m.duration_seconds):''}</span>`;
+  } else if(m.message_type==='image'){
+    el.innerHTML = `<img src="${url}" onclick="event.stopPropagation();window.open('${url}','_blank')">`;
+  } else if(m.message_type==='video'){
+    el.innerHTML = `<video controls src="${url}"></video>`;
+  }
 }
 
 async function togglePinMessage(msgId, pinTo){
@@ -1483,8 +1686,91 @@ async function sendChatFile(input){
       room_id: activeRoomId, sender_id: currentUser.id, message_type: kind==='photo'?'image':kind,
       telegram_file_id: up.file_id, content: file.name
     });
+    input.value = '';
     loadRoomMessages(activeRoomId);
   }catch(e){ toast('فشل رفع الملف: '+e.message, 'error'); }
+}
+
+/* ================= VOICE MESSAGES (shared: rooms + DMs) ================= */
+let voiceRecorder = null;
+let voiceChunks = [];
+let voiceStartTime = 0;
+let voiceTimerInterval = null;
+let voiceStream = null;
+
+async function startVoiceRecording(context){
+  if(voiceRecorder && voiceRecorder.state==='recording') return;
+  if(!navigator.mediaDevices || !window.MediaRecorder){
+    toast('تسجيل الصوت مش مدعوم في المتصفح ده', 'error'); return;
+  }
+  try{
+    voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  }catch(e){
+    toast('محتاجين إذن الميكروفون عشان تبعت رسالة صوتية', 'error'); return;
+  }
+  voiceChunks = [];
+  voiceRecorder = new MediaRecorder(voiceStream);
+  voiceRecorder.ondataavailable = (e)=>{ if(e.data.size>0) voiceChunks.push(e.data); };
+  voiceRecorder.start();
+  voiceStartTime = Date.now();
+  const barId = context==='room' ? 'roomRecordBar' : 'dmRecordBar';
+  const timeId = context==='room' ? 'roomRecordTime' : 'dmRecordTime';
+  document.getElementById(barId)?.classList.add('active');
+  voiceTimerInterval = setInterval(()=>{
+    const sec = Math.floor((Date.now()-voiceStartTime)/1000);
+    const el = document.getElementById(timeId);
+    if(el) el.textContent = formatDuration(sec);
+  }, 250);
+}
+
+function cancelVoiceRecording(context){
+  if(voiceRecorder && voiceRecorder.state==='recording'){
+    voiceRecorder.onstop = null;
+    voiceRecorder.stop();
+  }
+  cleanupVoiceRecording(context);
+}
+
+function cleanupVoiceRecording(context){
+  clearInterval(voiceTimerInterval);
+  voiceTimerInterval = null;
+  if(voiceStream){ voiceStream.getTracks().forEach(t=>t.stop()); voiceStream = null; }
+  const barId = context==='room' ? 'roomRecordBar' : 'dmRecordBar';
+  document.getElementById(barId)?.classList.remove('active');
+  voiceRecorder = null;
+  voiceChunks = [];
+}
+
+async function stopVoiceRecording(context){
+  if(!voiceRecorder || voiceRecorder.state!=='recording'){ cleanupVoiceRecording(context); return; }
+  const durationSec = Math.round((Date.now()-voiceStartTime)/1000);
+  const finalizedBlob = await new Promise((resolve)=>{
+    voiceRecorder.onstop = ()=> resolve(new Blob(voiceChunks, { type: voiceRecorder.mimeType || 'audio/webm' }));
+    voiceRecorder.stop();
+  });
+  cleanupVoiceRecording(context);
+  if(durationSec < 1){ toast('التسجيل قصير جدًا', 'error'); return; }
+  const file = new File([finalizedBlob], `voice-${Date.now()}.webm`, { type: finalizedBlob.type });
+  try{
+    const up = await uploadToTelegram(file, 'voice');
+    if(context==='room'){
+      if(!activeRoomId) return;
+      await sb.from('chat_messages').insert({
+        room_id: activeRoomId, sender_id: currentUser.id, message_type:'voice',
+        telegram_file_id: up.file_id, duration_seconds: durationSec, reply_to_id: replyingTo
+      });
+      cancelReply();
+      loadRoomMessages(activeRoomId);
+    } else {
+      if(!activeDmUserId) return;
+      await sb.from('chat_messages').insert({
+        sender_id: currentUser.id, receiver_id: activeDmUserId, message_type:'voice',
+        telegram_file_id: up.file_id, duration_seconds: durationSec, reply_to_id: dmReplyingTo
+      });
+      cancelDmReply();
+      loadDmMessages();
+    }
+  }catch(e){ toast('فشل إرسال الرسالة الصوتية: '+e.message, 'error'); }
 }
 
 /* ================= PROFILE ================= */
@@ -1736,7 +2022,7 @@ async function renderMessagesList(container){
     <div class="view-header"><h1>الرسائل الخاصة</h1></div>
     <div id="dmConversationsList"><div class="empty-state">جاري التحميل...</div></div>
   </div>`;
-  const { data: msgs, error } = await sb.from('chat_messages').select('id, content, sender_id, receiver_id, created_at').is('room_id', null).or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`).order('created_at', {ascending:false}).limit(200);
+  const { data: msgs, error } = await sb.from('chat_messages').select('id, content, message_type, sender_id, receiver_id, created_at').is('room_id', null).or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`).order('created_at', {ascending:false}).limit(200);
   const listEl = document.getElementById('dmConversationsList');
   if(error){ listEl.innerHTML = `<div class="empty-state" style="color:var(--red)">تعذر التحميل: ${escapeHtml(error.message)}</div>`; toast('خطأ: '+error.message,'error'); return; }
   const others = new Map();
@@ -1746,48 +2032,98 @@ async function renderMessagesList(container){
   }
   if(!others.size){ listEl.innerHTML = `<div class="empty-state"><div class="icon">✉️</div>لسه مفيش محادثات — ابعت رسالة من بروفايل أي حد</div>`; return; }
   const otherIds = [...others.keys()];
-  const { data: profs } = await sb.from('profiles').select('id, username, full_name').in('id', otherIds);
+  const { data: profs } = await sb.from('profiles').select('id, username, full_name, avatar_file_id').in('id', otherIds);
   const profMap = new Map((profs||[]).map(p=>[p.id,p]));
+  const previewFor = (m)=> m.message_type==='voice' ? '🎤 رسالة صوتية' : m.message_type==='image' ? '📷 صورة' : m.message_type==='video' ? '🎬 فيديو' : m.message_type==='document' ? '📎 ملف' : (m.content||'');
   listEl.innerHTML = otherIds.map(oid=>{
     const p = profMap.get(oid); const lastMsg = others.get(oid);
-    return `<div class="room-card" style="cursor:pointer" onclick="openDmConversation('${oid}','${escapeHtml(p?.username||'')}')">
-      <div class="room-info"><div class="name">${escapeHtml(p?.full_name||p?.username||'مستخدم')}</div><div class="desc">${escapeHtml((lastMsg.content||'').slice(0,50))}</div></div>
+    return `<div class="room-card" style="cursor:pointer;display:flex;align-items:center;gap:12px" onclick="openDmConversation('${oid}','${escapeHtml(p?.username||'')}')">
+      <div class="avatar" id="dmlist-av-${oid}" onclick="event.stopPropagation();viewProfile('${oid}')">${(p?.username||'?')[0].toUpperCase()}</div>
+      <div class="room-info"><div class="name">${escapeHtml(p?.full_name||p?.username||'مستخدم')}</div><div class="desc">${escapeHtml(previewFor(lastMsg).slice(0,50))}</div></div>
     </div>`;
   }).join('');
+  otherIds.forEach(oid=>{ const p = profMap.get(oid); if(p?.avatar_file_id) loadAvatarInto(`dmlist-av-${oid}`, p.avatar_file_id); });
 }
 
 let activeDmUserId = null;
+let activeDmUsername = null;
 let dmChannel = null;
 async function openDmConversation(otherId, otherUsername){
   activeDmUserId = otherId;
+  activeDmUsername = otherUsername;
   const c = document.getElementById('viewContainer');
   c.innerHTML = `<div class="chat-view">
     <div style="flex:1;display:flex;flex-direction:column">
       <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:600;display:flex;align-items:center;gap:10px">
-        <button class="btn btn-sm" onclick="nav('messages')">→</button> @${escapeHtml(otherUsername)}
+        <button class="btn btn-sm" onclick="nav('messages')">→</button>
+        <span class="avatar" id="dmHeaderAvatar" style="width:28px;height:28px;font-size:12px;cursor:pointer" onclick="viewProfile('${otherId}')">${(otherUsername||'?')[0].toUpperCase()}</span>
+        <span style="cursor:pointer" onclick="viewProfile('${otherId}')">@${escapeHtml(otherUsername)}</span>
       </div>
+      <div id="dmPinnedBanner"></div>
       <div class="chat-messages" id="dmMessages"><div class="empty-state">جاري التحميل...</div></div>
+      <div id="dmTypingIndicator" style="padding:4px 20px;font-size:12px;color:var(--ink-faint);min-height:20px"></div>
+      <div id="dmReplyBar" style="display:none;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border-top:1px solid var(--border);font-size:12px;color:var(--ink-dim)">
+        <span id="dmReplyBarText" style="flex:1"></span>
+        <button class="icon-btn" style="width:24px;height:24px" onclick="cancelDmReply()">×</button>
+      </div>
+      <div id="dmRecordBar" class="record-bar"><span class="record-dot"></span><span id="dmRecordTime">0:00</span> جاري التسجيل...
+        <button class="btn btn-sm" onclick="cancelVoiceRecording('dm')">إلغاء</button>
+        <button class="btn btn-primary btn-sm" onclick="stopVoiceRecording('dm')">إرسال</button>
+      </div>
       <div class="chat-input-bar">
+        <label class="file-label">📎<input type="file" id="dmFile" style="display:none" onchange="sendDmFile(this)"></label>
+        <span class="mic-btn" id="dmMicBtn" onclick="startVoiceRecording('dm')">🎤</span>
         <input type="text" id="dmInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter'){event.preventDefault();sendDmMessage();}">
         <button class="btn btn-primary btn-sm" onclick="sendDmMessage()">إرسال</button>
       </div>
     </div>
   </div>`;
+  const { data: p } = await sb.from('profiles').select('avatar_file_id').eq('id', otherId).single();
+  if(p?.avatar_file_id) loadAvatarInto('dmHeaderAvatar', p.avatar_file_id);
   await loadDmMessages();
   if(dmChannel){ sb.removeChannel(dmChannel); dmChannel = null; }
   dmChannel = sb.channel('dm-'+[currentUser.id,otherId].sort().join('-'))
-    .on('postgres_changes', { event:'INSERT', schema:'public', table:'chat_messages' }, (payload)=>{
-      const m = payload.new;
+    .on('postgres_changes', { event:'*', schema:'public', table:'chat_messages' }, (payload)=>{
+      const m = payload.new || payload.old;
       if(m.room_id) return;
-      if((m.sender_id===currentUser.id && m.receiver_id===activeDmUserId) || (m.sender_id===activeDmUserId && m.receiver_id===currentUser.id)) loadDmMessages();
+      if((m.sender_id===currentUser.id && m.receiver_id===activeDmUserId) || (m.sender_id===activeDmUserId && m.receiver_id===currentUser.id)){
+        loadDmMessages();
+        if(m.sender_id===activeDmUserId) sb.rpc('mark_dm_read', { p_other_user_id: activeDmUserId }).then(()=>checkUnreadBadges());
+      }
+    })
+    .on('broadcast', { event:'typing' }, (payload)=>{
+      if(payload.payload.user_id !== activeDmUserId) return;
+      const el = document.getElementById('dmTypingIndicator');
+      if(!el) return;
+      el.textContent = 'بيكتب...';
+      clearTimeout(window._dmTypingTimeout);
+      window._dmTypingTimeout = setTimeout(()=>{ el.textContent=''; }, 3000);
     }).subscribe();
+  sb.rpc('mark_dm_read', { p_other_user_id: otherId }).then(()=>checkUnreadBadges());
+}
+
+function broadcastDmTyping(){
+  if(!dmChannel || !activeDmUserId) return;
+  dmChannel.send({ type:'broadcast', event:'typing', payload:{ user_id: currentUser.id } });
+}
+
+let dmReplyingTo = null;
+function setDmReplyTarget(msgId, username, preview){
+  dmReplyingTo = msgId;
+  const bar = document.getElementById('dmReplyBar');
+  if(bar){ bar.style.display='flex'; document.getElementById('dmReplyBarText').textContent = `رد على @${username}: ${preview}`; }
+}
+function cancelDmReply(){
+  dmReplyingTo = null;
+  const bar = document.getElementById('dmReplyBar');
+  if(bar) bar.style.display='none';
 }
 
 async function loadDmMessages(){
   // Fetch all of my DMs (simple, reliable filter) then filter client-side to this conversation —
   // avoids fragile nested or()/and() filter strings that can silently fail server-side.
   const { data: msgs, error } = await sb.from('chat_messages')
-    .select('id, content, sender_id, receiver_id, created_at')
+    .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
     .is('room_id', null)
     .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
     .order('created_at')
@@ -1799,9 +2135,50 @@ async function loadDmMessages(){
     (m.sender_id===currentUser.id && m.receiver_id===activeDmUserId) ||
     (m.sender_id===activeDmUserId && m.receiver_id===currentUser.id)
   );
-  box.innerHTML = convo.length ? convo.map(m=>`<div class="msg ${m.sender_id===currentUser.id?'mine':''}">${escapeHtml(m.content||'')}</div>`).join('')
+  box.innerHTML = convo.length ? convo.map(m=>renderOneDmMessage(m)).join('')
     : `<div class="empty-state" style="padding:20px">ابدأ المحادثة 👋</div>`;
   box.scrollTop = box.scrollHeight;
+  convo.forEach(m=>{
+    if(m.profiles?.avatar_file_id) loadAvatarInto(`msgav-${m.id}`, m.profiles.avatar_file_id);
+    if(!m.is_removed && m.telegram_file_id) loadMessageMedia(m);
+  });
+}
+
+function renderOneDmMessage(m){
+  const mine = m.sender_id===currentUser.id;
+  const username = m.profiles?.username || (mine ? currentProfile.username : activeDmUsername);
+  const initials = (username||'?')[0]?.toUpperCase()||'?';
+  return `
+    <div class="msg-row ${mine?'mine':''}">
+      <div class="msg-avatar" id="msgav-${m.id}" onclick="viewProfile('${m.sender_id}')">${initials}</div>
+      <div class="msg ${mine?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setDmReplyTarget('${m.id}', '${escapeHtml((username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||(m.message_type==='voice'?'رسالة صوتية':'')).slice(0,60)).replace(/'/g,"\\'")}')"`}>
+        <div class="sender"><span style="color:var(--ink-faint);font-weight:400">${timeAgo(m.created_at)}${m.edited_at?' · (معدّلة)':''}</span>
+          ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
+            ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editDmMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل">✏️</span>` : ''}
+            ${mine ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteDmMessage('${m.id}')" title="حذف الرسالة">🗑️</span>` : ''}
+          </span>` : ''}
+        </div>
+        ${m.is_removed ? `<i style="color:var(--ink-faint)">تم حذف هذه الرسالة</i>` : `
+          ${m.reply ? `<div style="border-right:3px solid var(--amber);padding-right:8px;margin-bottom:6px;opacity:.75;font-size:12px">@${m.reply.profiles?.username||''}: ${escapeHtml((m.reply.content||'').slice(0,50))}</div>` : ''}
+          ${renderMessageBody(m)}
+        `}
+      </div>
+    </div>`;
+}
+
+async function editDmMessage(msgId, currentContent){
+  const newContent = prompt('عدّل رسالتك:', currentContent);
+  if(newContent===null || !newContent.trim() || newContent===currentContent) return;
+  const { error } = await sb.from('chat_messages').update({ content: newContent.trim(), edited_at: new Date().toISOString() }).eq('id', msgId);
+  if(error){ toast('تعذر التعديل: '+error.message, 'error'); return; }
+  loadDmMessages();
+}
+
+async function deleteDmMessage(msgId){
+  if(!confirm('تحذف الرسالة دي؟')) return;
+  const { error } = await sb.from('chat_messages').update({ is_removed: true }).eq('id', msgId);
+  if(error){ toast('تعذر الحذف: '+error.message, 'error'); return; }
+  loadDmMessages();
 }
 
 async function sendDmMessage(){
@@ -1809,11 +2186,27 @@ async function sendDmMessage(){
   const content = input.value.trim();
   if(!content || !activeDmUserId) return;
   input.disabled = true;
-  const { error } = await sb.from('chat_messages').insert({ sender_id: currentUser.id, receiver_id: activeDmUserId, content, message_type:'text' });
+  const { error } = await sb.from('chat_messages').insert({ sender_id: currentUser.id, receiver_id: activeDmUserId, content, message_type:'text', reply_to_id: dmReplyingTo });
   input.disabled = false;
   if(error){ toast('تعذر الإرسال: '+error.message, 'error'); return; }
   input.value='';
+  cancelDmReply();
   await loadDmMessages();
+}
+
+async function sendDmFile(input){
+  const file = input.files[0];
+  if(!file || !activeDmUserId) return;
+  try{
+    const kind = file.type.startsWith('image')?'photo':file.type.startsWith('video')?'video':'document';
+    const up = await uploadToTelegram(file, kind);
+    await sb.from('chat_messages').insert({
+      sender_id: currentUser.id, receiver_id: activeDmUserId, message_type: kind==='photo'?'image':kind,
+      telegram_file_id: up.file_id, content: file.name
+    });
+    input.value = '';
+    loadDmMessages();
+  }catch(e){ toast('فشل رفع الملف: '+e.message, 'error'); }
 }
 
 /* ================= ADMIN ================= */
