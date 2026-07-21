@@ -1,0 +1,2868 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevVerse — أكبر مجتمع عربي للتقنية</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0E14">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DevVerse">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0E14;
+  --bg-elevated:#12161F;
+  --surface:#171C27;
+  --surface-hover:#1E2430;
+  --border:#262D3A;
+  --ink:#E7E9EE;
+  --ink-dim:#8B93A7;
+  --ink-faint:#5B6478;
+  --amber:#4F8FFF;
+  --amber-dim:#3A6FD6;
+  --teal:#B8C4D9;
+  --red:#E85D5D;
+  --font-display:'El Messiri', sans-serif;
+  --font-body:'IBM Plex Sans Arabic', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+}
+body.light-mode{
+  --bg:#F3F5F9;
+  --bg-elevated:#FFFFFF;
+  --surface:#EBEEF3;
+  --surface-hover:#E1E5EC;
+  --border:#D7DCE5;
+  --ink:#161B26;
+  --ink-dim:#525C70;
+  --ink-faint:#8891A3;
+  --amber:#3D74E0;
+  --amber-dim:#2C5BC2;
+  --teal:#5C6B85;
+  --red:#D6473F;
+}
+body.light-mode .terminal-line.out{color:var(--ink-faint);}
+body.light-mode .btn-primary{color:#fff;}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body);
+  min-height:100vh; line-height:1.6;
+}
+::selection{background:var(--amber); color:#0B0E14;}
+a{color:inherit; text-decoration:none;}
+button{font-family:var(--font-body); cursor:pointer;}
+::-webkit-scrollbar{width:8px; height:8px;}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px;}
+
+/* ---------- Landing ---------- */
+#landing{display:flex; flex-direction:column; min-height:100vh;}
+.landing-nav{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:20px 40px; border-bottom:1px solid var(--border);
+}
+.logo{font-family:var(--font-display); font-size:22px; font-weight:700; color:var(--amber); display:flex; align-items:center; gap:8px;}
+.logo .bracket{color:var(--ink-faint); font-family:var(--font-mono); font-weight:400;}
+.landing-nav-actions{display:flex; gap:12px;}
+.btn{
+  padding:10px 20px; border-radius:8px; border:1px solid var(--border);
+  background:var(--surface); color:var(--ink); font-size:14px; font-weight:600;
+  transition:all .15s;
+}
+.btn:hover{background:var(--surface-hover); border-color:var(--ink-faint);}
+.btn-primary{background:var(--amber); color:#0B0E14; border-color:var(--amber);}
+.btn-primary:hover{background:#6FA5FF; border-color:#6FA5FF;}
+.btn-ghost{background:transparent; border-color:transparent;}
+#notifToggleBtn.active{color:var(--teal); border-color:var(--teal);}
+.btn-ghost:hover{background:var(--surface);}
+.btn-sm{padding:6px 14px; font-size:13px;}
+.btn-danger{background:transparent; border-color:var(--red); color:var(--red);}
+.btn-danger:hover{background:rgba(232,93,93,.1);}
+
+.hero{
+  flex:1; display:flex; align-items:center; gap:60px;
+  padding:60px 40px; max-width:1200px; margin:0 auto; width:100%;
+}
+.hero-text{flex:1;}
+.eyebrow{font-family:var(--font-mono); color:var(--teal); font-size:13px; letter-spacing:.5px; margin-bottom:16px;}
+.eyebrow::before{content:'▸ ';}
+.hero h1{
+  font-family:var(--font-display); font-size:52px; line-height:1.2; font-weight:700;
+  margin-bottom:20px;
+}
+.hero h1 span{color:var(--amber);}
+.hero p{color:var(--ink-dim); font-size:17px; max-width:520px; margin-bottom:32px;}
+.hero-actions{display:flex; gap:14px;}
+.stats-row{display:flex; gap:32px; margin-top:48px;}
+.stat{font-family:var(--font-mono);}
+.stat .num{font-size:28px; font-weight:600; color:var(--ink);}
+.stat .label{font-size:12px; color:var(--ink-faint); margin-top:4px;}
+
+.terminal{
+  flex:1; max-width:460px; background:var(--bg-elevated); border:1px solid var(--border);
+  border-radius:12px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+.terminal-head{
+  display:flex; align-items:center; gap:8px; padding:12px 16px;
+  background:var(--surface); border-bottom:1px solid var(--border);
+}
+.dot{width:10px; height:10px; border-radius:50%;}
+.dot.red{background:#E85D5D;} .dot.yellow{background:#E8C23D;} .dot.green{background:#3DDC97;}
+.terminal-title{font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); margin-right:auto;}
+.terminal-body{padding:20px; font-family:var(--font-mono); font-size:13px; height:280px; overflow-y:auto;}
+.terminal-line{margin-bottom:10px; color:var(--ink-dim); direction:ltr; text-align:left;}
+.terminal-line .prompt{color:var(--teal);}
+.terminal-line .path{color:var(--amber-dim);}
+.terminal-line.out{color:var(--ink-faint); padding-right:14px;}
+
+.sections-preview{padding:60px 40px; border-top:1px solid var(--border); background:var(--bg-elevated);}
+.sections-preview h2, .features-section h2, .steps-section h2{font-family:var(--font-display); font-size:28px; margin-bottom:32px; text-align:center;}
+
+.features-section{padding:70px 40px; border-top:1px solid var(--border); max-width:1100px; margin:0 auto;}
+.features-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px;}
+.feature-card{
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:14px; padding:26px;
+  transition:.2s; position:relative; overflow:hidden;
+}
+.feature-card::before{
+  content:''; position:absolute; inset:0; opacity:0; transition:.25s;
+  background:linear-gradient(135deg, rgba(79,143,255,.08), transparent 60%);
+}
+.feature-card:hover{border-color:var(--amber-dim); transform:translateY(-3px);}
+.feature-card:hover::before{opacity:1;}
+.feature-icon{font-size:28px; margin-bottom:14px;}
+.feature-card h3{font-family:var(--font-display); font-size:18px; margin-bottom:8px; position:relative;}
+.feature-card p{font-size:13.5px; color:var(--ink-dim); line-height:1.7; position:relative;}
+
+.steps-section{padding:70px 40px; border-top:1px solid var(--border); background:var(--bg-elevated);}
+.steps-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:24px; max-width:1000px; margin:0 auto;}
+.step{padding:0 8px;}
+.step-num{font-family:var(--font-mono); font-size:13px; color:var(--amber); margin-bottom:10px; letter-spacing:1px;}
+.step h4{font-family:var(--font-display); font-size:18px; margin-bottom:8px;}
+.step p{font-size:13.5px; color:var(--ink-dim); line-height:1.7;}
+
+.cta-section{padding:90px 40px; text-align:center; border-top:1px solid var(--border);}
+.cta-section h2{font-family:var(--font-display); font-size:32px; margin-bottom:10px;}
+.cta-section p{color:var(--ink-dim); margin-bottom:28px; font-size:15px;}
+.section-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; max-width:1000px; margin:0 auto;}
+.section-chip{
+  padding:16px; background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  text-align:center; font-size:14px; font-weight:600; transition:.15s;
+}
+.section-chip:hover{border-color:var(--amber); transform:translateY(-2px);}
+
+/* ---------- Auth Modal ---------- */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center; z-index:100;
+}
+.modal-overlay.active{display:flex;}
+.modal{
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:14px;
+  padding:32px; width:400px; max-width:90vw;
+}
+.modal h2{font-family:var(--font-display); font-size:24px; margin-bottom:6px;}
+.modal .sub{color:var(--ink-dim); font-size:13px; margin-bottom:24px;}
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:13px; color:var(--ink-dim); margin-bottom:6px;}
+.field input, .field textarea, .field select{
+  width:100%; padding:11px 14px; background:var(--surface); border:1px solid var(--border);
+  border-radius:8px; color:var(--ink); font-size:14px; font-family:var(--font-body);
+}
+.field input:focus, .field textarea:focus, .field select:focus{outline:2px solid var(--amber); border-color:var(--amber);}
+.modal-error{color:var(--red); font-size:13px; margin-bottom:12px; display:none;}
+
+/* ---------- Upload Progress Modal ---------- */
+.upload-modal{
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:14px;
+  padding:28px; width:340px; max-width:90vw; text-align:center;
+}
+.upload-modal .fname{font-size:13px; color:var(--ink-dim); margin-bottom:16px; word-break:break-all;}
+.upload-progress-track{
+  width:100%; height:10px; background:var(--surface); border-radius:6px; overflow:hidden; margin-bottom:10px;
+}
+.upload-progress-fill{
+  height:100%; width:0%; background:var(--amber); border-radius:6px; transition:width .15s ease;
+}
+.upload-progress-pct{font-family:var(--font-mono, monospace); font-size:18px; font-weight:700; color:var(--amber);}
+.upload-progress-status{font-size:12px; color:var(--ink-faint); margin-top:6px;}
+.modal-switch{text-align:center; margin-top:16px; font-size:13px; color:var(--ink-dim);}
+.modal-switch a{color:var(--amber); font-weight:600;}
+.modal-close{position:absolute; top:16px; left:16px; color:var(--ink-faint); font-size:20px; background:none; border:none;}
+
+/* ---------- App Shell ---------- */
+#app{display:none; min-height:100vh;}
+#app.active{display:flex;}
+.sidebar{
+  width:250px; flex-shrink:0; background:var(--bg-elevated); border-left:1px solid var(--border);
+  padding:20px 0; display:flex; flex-direction:column; height:100vh; position:sticky; top:0;
+}
+.sidebar-logo{padding:0 20px 20px; border-bottom:1px solid var(--border); margin-bottom:16px;}
+.nav-section{padding:0 12px; margin-bottom:20px;}
+.nav-label{font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); padding:0 10px; margin-bottom:8px; text-transform:uppercase;}
+.nav-item{
+  display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px;
+  font-size:14px; color:var(--ink-dim); cursor:pointer; transition:.12s;
+}
+.nav-item:hover{background:var(--surface); color:var(--ink);}
+.nav-item.active{background:var(--surface); color:var(--amber); font-weight:600;}
+.nav-item .badge{margin-right:auto; background:var(--amber); color:#0B0E14; font-size:11px; font-weight:700; padding:1px 7px; border-radius:10px;}
+.categories-list{max-height:280px; overflow-y:auto;}
+.sidebar-footer{margin-top:auto; padding:12px 20px 0; border-top:1px solid var(--border);}
+.mini-profile{display:flex; align-items:center; gap:10px; padding:10px 0; cursor:pointer;}
+.avatar{
+  width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--amber),var(--teal));
+  display:flex; align-items:center; justify-content:center; font-weight:700; color:#0B0E14; flex-shrink:0; font-size:14px;
+}
+.mini-profile .name{font-size:13px; font-weight:600;}
+.mini-profile .role{font-size:11px; color:var(--ink-faint); font-family:var(--font-mono);}
+
+.main{flex:1; min-width:0;}
+.topbar{
+  display:flex; align-items:center; gap:16px; padding:14px 28px; border-bottom:1px solid var(--border);
+  background:var(--bg); position:sticky; top:0; z-index:10;
+}
+.search-box{flex:1; max-width:420px; position:relative;}
+.search-box input{
+  width:100%; padding:9px 14px 9px 36px; background:var(--surface); border:1px solid var(--border);
+  border-radius:8px; color:var(--ink); font-size:14px;
+}
+.search-box .icon{position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--ink-faint);}
+.topbar-actions{display:flex; align-items:center; gap:10px; margin-right:auto;}
+.icon-btn{
+  width:38px; height:38px; border-radius:8px; background:var(--surface); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; color:var(--ink-dim); position:relative; font-size:16px;
+}
+.icon-btn:hover{color:var(--amber); border-color:var(--amber);}
+.notif-dot{position:absolute; top:6px; left:6px; width:8px; height:8px; background:var(--red); border-radius:50%;}
+
+.view{padding:28px; max-width:760px; margin:0 auto;}
+.view-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;}
+.view-header h1{font-family:var(--font-display); font-size:26px;}
+.view-header .sub{color:var(--ink-dim); font-size:13px; margin-top:2px;}
+
+.composer{
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:20px;
+}
+.composer textarea{
+  width:100%; background:transparent; border:none; color:var(--ink); font-size:15px; resize:none;
+  font-family:var(--font-body); min-height:60px;
+}
+.composer textarea:focus{outline:none;}
+.composer-bar{display:flex; align-items:center; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border);}
+.chip-select{background:var(--surface); border:1px solid var(--border); color:var(--ink-dim); font-size:12px; padding:6px 10px; border-radius:6px;}
+.file-label{font-size:12px; color:var(--ink-faint); cursor:pointer; padding:6px 10px;}
+.file-label:hover{color:var(--amber);}
+
+.post-card{
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:14px;
+}
+.post-head{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.post-head .name{font-weight:600; font-size:14px;}
+.post-head .meta{font-size:12px; color:var(--ink-faint); font-family:var(--font-mono);}
+.post-cat{
+  font-size:11px; background:var(--surface); color:var(--amber); padding:3px 9px; border-radius:6px;
+  margin-right:auto; font-family:var(--font-mono);
+}
+.post-content{font-size:14.5px; margin-bottom:12px; white-space:pre-wrap;}
+.post-content.code{background:var(--surface); padding:12px; border-radius:8px; font-family:var(--font-mono); font-size:13px; overflow-x:auto;}
+.post-file{margin-bottom:12px; border-radius:8px; overflow:hidden; border:1px solid var(--border);}
+.post-file img, .post-file video{width:100%; display:block;}
+.post-actions{display:flex; gap:18px; font-size:13px; color:var(--ink-dim);}
+.post-actions .act{display:flex; align-items:center; gap:5px; cursor:pointer;}
+.post-actions .act:hover{color:var(--amber);}
+.post-actions .act.liked{color:var(--red);}
+.comments-box{margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:none;}
+.comments-box.open{display:block;}
+.comment{display:flex; gap:8px; margin-bottom:8px; font-size:13px;}
+.comment .name{font-weight:600;}
+.comment-input{display:flex; gap:8px; margin-top:8px;}
+.comment-input input{flex:1; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:8px 14px; color:var(--ink); font-size:13px;}
+
+.article-card{
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:14px; cursor:pointer;
+}
+.article-card:hover{border-color:var(--amber-dim);}
+.article-card h3{font-family:var(--font-display); font-size:19px; margin-bottom:6px;}
+.article-meta{font-size:12px; color:var(--ink-faint); font-family:var(--font-mono); margin-bottom:8px;}
+.article-excerpt{color:var(--ink-dim); font-size:14px;}
+
+.room-card{
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px;
+  display:flex; align-items:center; justify-content:between; gap:12px;
+}
+.room-info{flex:1;}
+.room-info .name{font-weight:600; margin-bottom:2px;}
+.room-info .desc{font-size:13px; color:var(--ink-dim);}
+.status-pill{font-size:11px; padding:3px 10px; border-radius:10px; font-family:var(--font-mono);}
+.status-pill.pending{background:rgba(232,163,61,.15); color:var(--amber);}
+.status-pill.approved{background:rgba(184,196,217,.15); color:var(--teal);}
+.status-pill.rejected{background:rgba(232,93,93,.15); color:var(--red);}
+.room-number-tag{font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:1px 7px; margin-left:6px;}
+.invite-row, .member-row{display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; margin-bottom:8px; font-size:13px;}
+.invite-row .code{font-family:var(--font-mono); flex:1; word-break:break-all;}
+.invite-row .meta, .member-row .meta{font-size:11px; color:var(--ink-faint);}
+.invite-row.revoked{opacity:.5;}
+.member-row .name{flex:1; font-weight:600;}
+
+.chat-view{display:flex; height:calc(100vh - 65px);}
+.rooms-rail{width:240px; border-left:1px solid var(--border); padding:16px 10px; overflow-y:auto;}
+.room-item{padding:10px 12px; border-radius:8px; font-size:13px; margin-bottom:4px; color:var(--ink-dim); cursor:pointer;}
+.room-item:hover, .room-item.active{background:var(--surface); color:var(--ink);}
+.chat-messages{flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; background:
+  radial-gradient(circle at 20% 10%, rgba(79,143,255,.04), transparent 40%),
+  radial-gradient(circle at 80% 90%, rgba(184,196,217,.03), transparent 40%);}
+.msg{
+  max-width:66%; padding:9px 13px; font-size:14px; background:var(--surface);
+  border:1px solid var(--border); box-shadow:0 2px 6px rgba(0,0,0,.15);
+  border-radius:16px 16px 4px 16px; position:relative; cursor:pointer;
+  transition:transform .1s;
+}
+.msg:active{transform:scale(.99);}
+.msg.mine{
+  color:#fff; border-color:transparent;
+  background:linear-gradient(135deg, var(--amber), var(--amber-dim));
+  border-radius:16px 16px 16px 4px;
+}
+.msg .sender{font-size:11px; color:var(--ink-faint); margin-bottom:3px; font-family:var(--font-mono);}
+.msg.mine .sender{color:rgba(255,255,255,.75);}
+.msg.mine .sender span{color:rgba(255,255,255,.75) !important;}
+.chat-input-bar{display:flex; gap:8px; padding:16px; border-top:1px solid var(--border); background:var(--bg-elevated);}
+.chat-input-bar input{flex:1; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:10px 16px; color:var(--ink);}
+
+.msg-row{display:flex; align-items:flex-end; gap:8px; max-width:100%; align-self:flex-start;}
+.msg-row.mine{flex-direction:row-reverse; align-self:flex-end;}
+.msg-avatar{width:28px; height:28px; border-radius:50%; flex-shrink:0; cursor:pointer;
+  background:linear-gradient(135deg,var(--amber),var(--teal)); display:flex; align-items:center; justify-content:center;
+  font-weight:700; color:#0B0E14; font-size:11px;}
+.msg-media img, .msg-media video{max-width:220px; border-radius:10px; display:block; margin-top:4px;}
+.msg-voice{display:flex; align-items:center; gap:8px; min-width:180px;}
+.msg-voice audio{height:32px; max-width:190px;}
+.mic-btn{font-size:12px; color:var(--ink-faint); cursor:pointer; padding:6px 10px;}
+.mic-btn.recording{color:var(--red); animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.record-bar{display:none; align-items:center; gap:10px; padding:8px 16px; background:rgba(232,93,93,.08); border-top:1px solid var(--border); font-size:13px; color:var(--red);}
+.record-bar.active{display:flex;}
+.record-dot{width:8px; height:8px; border-radius:50%; background:var(--red); animation:pulse 1s infinite;}
+
+.empty-state{text-align:center; padding:60px 20px; color:var(--ink-faint);}
+.empty-state .icon{font-size:40px; margin-bottom:12px;}
+
+.admin-grid{display:grid; grid-template-columns:1fr; gap:14px;}
+.admin-tabs{display:flex; gap:8px; margin-bottom:18px; border-bottom:1px solid var(--border);}
+.admin-tab{padding:10px 16px; font-size:13px; color:var(--ink-dim); border-bottom:2px solid transparent; cursor:pointer;}
+.admin-tab.active{color:var(--amber); border-color:var(--amber);}
+
+.profile-header{background:var(--bg-elevated); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:20px;}
+.profile-cover{height:140px; background:linear-gradient(135deg, var(--surface), var(--bg-elevated)); background-size:cover; background-position:center; position:relative; cursor:pointer;}
+.profile-cover .cover-hint{position:absolute; bottom:8px; left:8px; font-size:11px; background:rgba(0,0,0,.5); color:#fff; padding:3px 8px; border-radius:6px;}
+.profile-body{padding:24px;}
+.social-links{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+.social-links a{font-size:12px; background:var(--surface); border:1px solid var(--border); padding:5px 10px; border-radius:6px; color:var(--ink-dim);}
+.social-links a:hover{color:var(--amber);}
+.portfolio-grid, .gallery-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px;}
+.portfolio-card{background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; padding:14px;}
+.portfolio-card h4{font-size:14px; margin-bottom:4px;}
+.portfolio-card p{font-size:12px; color:var(--ink-dim);}
+.portfolio-card a{font-size:11px; color:var(--amber);}
+.gallery-thumb{width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; border:1px solid var(--border);}
+.profile-tabs{display:flex; gap:6px; margin-bottom:16px; border-bottom:1px solid var(--border);}
+.profile-tab{padding:8px 14px; font-size:13px; color:var(--ink-dim); border-bottom:2px solid transparent; cursor:pointer;}
+.profile-tab.active{color:var(--amber); border-color:var(--amber);}
+.profile-top{display:flex; align-items:center; gap:16px; margin-bottom:16px;}
+.avatar-lg{width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,var(--amber),var(--teal)); display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:700; color:#0B0E14;}
+.profile-stats{display:flex; gap:24px; margin-top:14px; font-family:var(--font-mono);}
+.profile-stats .n{font-size:18px; font-weight:600;}
+.profile-stats .l{font-size:11px; color:var(--ink-faint);}
+.tag{display:inline-block; background:var(--surface); border:1px solid var(--border); padding:4px 10px; border-radius:6px; font-size:12px; margin:3px 4px 0 0;}
+
+/* AI Assistant floating panel */
+.ai-fab{
+  position:fixed; top:80px; left:24px; width:52px; height:52px; border-radius:50%;
+  background:linear-gradient(135deg,var(--amber),var(--amber-dim)); color:#fff; border:none; font-size:20px;
+  box-shadow:0 8px 24px rgba(79,143,255,.4); z-index:55;
+}
+.ai-panel{
+  position:fixed; top:140px; left:24px; width:360px; max-width:90vw; height:440px;
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:14px; display:none;
+  flex-direction:column; overflow:hidden; z-index:55; box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.ai-panel.active{display:flex;}
+.ai-head{padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px;}
+.ai-head b{font-family:var(--font-display);}
+.ai-mode{margin-right:auto; font-size:11px; background:var(--surface); border:1px solid var(--border); color:var(--ink-dim); padding:4px 8px; border-radius:6px;}
+.ai-body{flex:1; padding:14px; overflow-y:auto; font-size:13px;}
+.ai-msg{margin-bottom:10px; padding:10px 12px; border-radius:8px; background:var(--surface);}
+.ai-msg.user{background:var(--amber-dim); color:#fff; margin-right:auto; max-width:85%;}
+.ai-input-bar{display:flex; gap:8px; padding:12px; border-top:1px solid var(--border);}
+.ai-input-bar textarea{flex:1; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--ink); font-size:13px; resize:none; height:36px; font-family:var(--font-body);}
+
+.toast-wrap{position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; gap:8px;}
+.toast{background:var(--bg-elevated); border:1px solid var(--border); padding:12px 20px; border-radius:8px; font-size:13px; box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.toast.error{border-color:var(--red); color:var(--red);}
+.toast.success{border-color:var(--teal); color:var(--teal);}
+
+/* ---------- Mobile: floating island bottom nav ---------- */
+.island-nav{display:none;}
+@media(max-width:900px){
+  .rooms-rail{display:none;}
+  .hero{flex-direction:column;} .terminal{max-width:100%;}
+  .sidebar{display:none;}
+  .ai-fab{display:none;}
+  .ai-panel{top:auto; bottom:160px; left:16px; width:calc(100vw - 32px); height:60vh;}
+  .main{padding-bottom:90px;}
+  .island-nav{
+    display:flex; position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+    background:rgba(17,22,31,.85); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--border); border-radius:999px; padding:8px 10px; gap:4px;
+    box-shadow:0 12px 40px rgba(0,0,0,.5); z-index:60; max-width:94vw;
+  }
+  .island-item{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    width:56px; height:52px; border-radius:999px; color:var(--ink-faint); font-size:10px; position:relative;
+  }
+  .island-item .ic{font-size:19px;}
+  .island-item.active{background:var(--amber); color:#fff;}
+  .island-item .dot{position:absolute; top:6px; left:14px; width:7px; height:7px; background:var(--red); border-radius:50%; display:none;}
+  #app.active{display:block;}
+}
+</style>
+</head>
+<body>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ============ LANDING ============ -->
+<div id="landing">
+  <nav class="landing-nav">
+    <div class="logo">Dev<span class="bracket">::</span>Verse</div>
+    <div class="landing-nav-actions">
+      <button class="icon-btn" id="themeToggleBtnLanding" onclick="toggleTheme()" title="الوضع الفاتح/الليلي">🌙</button>
+      <button class="btn" onclick="openAuth('login')">تسجيل الدخول</button>
+      <button class="btn btn-primary" onclick="openAuth('signup')">إنشاء حساب</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">مجتمع عربي · تقنية · مفتوح المصدر</div>
+      <h1>مكان واحد لكل <span>مبرمج عربي</span> يتعلم، يبني، ويتواصل</h1>
+      <p>انضم لمجتمع يجمع مطوري الويب، مهندسي الذكاء الاصطناعي، خبراء الأمن السيبراني، والمصممين — شارك مشاريعك، اسأل، وابنِ اسمك التقني.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="openAuth('signup')">ابدأ الآن مجانًا</button>
+        <button class="btn" onclick="document.getElementById('sectionsPreview').scrollIntoView({behavior:'smooth'})">استكشف الأقسام</button>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="num" id="statUsers">—</div><div class="label">مستخدم</div></div>
+        <div class="stat"><div class="num" id="statPosts">—</div><div class="label">منشور</div></div>
+        <div class="stat"><div class="num" id="statArticles">—</div><div class="label">مقال</div></div>
+        <div class="stat"><div class="num" id="statRooms">—</div><div class="label">غرفة دردشة</div></div>
+      </div>
+    </div>
+    <div class="terminal">
+      <div class="terminal-head">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="terminal-title">activity.log</div>
+      </div>
+      <div class="terminal-body" id="terminalBody"></div>
+    </div>
+  </section>
+
+  <section class="sections-preview" id="sectionsPreview">
+    <div class="eyebrow" style="text-align:center">15 قسم تقني</div>
+    <h2>أقسام المجتمع</h2>
+    <div class="section-grid" id="sectionGrid"></div>
+  </section>
+
+  <section class="features-section">
+    <div class="eyebrow" style="text-align:center">كل حاجة محتاجها في مكان واحد</div>
+    <h2>مبني عشان تشتغل فعليًا، مش مجرد واجهة</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>غرف دردشة حقيقية</h3>
+        <p>شات لايف بالرد على الرسائل، مراجعة الأدمن قبل التفعيل، وحماية اختيارية بكلمة سر لأي غرفة.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>مقالات ومنشورات</h3>
+        <p>انشر مقال تقني أو سؤال سريع، مع دعم كامل للبحث العربي والتصنيف حسب القسم.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✨</div>
+        <h3>مساعد ذكاء اصطناعي</h3>
+        <p>شرح كود، إصلاح أخطاء، أو تلخيص مقال — مساعد مدمج في الموقع يفهم اللي محتاجه.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>إدارة ومراجعة حقيقية</h3>
+        <p>لوحة تحكم كاملة: مراجعة الغرف والبلاغات، إدارة الصلاحيات، وحماية من السبام.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👤</div>
+        <h3>ملف شخصي احترافي</h3>
+        <p>اعرض مهاراتك، تابع مبرمجين تانيين، واتابع نشاطك من مكان واحد.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔎</div>
+        <h3>بحث ذكي</h3>
+        <p>دور على مستخدمين، منشورات، أو مقالات بالعربي في ثواني.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps-section">
+    <div class="eyebrow" style="text-align:center">ابدأ في 3 خطوات</div>
+    <h2>من التسجيل لأول منشور في دقيقة</h2>
+    <div class="steps-row">
+      <div class="step"><div class="step-num">01</div><h4>اعمل حساب</h4><p>سجّل بإيميلك أو بجوجل، وأكّد حسابك من الإيميل.</p></div>
+      <div class="step"><div class="step-num">02</div><h4>اختار قسمك</h4><p>من 15 قسم تقني، من الذكاء الاصطناعي لتطوير الويب للأمن السيبراني.</p></div>
+      <div class="step"><div class="step-num">03</div><h4>شارك وابنِ اسمك</h4><p>انشر، ادخل غرفة دردشة، أو اسأل المساعد الذكي.</p></div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>جاهز تنضم؟</h2>
+    <p>مجتمع بيتبني فعليًا، مش شعارات.</p>
+    <button class="btn btn-primary" onclick="openAuth('signup')">إنشاء حساب مجاني</button>
+  </section>
+</div>
+
+<!-- ============ AUTH MODAL ============ -->
+<div class="modal-overlay" id="authOverlay">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeAuth()">×</button>
+    <div id="loginForm">
+      <h2>تسجيل الدخول</h2>
+      <div class="sub">أهلاً بيك تاني في المجتمع</div>
+      <div class="modal-error" id="loginError"></div>
+      <div class="field"><label>البريد الإلكتروني</label><input type="email" id="loginEmail"></div>
+      <div class="field"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
+      <button class="btn btn-primary" style="width:100%" onclick="doLogin()">دخول</button>
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--border)"></div>أو<div style="flex:1;height:1px;background:var(--border)"></div></div>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGoogleAuth()">🔵 الدخول بحساب جوجل</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGithubAuth()">⚫ الدخول بحساب GitHub</button>
+      <button class="btn" style="width:100%" onclick="openAuth('magic')">✉️ الدخول بلينك سحري (بدون باسورد)</button>
+      <div class="modal-switch">مش عندك حساب؟ <a onclick="openAuth('signup')">إنشاء حساب</a></div>
+    </div>
+    <div id="magicForm" style="display:none">
+      <h2>الدخول بلينك سحري</h2>
+      <div class="sub">هنبعتلك لينك دخول على إيميلك، من غير باسورد</div>
+      <div class="modal-error" id="magicError"></div>
+      <div class="field"><label>اسم المستخدم</label><input type="text" id="magicUsername" placeholder="بدون مسافات (لأول مرة بس)"></div>
+      <div class="field"><label>البريد الإلكتروني</label><input type="email" id="magicEmail"></div>
+      <button class="btn btn-primary" style="width:100%" onclick="doMagicLink()">ابعت اللينك</button>
+      <div class="modal-switch">رجوع لـ <a onclick="openAuth('login')">تسجيل الدخول</a></div>
+    </div>
+    <div id="signupForm" style="display:none">
+      <h2>إنشاء حساب</h2>
+      <div class="sub">انضم للمجتمع في ثواني</div>
+      <div class="modal-error" id="signupError"></div>
+      <div class="field"><label>اسم المستخدم</label><input type="text" id="signupUsername" placeholder="بدون مسافات"></div>
+      <div class="field"><label>الاسم الكامل</label><input type="text" id="signupFullname"></div>
+      <div class="field"><label>البريد الإلكتروني</label><input type="email" id="signupEmail"></div>
+      <div class="field"><label>كلمة المرور</label><input type="password" id="signupPassword" placeholder="6 أحرف على الأقل"></div>
+      <button class="btn btn-primary" style="width:100%" onclick="doSignup()">إنشاء الحساب</button>
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--border)"></div>أو<div style="flex:1;height:1px;background:var(--border)"></div></div>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGoogleAuth()">🔵 التسجيل بحساب جوجل</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGithubAuth()">⚫ التسجيل بحساب GitHub</button>
+      <button class="btn" style="width:100%" onclick="openAuth('magic')">✉️ التسجيل بلينك سحري (بدون باسورد)</button>
+      <div class="modal-switch">عندك حساب؟ <a onclick="openAuth('login')">تسجيل الدخول</a></div>
+    </div>
+    <div id="confirmForm" style="display:none">
+      <h2>تحقق من إيميلك 📩</h2>
+      <div class="sub" id="confirmSub">بعتنالك لينك تأكيد</div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px; font-size:13px; color:var(--ink-dim); margin-bottom:16px">
+        دوس على اللينك اللي وصلك في الإيميل عشان تفعّل حسابك، وبعدها ارجع سجّل دخول عادي.
+      </div>
+      <button class="btn" style="width:100%" onclick="resendConfirmCode()">إعادة إرسال اللينك</button>
+      <div class="modal-switch">فعّلت حسابك؟ <a onclick="openAuth('login')">تسجيل الدخول</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ UPLOAD PROGRESS MODAL ============ -->
+<div class="modal-overlay" id="uploadOverlay">
+  <div class="upload-modal">
+    <div class="fname" id="uploadFileName"></div>
+    <div class="upload-progress-track"><div class="upload-progress-fill" id="uploadProgressFill"></div></div>
+    <div class="upload-progress-pct" id="uploadProgressPct">0%</div>
+    <div class="upload-progress-status" id="uploadProgressStatus">جاري الرفع...</div>
+  </div>
+</div>
+
+
+<!-- ============ APP SHELL ============ -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo" style="font-size:18px">Dev<span class="bracket">::</span>Verse</div></div>
+    <div class="nav-section">
+      <div class="nav-item active" data-view="feed" onclick="nav('feed')">🏠 الرئيسية</div>
+      <div class="nav-item" data-view="articles" onclick="nav('articles')">📝 المقالات</div>
+      <div class="nav-item" data-view="rooms" onclick="nav('rooms')">💬 غرف الدردشة <span class="badge" id="roomsBadge" style="display:none">0</span></div>
+      <div class="nav-item" data-view="messages" onclick="nav('messages')">✉️ الرسائل الخاصة <span class="badge" id="dmBadge" style="display:none">0</span></div>
+      <div class="nav-item" data-view="bookmarks" onclick="nav('bookmarks')">🔖 المحفوظات</div>
+      <div class="nav-item" data-view="profile" onclick="nav('profile')">👤 ملفي الشخصي</div>
+      <div class="nav-item" data-view="admin" id="adminNavItem" onclick="nav('admin')" style="display:none">🛡️ لوحة التحكم <span class="badge" id="adminBadge" style="display:none">0</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">الأقسام</div>
+      <div class="categories-list" id="sidebarCategories"></div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="mini-profile" onclick="nav('profile')">
+        <div class="avatar" id="miniAvatar">؟</div>
+        <div><div class="name" id="miniName">—</div><div class="role" id="miniRole">member</div></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="notifToggleBtn" style="width:100%; margin-bottom:8px; display:none" onclick="requestNotificationPermission()">🔕 فعّل الإشعارات</button>
+      <button class="btn btn-ghost btn-sm" style="width:100%" onclick="doLogout()">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="search-box">
+        <span class="icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="ابحث عن منشورات، مقالات، مستخدمين..." oninput="handleSearch(this.value)" onblur="setTimeout(()=>document.getElementById('searchResults').style.display='none', 200)">
+        <div id="searchResults" style="display:none; position:absolute; top:110%; right:0; left:0; background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; max-height:400px; overflow-y:auto; z-index:50; box-shadow:0 12px 30px rgba(0,0,0,.4)"></div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="الوضع الفاتح/الليلي">🌙</button>
+        <div style="position:relative">
+          <button class="icon-btn" onclick="toggleNotifications()">🔔<span class="notif-dot" id="notifDot" style="display:none"></span></button>
+          <div id="notifPanel" style="display:none; position:absolute; top:110%; left:0; width:320px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; max-height:420px; overflow-y:auto; z-index:60; box-shadow:0 12px 30px rgba(0,0,0,.4)"></div>
+        </div>
+      </div>
+    </div>
+    <div id="viewContainer"></div>
+  </main>
+</div>
+
+<nav class="island-nav">
+  <div class="island-item nav-item active" data-view="feed" onclick="nav('feed')"><span class="ic">🏠</span>الرئيسية</div>
+  <div class="island-item nav-item" data-view="rooms" onclick="nav('rooms')"><span class="ic">💬</span>غرف<span class="badge" id="roomsBadgeMobile" style="display:none">0</span></div>
+  <div class="island-item nav-item" data-view="articles" onclick="nav('articles')"><span class="ic">📝</span>مقالات</div>
+  <div class="island-item nav-item" data-view="profile" onclick="nav('profile')"><span class="ic">👤</span>ملفي</div>
+  <div class="island-item" onclick="toggleMoreSheet()"><span class="ic">⋯</span>المزيد<span class="dot" id="moreDot"></span></div>
+</nav>
+
+<div class="modal-overlay" id="moreSheetOverlay" onclick="if(event.target===this)toggleMoreSheet()">
+  <div class="modal" style="width:320px; max-height:70vh; overflow-y:auto">
+    <h2 style="font-size:18px; margin-bottom:14px">المزيد</h2>
+    <div class="nav-item" onclick="toggleMoreSheet(); toggleAiPanel()" style="margin-bottom:6px">✨ المساعد الذكي</div>
+    <div class="nav-item" id="adminNavItemMobile" onclick="toggleMoreSheet(); nav('admin')" style="display:none; margin-bottom:6px">🛡️ لوحة التحكم</div>
+    <div class="nav-item" onclick="toggleMoreSheet(); nav('messages')" style="margin-bottom:6px">✉️ الرسائل الخاصة <span class="badge" id="dmBadgeMobile" style="display:none">0</span></div>
+    <div class="nav-item" onclick="toggleMoreSheet(); nav('bookmarks')" style="margin-bottom:6px">🔖 المحفوظات</div>
+    <div class="nav-label" style="margin-top:10px">الأقسام</div>
+    <div id="mobileCategories" style="max-height:220px; overflow-y:auto; margin-bottom:14px"></div>
+    <button class="btn btn-ghost btn-sm" style="width:100%" onclick="doLogout()">تسجيل الخروج</button>
+  </div>
+</div>
+
+<button class="ai-fab" id="aiFab" onclick="toggleAiPanel()" title="مساعد الذكاء الاصطناعي">✨</button>
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-head">
+    <b>🤖 المساعد الذكي</b>
+    <select class="ai-mode" id="aiMode">
+      <option value="general">عام</option>
+      <option value="explain">شرح كود</option>
+      <option value="fix">إصلاح خطأ</option>
+      <option value="summarize">تلخيص</option>
+    </select>
+    <button class="icon-btn" style="width:28px;height:28px" onclick="toggleAiPanel()">×</button>
+  </div>
+  <div class="ai-body" id="aiBody"><div class="ai-msg">أهلاً! اسألني أي حاجة عن البرمجة أو التقنية 👋</div></div>
+  <div class="ai-input-bar">
+    <textarea id="aiInput" placeholder="اكتب سؤالك..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMessage();}"></textarea>
+    <button class="btn btn-primary btn-sm" onclick="sendAiMessage()">إرسال</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* ================= CONFIG ================= */
+const SUPABASE_URL = "https://ccshmpaejvwpsthbvsww.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjc2htcGFlanZ3cHN0aGJ2c3d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0MDEwOTcsImV4cCI6MjA5OTk3NzA5N30.n_6bRGfV9dWGNrRxLQ-XkYOMWiVAAU8twPfTaEEOvxc";
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage, storageKey: 'devverse-auth' }
+});
+
+let currentUser = null;
+let currentProfile = null;
+let categories = [];
+let activeCategoryFilter = null;
+let activeRoomId = null;
+let activeRoomCreatorId = null;
+let roomChannel = null;
+
+/* ================= TOAST ================= */
+function toast(msg, type=''){
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(()=>el.remove(), 3500);
+}
+
+/* ================= LANDING TERMINAL ANIMATION ================= */
+const fakeLog = [
+  {p:'~/devverse', c:'new_post --category ai', o:'✓ نُشر: "أفضل مكتبات NLP عربي 2026"'},
+  {p:'~/devverse', c:'join --room cybersecurity', o:'✓ بانتظار موافقة الأدمن...'},
+  {p:'~/devverse', c:'article publish', o:'✓ تم نشر: "مقدمة في Rust للمبتدئين"'},
+  {p:'~/devverse', c:'follow @sara_dev', o:'✓ بدأت متابعة sara_dev'},
+  {p:'~/devverse', c:'ai explain --file main.py', o:'✓ تم شرح الكود بواسطة المساعد الذكي'},
+];
+let logIdx = 0;
+function typeTerminalLine(){
+  const body = document.getElementById('terminalBody');
+  if(!body) return;
+  const entry = fakeLog[logIdx % fakeLog.length];
+  const line = document.createElement('div');
+  line.className = 'terminal-line';
+  line.innerHTML = `<span class="prompt">$</span> <span class="path">${entry.p}</span> ${entry.c}`;
+  const out = document.createElement('div');
+  out.className = 'terminal-line out';
+  out.textContent = entry.o;
+  body.appendChild(line); body.appendChild(out);
+  body.scrollTop = body.scrollHeight;
+  if(body.children.length > 14){ body.removeChild(body.firstChild); body.removeChild(body.firstChild); }
+  logIdx++;
+}
+setInterval(typeTerminalLine, 2600);
+typeTerminalLine();
+
+/* ================= AUTH MODAL ================= */
+function openAuth(which){
+  document.getElementById('authOverlay').classList.add('active');
+  document.getElementById('loginForm').style.display = which==='login' ? 'block':'none';
+  document.getElementById('signupForm').style.display = which==='signup' ? 'block':'none';
+  document.getElementById('confirmForm').style.display = which==='confirm' ? 'block':'none';
+  document.getElementById('magicForm').style.display = which==='magic' ? 'block':'none';
+}
+function closeAuth(){ document.getElementById('authOverlay').classList.remove('active'); }
+
+let pendingConfirmEmail = null;
+async function doSignup(){
+  const username = document.getElementById('signupUsername').value.trim();
+  const full_name = document.getElementById('signupFullname').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const errEl = document.getElementById('signupError');
+  errEl.style.display='none';
+  if(!username || !email || password.length < 6){
+    errEl.textContent = 'من فضلك املأ كل الحقول (كلمة المرور 6 أحرف على الأقل)';
+    errEl.style.display='block'; return;
+  }
+  const { data, error } = await sb.auth.signUp({
+    email, password,
+    options:{ data:{ username, full_name }, emailRedirectTo: window.location.origin + window.location.pathname }
+  });
+  if(error){ errEl.textContent = translateError(error.message); errEl.style.display='block'; return; }
+  pendingConfirmEmail = email;
+  document.getElementById('confirmSub').textContent = `بعتنالك لينك تأكيد على ${email} — افتح إيميلك ودوس عليه عشان تفعّل حسابك`;
+  openAuth('confirm');
+}
+
+async function resendConfirmCode(){
+  if(!pendingConfirmEmail){ toast('من فضلك سجّل حساب الأول', 'error'); return; }
+  const { error } = await sb.auth.resend({ type: 'signup', email: pendingConfirmEmail, options:{ emailRedirectTo: window.location.origin + window.location.pathname } });
+  if(error){ toast('تعذر إعادة الإرسال: '+error.message, 'error'); return; }
+  toast('تم إرسال لينك جديد', 'success');
+}
+
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display='none';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if(error){ errEl.textContent = translateError(error.message); errEl.style.display='block'; return; }
+  closeAuth();
+  await initSession();
+}
+
+async function doGoogleAuth(){
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href }
+  });
+  if(error){ toast('تعذر بدء الدخول بجوجل: '+error.message, 'error'); }
+}
+
+async function doGithubAuth(){
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'github',
+    options: { redirectTo: window.location.href }
+  });
+  if(error){ toast('تعذر بدء الدخول بـ GitHub: '+error.message, 'error'); }
+}
+
+async function doMagicLink(){
+  const email = document.getElementById('magicEmail').value.trim();
+  const username = document.getElementById('magicUsername').value.trim();
+  const errEl = document.getElementById('magicError');
+  errEl.style.display='none';
+  if(!email){ errEl.textContent = 'من فضلك اكتب إيميلك'; errEl.style.display='block'; return; }
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: window.location.origin + window.location.pathname,
+      data: username ? { username } : undefined
+    }
+  });
+  if(error){ errEl.textContent = translateError(error.message); errEl.style.display='block'; return; }
+  toast('بعتنالك لينك الدخول على إيميلك، افتحه ودوس عليه', 'success');
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  currentUser = null; currentProfile = null;
+  if(unreadBadgesInterval){ clearInterval(unreadBadgesInterval); unreadBadgesInterval = null; }
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('landing').style.display = 'flex';
+}
+
+function translateError(msg){
+  if(msg.includes('Invalid login')) return 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+  if(msg.includes('already registered')) return 'البريد الإلكتروني مستخدم بالفعل';
+  if(msg.includes('Password')) return 'كلمة المرور ضعيفة جدًا';
+  return msg;
+}
+
+/* ================= SESSION / PROFILE ================= */
+async function initSession(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session){ return; }
+  currentUser = session.user;
+  const { data: profile, error } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  if(error || !profile){ toast('تعذر تحميل الملف الشخصي', 'error'); return; }
+  currentProfile = profile;
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  document.getElementById('miniName').textContent = profile.full_name || profile.username;
+  document.getElementById('miniRole').textContent = profile.role;
+  document.getElementById('miniAvatar').textContent = (profile.username||'?')[0].toUpperCase();
+  if(profile.avatar_file_id) loadAvatarInto('miniAvatar', profile.avatar_file_id);
+  if(['owner','super_admin','admin','moderator'].includes(profile.role)){
+    document.getElementById('adminNavItem').style.display = 'flex';
+    document.getElementById('adminNavItemMobile').style.display = 'block';
+  }
+  await loadCategories();
+  nav('feed');
+  checkNotifications();
+  if(['owner','super_admin','admin','moderator'].includes(profile.role)) checkAdminBadge();
+  checkUnreadBadges();
+  if(unreadBadgesInterval) clearInterval(unreadBadgesInterval);
+  unreadBadgesInterval = setInterval(checkUnreadBadges, 20000);
+  checkUrlInviteOnLoad();
+  checkUrlDeepLink();
+  setupPushNotifications();
+}
+
+async function checkUrlDeepLink(){
+  const params = new URLSearchParams(window.location.search);
+  const roomId = params.get('room');
+  const dmUserId = params.get('dm');
+  if(roomId){
+    const { data: room } = await sb.from('chat_rooms').select('name').eq('id', roomId).single();
+    if(room){ openRoomChat(roomId, room.name); }
+    const url = new URL(window.location.href); url.searchParams.delete('room'); window.history.replaceState({}, '', url.toString());
+  } else if(dmUserId){
+    const { data: p } = await sb.from('profiles').select('username').eq('id', dmUserId).single();
+    if(p){ openDmConversation(dmUserId, p.username); }
+    const url = new URL(window.location.href); url.searchParams.delete('dm'); window.history.replaceState({}, '', url.toString());
+  }
+}
+
+let unreadBadgesInterval = null;
+
+async function checkUnreadBadges(){
+  const [{data:roomCount}, {data:dmCount}] = await Promise.all([
+    sb.rpc('get_unread_room_count'),
+    sb.rpc('get_unread_dm_count'),
+  ]);
+  const rc = roomCount || 0;
+  const dc = dmCount || 0;
+  for(const id of ['roomsBadge','roomsBadgeMobile']){
+    const el = document.getElementById(id);
+    if(!el) continue;
+    if(rc > 0){ el.style.display='inline-block'; el.textContent = rc; }
+    else{ el.style.display='none'; }
+  }
+  for(const id of ['dmBadge','dmBadgeMobile']){
+    const el = document.getElementById(id);
+    if(!el) continue;
+    if(dc > 0){ el.style.display='inline-block'; el.textContent = dc; }
+    else{ el.style.display='none'; }
+  }
+}
+
+async function checkAdminBadge(){
+  const [{count:pendingRooms}, {count:pendingReports}] = await Promise.all([
+    sb.from('chat_rooms').select('id', {count:'exact', head:true}).eq('status','pending'),
+    sb.from('reports').select('*', {count:'exact', head:true}).eq('status','pending'),
+  ]);
+  const total = (pendingRooms||0) + (pendingReports||0);
+  const badge = document.getElementById('adminBadge');
+  if(total > 0){ badge.style.display='inline-block'; badge.textContent = total; }
+  else{ badge.style.display='none'; }
+  const moreDot = document.getElementById('moreDot');
+  if(moreDot) moreDot.style.display = total > 0 ? 'block' : 'none';
+}
+
+function toggleMoreSheet(){
+  document.getElementById('moreSheetOverlay').classList.toggle('active');
+}
+
+/* ================= CATEGORIES ================= */
+async function loadCategories(){
+  const { data, error } = await sb.from('categories').select('*').order('sort_order');
+  if(error) return;
+  categories = data;
+  const sideEl = document.getElementById('sidebarCategories');
+  sideEl.innerHTML = categories.map(c=>`<div class="nav-item" onclick="filterByCategory('${c.id}')">${c.name_ar}</div>`).join('');
+  const mobileEl = document.getElementById('mobileCategories');
+  if(mobileEl) mobileEl.innerHTML = categories.map(c=>`<div class="nav-item" onclick="toggleMoreSheet(); filterByCategory('${c.id}')">${c.name_ar}</div>`).join('');
+  const gridEl = document.getElementById('sectionGrid');
+  if(gridEl) gridEl.innerHTML = categories.map(c=>`<div class="section-chip">${c.name_ar}</div>`).join('');
+  loadLandingStats();
+}
+
+async function loadLandingStats(){
+  const [{count:u}, {count:p}, {count:a}, {count:r}] = await Promise.all([
+    sb.from('profiles').select('*', {count:'exact', head:true}),
+    sb.from('posts').select('*', {count:'exact', head:true}),
+    sb.from('articles').select('*', {count:'exact', head:true}).eq('is_draft', false),
+    sb.from('chat_rooms').select('id', {count:'exact', head:true}).eq('status','approved'),
+  ]);
+  document.getElementById('statUsers').textContent = u ?? 0;
+  document.getElementById('statPosts').textContent = p ?? 0;
+  document.getElementById('statArticles').textContent = a ?? 0;
+  document.getElementById('statRooms').textContent = r ?? 0;
+}
+
+function filterByCategory(catId){
+  activeCategoryFilter = catId;
+  nav('feed');
+}
+
+/* ================= NAV / ROUTER ================= */
+let viewedProfileId = null;
+function nav(view){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const navEl = document.querySelector(`.nav-item[data-view="${view}"]`);
+  if(navEl) navEl.classList.add('active');
+  const c = document.getElementById('viewContainer');
+  if(view==='profile') viewedProfileId = null; // clicking the nav item always means "my own profile"
+  if(view==='feed') renderFeed(c);
+  else if(view==='articles') renderArticles(c);
+  else if(view==='rooms') renderRooms(c);
+  else if(view==='profile') renderProfile(c, currentUser.id);
+  else if(view==='admin') renderAdmin(c);
+  else if(view==='bookmarks') renderBookmarks(c);
+  else if(view==='messages') renderMessagesList(c);
+}
+
+function viewProfile(userId){
+  if(!userId) return;
+  viewedProfileId = userId;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  renderProfile(document.getElementById('viewContainer'), userId);
+}
+
+/* ================= FEED ================= */
+async function renderFeed(container){
+  container.innerHTML = `
+    <div class="view">
+      <div class="view-header">
+        <div>
+          <h1>الرئيسية</h1>
+          <div class="sub">${activeCategoryFilter ? 'قسم: ' + (categories.find(c=>c.id===activeCategoryFilter)?.name_ar||'') : 'أحدث المنشورات من كل الأقسام'}</div>
+        </div>
+        ${activeCategoryFilter ? '<button class="btn btn-sm" onclick="activeCategoryFilter=null;nav(\'feed\')">إلغاء الفلتر</button>' : ''}
+      </div>
+      <div class="composer">
+        <textarea id="postContent" placeholder="شارك حاجة مع المجتمع... (بوست، سؤال، كود)"></textarea>
+        <input type="text" id="postTags" placeholder="وسوم مفصولة بفاصلة (اختياري) مثال: react, ai" style="width:100%; background:transparent; border:none; border-top:1px dashed var(--border); color:var(--ink-dim); font-size:12px; padding:8px 0 0; margin-top:8px; font-family:var(--font-mono)">
+        <div class="composer-bar">
+          <select class="chip-select" id="postCategory">
+            <option value="">بدون قسم</option>
+            ${categories.map(c=>`<option value="${c.id}">${c.name_ar}</option>`).join('')}
+          </select>
+          <select class="chip-select" id="postType">
+            <option value="text">نص</option>
+            <option value="code">كود</option>
+            <option value="poll">استطلاع رأي</option>
+          </select>
+          <label class="file-label">📎 صورة/فيديو<input type="file" id="postFile" accept="image/*,video/*" style="display:none" onchange="handlePostFileChosen(this)"></label>
+          <span id="postFileLabel" style="font-size:12px;color:var(--teal)"></span>
+          <button class="btn btn-primary btn-sm" style="margin-right:auto" onclick="submitPost()">نشر</button>
+        </div>
+      </div>
+      ${activeTagFilter ? `<div style="margin-bottom:14px;font-size:13px;color:var(--ink-dim)">وسم: <b style="color:var(--amber)">#${escapeHtml(activeTagFilter)}</b> <a style="color:var(--red);cursor:pointer" onclick="activeTagFilter=null;nav('feed')">إلغاء</a></div>` : ''}
+      <div id="postsList"><div class="empty-state">جاري التحميل...</div></div>
+    </div>`;
+  loadPosts();
+}
+let activeTagFilter = null;
+function filterByTag(tag){ activeTagFilter = tag; activeCategoryFilter = null; nav('feed'); }
+
+let pendingPostFile = null;
+function handlePostFileChosen(input){
+  pendingPostFile = input.files[0] || null;
+  document.getElementById('postFileLabel').textContent = pendingPostFile ? pendingPostFile.name : '';
+}
+
+function showUploadProgress(file){
+  document.getElementById('uploadFileName').textContent = file.name;
+  document.getElementById('uploadProgressFill').style.width = '0%';
+  document.getElementById('uploadProgressPct').textContent = '0%';
+  document.getElementById('uploadProgressStatus').textContent = 'جاري الرفع...';
+  document.getElementById('uploadOverlay').classList.add('active');
+}
+function updateUploadProgress(pct){
+  document.getElementById('uploadProgressFill').style.width = pct + '%';
+  document.getElementById('uploadProgressPct').textContent = pct + '%';
+  if(pct >= 100) document.getElementById('uploadProgressStatus').textContent = 'جاري المعالجة...';
+}
+function hideUploadProgress(){
+  document.getElementById('uploadOverlay').classList.remove('active');
+}
+
+async function uploadToTelegram(file, kind){
+  const form = new FormData();
+  form.append('file', file);
+  form.append('kind', kind);
+  const { data:{ session } } = await sb.auth.getSession();
+  showUploadProgress(file);
+  try{
+    const data = await new Promise((resolve, reject)=>{
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${SUPABASE_URL}/functions/v1/telegram-upload`);
+      xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+      xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+      xhr.upload.onprogress = (e)=>{
+        if(e.lengthComputable){
+          const pct = Math.round((e.loaded / e.total) * 100);
+          updateUploadProgress(pct);
+        }
+      };
+      xhr.onload = ()=>{
+        let parsed;
+        try{ parsed = JSON.parse(xhr.responseText); }catch(e){ parsed = null; }
+        if(xhr.status >= 200 && xhr.status < 300 && parsed){ resolve(parsed); }
+        else{ reject(new Error(parsed?.error || 'فشل رفع الملف')); }
+      };
+      xhr.onerror = ()=> reject(new Error('فشل رفع الملف — تأكد من اتصال الإنترنت'));
+      xhr.send(form);
+    });
+    return data;
+  } finally {
+    hideUploadProgress();
+  }
+}
+
+async function getTelegramFileBlobUrl(file_id){
+  const { data:{ session } } = await sb.auth.getSession();
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/telegram-file-url`, {
+    method:'POST',
+    headers:{ 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON_KEY, 'Content-Type':'application/json' },
+    body: JSON.stringify({ file_id })
+  });
+  if(!res.ok) return null;
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}
+
+async function submitPost(){
+  const content = document.getElementById('postContent').value.trim();
+  const category_id = document.getElementById('postCategory').value || null;
+  const post_type = document.getElementById('postType').value;
+  const tagsRaw = document.getElementById('postTags').value.trim();
+  const tags = tagsRaw ? tagsRaw.split(',').map(t=>t.trim().replace(/^#/,'')).filter(Boolean) : [];
+
+  if(post_type === 'poll'){
+    const question = document.getElementById('postContent').value.trim() || prompt('سؤال الاستطلاع:');
+    if(!question){ toast('اكتب سؤال الاستطلاع', 'error'); return; }
+    const options = [];
+    for(let i=1; i<=6; i++){
+      const opt = prompt(`اختيار رقم ${i} (اسيبه فاضي عشان توقف):`);
+      if(!opt) break;
+      options.push(opt.trim());
+    }
+    if(options.length < 2){ toast('لازم اختيارين على الأقل', 'error'); return; }
+    try{
+      const { data: post, error: postErr } = await sb.from('posts').insert({ author_id: currentUser.id, category_id, content: question, post_type:'poll', tags }).select().single();
+      if(postErr) throw postErr;
+      const { data: poll, error: pollErr } = await sb.from('polls').insert({ post_id: post.id, question }).select().single();
+      if(pollErr) throw pollErr;
+      const { error: optErr } = await sb.from('poll_options').insert(options.map((option_text, i)=>({ poll_id: poll.id, option_text, sort_order:i })));
+      if(optErr) throw optErr;
+      toast('تم نشر الاستطلاع', 'success');
+      document.getElementById('postContent').value=''; document.getElementById('postTags').value='';
+      loadPosts();
+    }catch(e){ toast('خطأ: '+e.message, 'error'); }
+    return;
+  }
+
+  if(!content && !pendingPostFile){ toast('اكتب حاجة الأول', 'error'); return; }
+
+  let telegram_file_id = null;
+  let finalType = post_type;
+  try{
+    if(pendingPostFile){
+      const kind = pendingPostFile.type.startsWith('video') ? 'video' : 'photo';
+      const up = await uploadToTelegram(pendingPostFile, kind);
+      telegram_file_id = up.file_id;
+      finalType = kind === 'video' ? 'video' : 'image';
+    }
+    const { error } = await sb.from('posts').insert({
+      author_id: currentUser.id, category_id, content,
+      post_type: finalType, telegram_file_id, tags,
+      code_language: post_type==='code' ? 'auto' : null
+    });
+    if(error) throw error;
+    toast('تم النشر بنجاح', 'success');
+    document.getElementById('postContent').value='';
+    document.getElementById('postTags').value='';
+    pendingPostFile = null;
+    document.getElementById('postFileLabel').textContent='';
+    loadPosts();
+  }catch(e){ toast('خطأ: '+e.message, 'error'); }
+}
+
+async function loadPosts(){
+  let q = sb.from('posts').select('*, profiles!posts_author_id_fkey(username, full_name, role, avatar_file_id), categories(name_ar), repost:repost_of(id, content, post_type, created_at, profiles!posts_author_id_fkey(username, full_name))').eq('is_removed', false).order('created_at', {ascending:false}).limit(30);
+  if(activeCategoryFilter) q = q.eq('category_id', activeCategoryFilter);
+  if(activeTagFilter) q = q.contains('tags', [activeTagFilter]);
+  const { data: posts, error } = await q;
+  const listEl = document.getElementById('postsList');
+  if(error){ listEl.innerHTML = `<div class="empty-state">تعذر تحميل المنشورات: ${escapeHtml(error.message)}</div>`; return; }
+  if(!posts.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">📭</div>لسه مفيش منشورات — كن أول من ينشر!</div>`; return; }
+
+  const { data: likes } = await sb.from('post_likes').select('post_id').eq('user_id', currentUser.id);
+  const likedSet = new Set((likes||[]).map(l=>l.post_id));
+  const { data: bookmarksData } = await sb.from('bookmarks').select('target_id').eq('user_id', currentUser.id).eq('target_type','post');
+  const bookmarkedSet = new Set((bookmarksData||[]).map(b=>b.target_id));
+
+  listEl.innerHTML = '';
+  for(const p of posts){
+    const el = document.createElement('div');
+    el.className = 'post-card';
+    const author = p.profiles?.full_name || p.profiles?.username || 'مستخدم';
+    const initials = (p.profiles?.username||'?')[0].toUpperCase();
+    const tagsHtml = (p.tags&&p.tags.length) ? `<div style="margin-bottom:10px">${p.tags.map(t=>`<span class="tag" style="cursor:pointer" onclick="filterByTag('${t}')">#${escapeHtml(t)}</span>`).join('')}</div>` : '';
+    const repostHtml = p.repost ? `
+      <div style="border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px; background:var(--surface)">
+        <div style="font-size:12px; color:var(--ink-faint); margin-bottom:6px">@${p.repost.profiles?.username||''} · ${timeAgo(p.repost.created_at)}</div>
+        <div style="font-size:13.5px">${escapeHtml(p.repost.content||'')}</div>
+      </div>` : '';
+    el.innerHTML = `
+      <div class="post-head">
+        <div class="avatar" style="width:32px;height:32px;font-size:12px;cursor:pointer" onclick="viewProfile('${p.author_id}')" id="avatar-post-${p.id}">${initials}</div>
+        <div style="cursor:pointer" onclick="viewProfile('${p.author_id}')"><div class="name">${author}</div><div class="meta">@${p.profiles?.username||''} · ${timeAgo(p.created_at)}</div></div>
+        ${p.categories ? `<div class="post-cat">${p.categories.name_ar}</div>` : ''}
+      </div>
+      ${p.repost_of ? '<div style="font-size:12px;color:var(--ink-faint);margin-bottom:8px">🔁 أعاد نشر منشور</div>' : ''}
+      ${repostHtml}
+      ${p.content ? `<div class="post-content ${p.post_type==='code'?'code':''}">${escapeHtml(p.content||'')}</div>` : ''}
+      ${tagsHtml}
+      ${p.post_type==='poll' ? `<div id="poll-${p.id}"><div class="empty-state" style="padding:16px">جاري تحميل الاستطلاع...</div></div>` : ''}
+      ${p.telegram_file_id ? `<div class="post-file" id="file-${p.id}"><div style="padding:20px;text-align:center;color:var(--ink-faint);font-size:12px">جاري تحميل الملف...</div></div>` : ''}
+      <div class="post-actions">
+        <div class="act ${likedSet.has(p.id)?'liked':''}" onclick="toggleLike('${p.id}', this)">❤️ <span id="likecount-${p.id}">‎</span></div>
+        <div class="act" onclick="toggleComments('${p.id}')">💬 تعليق</div>
+        <div class="act ${bookmarkedSet.has(p.id)?'liked':''}" onclick="toggleBookmark('${p.id}', this)">🔖 حفظ</div>
+        <div class="act" onclick="repostPost('${p.id}')">🔁 إعادة نشر</div>
+        <div class="act" onclick="sharePost('${p.id}')">📤 مشاركة</div>
+        ${(p.author_id===currentUser.id || ['owner','super_admin','admin','moderator'].includes(currentProfile.role)) ? `<div class="act" style="color:var(--red)" onclick="deletePost('${p.id}')">🗑️ حذف</div>` : ''}
+      </div>
+      <div class="comments-box" id="comments-${p.id}"></div>`;
+    listEl.appendChild(el);
+    if(p.profiles?.avatar_file_id) loadAvatarInto(`avatar-post-${p.id}`, p.profiles.avatar_file_id);
+    if(p.telegram_file_id) loadPostFile(p.id, p.post_type, p.telegram_file_id);
+    if(p.post_type==='poll') loadPollWidget(p.id);
+    loadLikeCount(p.id);
+  }
+}
+
+async function toggleBookmark(postId, el){
+  const saved = el.classList.contains('liked');
+  if(saved){
+    await sb.from('bookmarks').delete().eq('user_id', currentUser.id).eq('target_type','post').eq('target_id', postId);
+    el.classList.remove('liked'); toast('اتشال من المحفوظات');
+  }else{
+    const { error } = await sb.from('bookmarks').insert({ user_id: currentUser.id, target_type:'post', target_id: postId });
+    if(error){ toast('خطأ: '+error.message, 'error'); return; }
+    el.classList.add('liked'); toast('اتحفظ ✅', 'success');
+  }
+}
+
+function sharePost(postId){
+  const url = `${window.location.origin}${window.location.pathname}#post-${postId}`;
+  if(navigator.clipboard){ navigator.clipboard.writeText(url); toast('اتنسخ اللينك 📋', 'success'); }
+  else{ prompt('انسخ اللينك:', url); }
+}
+
+async function repostPost(postId){
+  if(!confirm('تعيد نشر المنشور ده في فيدك؟')) return;
+  const { error } = await sb.from('posts').insert({ author_id: currentUser.id, content: null, post_type:'text', repost_of: postId });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم إعادة النشر', 'success');
+  loadPosts();
+}
+
+async function loadPollWidget(postId){
+  const holder = document.getElementById(`poll-${postId}`);
+  if(!holder) return;
+  const { data: poll } = await sb.from('polls').select('id, question').eq('post_id', postId).maybeSingle();
+  if(!poll){ holder.innerHTML=''; return; }
+  const { data: myVote } = await sb.from('poll_votes').select('option_id').eq('poll_id', poll.id).eq('user_id', currentUser.id).maybeSingle();
+  const { data: results } = await sb.rpc('get_poll_results', { p_poll_id: poll.id });
+  const total = (results||[]).reduce((s,r)=>s+Number(r.votes),0);
+  holder.innerHTML = `<div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;background:var(--surface)">
+    ${(results||[]).map(r=>{
+      const pct = total ? Math.round((Number(r.votes)/total)*100) : 0;
+      const isMine = myVote?.option_id === r.option_id;
+      return `<div style="margin-bottom:8px;cursor:pointer" onclick="voteOnPoll('${poll.id}','${r.option_id}','${postId}')">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>${isMine?'✅ ':''}${escapeHtml(r.option_text)}</span><span style="color:var(--ink-faint)">${pct}%</span></div>
+        <div style="background:var(--bg);border-radius:6px;height:8px;overflow:hidden"><div style="background:${isMine?'var(--amber)':'var(--ink-faint)'};height:100%;width:${pct}%"></div></div>
+      </div>`;
+    }).join('')}
+    <div style="font-size:11px;color:var(--ink-faint);margin-top:6px">${total} صوت</div>
+  </div>`;
+}
+
+async function voteOnPoll(pollId, optionId, postId){
+  const { error } = await sb.from('poll_votes').upsert({ poll_id: pollId, option_id: optionId, user_id: currentUser.id }, { onConflict:'poll_id,user_id' });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  loadPollWidget(postId);
+}
+
+function applyAvatarBg(el, url){
+  el.style.backgroundImage = `url(${url})`; el.style.backgroundSize='cover'; el.style.backgroundPosition='center'; el.textContent='';
+}
+function blobToDataURL(blob){
+  return new Promise((resolve, reject)=>{
+    const r = new FileReader();
+    r.onload = ()=>resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(blob);
+  });
+}
+function getCachedFile(fileId){
+  try{ return localStorage.getItem('dvfile:'+fileId); }catch(e){ return null; }
+}
+function setCachedFile(fileId, dataUrl){
+  try{ localStorage.setItem('dvfile:'+fileId, dataUrl); }catch(e){ /* storage full or unavailable — safe to ignore, just won't cache */ }
+}
+
+async function loadAvatarInto(elId, fileId){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const cached = getCachedFile(fileId);
+  if(cached){ applyAvatarBg(el, cached); return; }
+  const { data:{ session } } = await sb.auth.getSession();
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/telegram-file-url`, {
+    method:'POST',
+    headers:{ 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON_KEY, 'Content-Type':'application/json' },
+    body: JSON.stringify({ file_id: fileId })
+  });
+  if(!res.ok) return;
+  const blob = await res.blob();
+  try{
+    const dataUrl = await blobToDataURL(blob);
+    setCachedFile(fileId, dataUrl);
+    applyAvatarBg(el, dataUrl);
+  }catch(e){
+    applyAvatarBg(el, URL.createObjectURL(blob));
+  }
+}
+
+async function loadPostFile(postId, type, fileId){
+  const url = await getTelegramFileBlobUrl(fileId);
+  const holder = document.getElementById(`file-${postId}`);
+  if(!holder) return;
+  if(!url){ holder.innerHTML = `<div style="padding:16px;color:var(--ink-faint);font-size:12px">تعذر تحميل الملف</div>`; return; }
+  holder.innerHTML = type==='video' ? `<video src="${url}" controls></video>` : `<img src="${url}">`;
+}
+
+async function loadLikeCount(postId){
+  const { count } = await sb.from('post_likes').select('*', {count:'exact', head:true}).eq('post_id', postId);
+  const elx = document.getElementById(`likecount-${postId}`);
+  if(elx) elx.textContent = count || 0;
+}
+
+async function deletePost(postId){
+  if(!confirm('متأكد إنك عايز تحذف المنشور ده؟')) return;
+  const { error } = await sb.from('posts').update({ is_removed: true }).eq('id', postId);
+  if(error){ toast('تعذر الحذف: '+error.message, 'error'); return; }
+  toast('تم حذف المنشور', 'success');
+  loadPosts();
+}
+
+async function toggleLike(postId, el){
+  const liked = el.classList.contains('liked');
+  if(liked){
+    await sb.from('post_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+    el.classList.remove('liked');
+  }else{
+    await sb.from('post_likes').insert({ post_id: postId, user_id: currentUser.id });
+    el.classList.add('liked');
+  }
+  loadLikeCount(postId);
+}
+
+async function toggleComments(postId){
+  const box = document.getElementById(`comments-${postId}`);
+  box.classList.toggle('open');
+  if(!box.classList.contains('open')) return;
+  box.innerHTML = `<div class="empty-state" style="padding:10px">جاري التحميل...</div>`;
+  const { data: comments } = await sb.from('post_comments').select('*, profiles(username)').eq('post_id', postId).eq('is_removed', false).order('created_at');
+  box.innerHTML = (comments||[]).map(c=>`<div class="comment"><b class="name" style="cursor:pointer" onclick="viewProfile('${c.author_id}')">@${c.profiles?.username||''}</b> ${escapeHtml(c.content)}</div>`).join('')
+    + `<div class="comment-input"><input type="text" placeholder="اكتب تعليق..." onkeydown="if(event.key==='Enter')submitComment('${postId}', this)"></div>`;
+}
+
+async function submitComment(postId, input){
+  const content = input.value.trim();
+  if(!content) return;
+  const { error } = await sb.from('post_comments').insert({ post_id: postId, author_id: currentUser.id, content });
+  if(error){ toast('تعذر إرسال التعليق', 'error'); return; }
+  input.value='';
+  toggleComments(postId); toggleComments(postId);
+}
+
+/* ================= ARTICLES ================= */
+async function renderArticles(container){
+  container.innerHTML = `
+    <div class="view">
+      <div class="view-header">
+        <div><h1>المقالات</h1><div class="sub">مقالات تقنية من المجتمع</div></div>
+        <button class="btn btn-primary btn-sm" onclick="openArticleEditor()">✍️ كتابة مقال</button>
+      </div>
+      <div id="articlesList"><div class="empty-state">جاري التحميل...</div></div>
+    </div>`;
+  const { data: articles, error } = await sb.from('articles').select('*, profiles(username, full_name)').eq('is_draft', false).eq('is_removed', false).order('created_at', {ascending:false});
+  const listEl = document.getElementById('articlesList');
+  if(error || !articles?.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">📝</div>لسه مفيش مقالات منشورة</div>`; return; }
+  listEl.innerHTML = articles.map(a=>`
+    <div class="article-card" onclick="openArticleReader('${a.id}')">
+      <h3>${escapeHtml(a.title)}</h3>
+      <div class="article-meta">${a.profiles?.full_name||a.profiles?.username} · ${timeAgo(a.created_at)} · ${a.views} مشاهدة</div>
+      <div class="article-excerpt">${escapeHtml((a.content_markdown||'').slice(0,160))}...</div>
+    </div>`).join('');
+}
+
+async function openArticleReader(articleId){
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `<div class="view"><div class="empty-state">جاري التحميل...</div></div>`;
+  sb.rpc('increment_article_views', { p_article_id: articleId });
+  const { data: a, error } = await sb.from('articles').select('*, profiles(username, full_name, avatar_file_id)').eq('id', articleId).single();
+  if(error || !a){ c.innerHTML = `<div class="view"><div class="empty-state">تعذر تحميل المقال</div></div>`; return; }
+  const { count: likeCount } = await sb.from('article_likes').select('*',{count:'exact',head:true}).eq('article_id', articleId);
+  const { data: myLike } = await sb.from('article_likes').select('*').eq('article_id', articleId).eq('user_id', currentUser.id).maybeSingle();
+  const { data: bookmark } = await sb.from('bookmarks').select('*').eq('user_id', currentUser.id).eq('target_type','article').eq('target_id', articleId).maybeSingle();
+  const { data: comments } = await sb.from('article_comments').select('*, profiles(username)').eq('article_id', articleId).eq('is_removed', false).order('created_at');
+  c.innerHTML = `<div class="view">
+    <button class="btn btn-sm" style="margin-bottom:16px" onclick="nav('articles')">→ رجوع للمقالات</button>
+    <h1 style="font-family:var(--font-display);font-size:26px;margin-bottom:8px">${escapeHtml(a.title)}</h1>
+    <div class="article-meta" style="margin-bottom:20px">${escapeHtml(a.profiles?.full_name||a.profiles?.username||'')} · ${timeAgo(a.created_at)} · ${a.views+1} مشاهدة</div>
+    <div style="white-space:pre-wrap;line-height:1.9;font-size:15px;margin-bottom:20px">${escapeHtml(a.content_markdown||'')}</div>
+    <div class="post-actions" style="margin-bottom:20px">
+      <div class="act ${myLike?'liked':''}" id="articleLikeAct" onclick="toggleArticleLike('${articleId}', this)">❤️ <span id="articleLikeCount">${likeCount||0}</span></div>
+      <div class="act ${bookmark?'liked':''}" onclick="toggleArticleBookmark('${articleId}', this)">🔖 حفظ</div>
+    </div>
+    <div class="view-header"><h1 style="font-size:16px">التعليقات</h1></div>
+    <div id="articleComments">${(comments||[]).map(cm=>`<div class="comment"><b class="name" style="cursor:pointer" onclick="viewProfile('${cm.author_id}')">@${cm.profiles?.username||''}</b> ${escapeHtml(cm.content)}</div>`).join('')}</div>
+    <div class="comment-input" style="margin-top:10px"><input type="text" id="articleCommentInput" placeholder="اكتب تعليق..." onkeydown="if(event.key==='Enter')submitArticleComment('${articleId}')"></div>
+  </div>`;
+}
+
+async function toggleArticleLike(articleId, el){
+  const liked = el.classList.contains('liked');
+  if(liked){ await sb.from('article_likes').delete().eq('article_id', articleId).eq('user_id', currentUser.id); el.classList.remove('liked'); }
+  else{ await sb.from('article_likes').insert({ article_id: articleId, user_id: currentUser.id }); el.classList.add('liked'); }
+  const { count } = await sb.from('article_likes').select('*',{count:'exact',head:true}).eq('article_id', articleId);
+  document.getElementById('articleLikeCount').textContent = count||0;
+}
+
+async function toggleArticleBookmark(articleId, el){
+  const saved = el.classList.contains('liked');
+  if(saved){ await sb.from('bookmarks').delete().eq('user_id', currentUser.id).eq('target_type','article').eq('target_id', articleId); el.classList.remove('liked'); toast('اتشال من المحفوظات'); }
+  else{ await sb.from('bookmarks').insert({ user_id: currentUser.id, target_type:'article', target_id: articleId }); el.classList.add('liked'); toast('اتحفظ ✅','success'); }
+}
+
+async function submitArticleComment(articleId){
+  const input = document.getElementById('articleCommentInput');
+  const content = input.value.trim();
+  if(!content) return;
+  const { error } = await sb.from('article_comments').insert({ article_id: articleId, author_id: currentUser.id, content });
+  if(error){ toast('تعذر إرسال التعليق: '+error.message, 'error'); return; }
+  input.value='';
+  openArticleReader(articleId);
+}
+
+function openArticleEditor(){
+  const title = prompt('عنوان المقال:');
+  if(!title) return;
+  const content = prompt('محتوى المقال (Markdown):');
+  if(!content) return;
+  const slug = title.trim().toLowerCase().replace(/[^ء-ي a-z0-9]/gi,'').replace(/\s+/g,'-') + '-' + Date.now();
+  sb.from('articles').insert({ author_id: currentUser.id, title, slug, content_markdown: content, is_draft:false })
+    .then(({error})=>{
+      if(error){ toast('خطأ: '+error.message, 'error'); return; }
+      toast('تم نشر المقال', 'success');
+      nav('articles');
+    });
+}
+
+/* ================= CHAT ROOMS ================= */
+async function renderRooms(container){
+  container.innerHTML = `
+    <div class="view">
+      <div class="view-header">
+        <div><h1>غرف الدردشة</h1><div class="sub">الغرف اللي انت عضو فيها بس — ادخل غرفة جديدة بلينك دعوة</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm" onclick="promptJoinByInvite()">🔗 دخول بلينك دعوة</button>
+          <button class="btn btn-primary btn-sm" onclick="requestNewRoom()">+ طلب غرفة جديدة</button>
+        </div>
+      </div>
+      <div id="roomsList"><div class="empty-state">جاري التحميل...</div></div>
+    </div>`;
+  const { data: rooms, error } = await sb.from('chat_rooms')
+    .select('id, name, description, category_id, creator_id, status, room_number, created_at, categories(name_ar)')
+    .order('created_at', {ascending:false});
+  const listEl = document.getElementById('roomsList');
+  if(error || !rooms?.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">💬</div>لسه مفيش غرف — اطلب أول غرفة أو ادخل بلينك دعوة</div>`; return; }
+  listEl.innerHTML = rooms.map(r=>`
+    <div class="room-card">
+      <div class="room-info">
+        <div class="name">${escapeHtml(r.name)} <span class="room-number-tag">#${r.room_number}</span> ${r.categories?`<span class="post-cat">${r.categories.name_ar}</span>`:''}</div>
+        <div class="desc">${escapeHtml(r.description||'')}</div>
+      </div>
+      <span class="status-pill ${r.status}">${r.status==='pending'?'بانتظار الموافقة':r.status==='approved'?'مفعّلة':'مرفوضة'}</span>
+      ${r.status==='approved' ? `<button class="btn btn-sm" onclick="openRoomChat('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">دخول</button>` : ''}
+      ${r.creator_id===currentUser.id ? `<button class="btn btn-sm" onclick="openRoomAdminPanel('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">⚙️ إدارة</button>` : ''}
+    </div>`).join('');
+}
+
+function promptJoinByInvite(){
+  const input = prompt('الصق لينك الدعوة أو الكود بتاعه:');
+  if(!input) return;
+  // Accept either a raw code or a full URL like https://site.com/?invite=CODE
+  let code = input.trim();
+  const match = code.match(/[?&]invite=([^&\s]+)/);
+  if(match) code = match[1];
+  joinRoomByCode(code);
+}
+
+async function joinRoomByCode(code){
+  const { data: roomId, error } = await sb.rpc('join_room_via_invite', { p_code: code });
+  if(error){
+    const msg = error.message.includes('invite not found') ? 'لينك الدعوة غلط'
+      : error.message.includes('invite revoked') ? 'لينك الدعوة ده ملغي'
+      : error.message.includes('invite expired') ? 'لينك الدعوة انتهى'
+      : error.message.includes('invite exhausted') ? 'لينك الدعوة وصل للحد الأقصى للاستخدام'
+      : error.message.includes('banned from room') ? 'انت متطرود من الغرفة دي'
+      : error.message;
+    toast('تعذر الدخول: '+msg, 'error');
+    return;
+  }
+  const { data: room } = await sb.from('chat_rooms').select('name').eq('id', roomId).single();
+  toast('اتضفت للغرفة بنجاح', 'success');
+  checkUnreadBadges();
+  openRoomChat(roomId, room?.name || '');
+}
+
+// Auto-join if the page was opened with ?invite=CODE in the URL
+function checkUrlInviteOnLoad(){
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('invite');
+  if(code && currentUser){
+    joinRoomByCode(code);
+    // clean the URL so refreshing doesn't re-trigger the join
+    const url = new URL(window.location.href);
+    url.searchParams.delete('invite');
+    window.history.replaceState({}, '', url.toString());
+  }
+}
+
+function requestNewRoom(){
+  const name = prompt('اسم الغرفة:');
+  if(!name) return;
+  const description = prompt('وصف قصير للغرفة:') || '';
+  sb.from('chat_rooms').insert({ name, description, creator_id: currentUser.id, status:'pending' })
+    .then(({error})=>{
+      if(error){ toast('خطأ: '+error.message, 'error'); return; }
+      toast('تم إرسال الطلب — بانتظار موافقة الأدمن', 'success');
+      nav('rooms');
+    });
+}
+
+async function openRoomChat(roomId, roomName){
+  activeRoomId = roomId;
+  replyingTo = null;
+  const { data: roomInfo } = await sb.from('chat_rooms').select('creator_id, room_number, is_disabled').eq('id', roomId).single();
+  activeRoomCreatorId = roomInfo?.creator_id || null;
+  const isRoomAdmin = activeRoomCreatorId === currentUser.id;
+  const { data: membership } = await sb.from('chat_room_members').select('is_muted').eq('room_id', roomId).eq('user_id', currentUser.id).single();
+  const isMuted = membership?.is_muted || false;
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="chat-view">
+      <div class="rooms-rail" id="roomsRail"></div>
+      <div style="flex:1;display:flex;flex-direction:column">
+        <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:600;display:flex;align-items:center;gap:10px">
+          <button class="btn btn-sm" onclick="nav('rooms')">→</button>
+          <span>${escapeHtml(roomName)} <span class="room-number-tag">#${roomInfo?.room_number ?? ''}</span></span>
+          <button class="btn btn-sm" style="margin-right:auto" id="roomMuteBtn" onclick="toggleRoomMute('${roomId}')">${isMuted ? '🔕 مكتومة' : '🔔 إشعارات مفعّلة'}</button>
+          ${isRoomAdmin ? `<button class="btn btn-sm" onclick="openRoomAdminPanel('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')">⚙️ إدارة الغرفة</button>` : ''}
+        </div>
+        ${roomInfo?.is_disabled ? `<div style="padding:8px 20px;background:rgba(232,93,93,.1);color:var(--red);font-size:12px">هذه الغرفة معطّلة من الإدارة — الأعضاء العاديين مايقدروش يبعتوا رسايل فيها</div>` : ''}
+        <div id="pinnedBanner"></div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div id="typingIndicator" style="padding:4px 20px;font-size:12px;color:var(--ink-faint);min-height:20px"></div>
+        <div id="replyBar" style="display:none;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border-top:1px solid var(--border);font-size:12px;color:var(--ink-dim)">
+          <span id="replyBarText" style="flex:1"></span>
+          <button class="icon-btn" style="width:24px;height:24px" onclick="cancelReply()">×</button>
+        </div>
+        <div id="roomRecordBar" class="record-bar"><span class="record-dot"></span><span id="roomRecordTime">0:00</span> جاري التسجيل...
+          <button class="btn btn-sm" onclick="cancelVoiceRecording('room')">إلغاء</button>
+          <button class="btn btn-primary btn-sm" onclick="stopVoiceRecording('room')">إرسال</button>
+        </div>
+        <div class="chat-input-bar">
+          <label class="file-label">📎<input type="file" id="chatFile" style="display:none" onchange="sendChatFile(this)"></label>
+          <span class="mic-btn" id="roomMicBtn" onclick="startVoiceRecording('room')">🎤</span>
+          <input type="text" id="chatInput" placeholder="اكتب رسالة... (اضغط على رسالة عشان ترد عليها)" oninput="broadcastTyping()" onkeydown="if(event.key==='Enter')sendChatMessage()">
+          <button class="btn btn-primary btn-sm" onclick="sendChatMessage()">إرسال</button>
+        </div>
+      </div>
+    </div>`;
+  loadRoomsRail();
+  loadRoomMessages(roomId);
+  subscribeToRoom(roomId);
+  subscribeToTyping(roomId);
+  sb.rpc('mark_room_read', { p_room_id: roomId }).then(()=>checkUnreadBadges());
+}
+
+async function toggleRoomMute(roomId){
+  const btn = document.getElementById('roomMuteBtn');
+  const currentlyMuted = btn?.textContent.includes('مكتومة');
+  const { error } = await sb.rpc('toggle_room_mute', { p_room_id: roomId, p_muted: !currentlyMuted });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  if(btn) btn.textContent = currentlyMuted ? '🔔 إشعارات مفعّلة' : '🔕 مكتومة';
+}
+
+async function loadRoomsRail(){
+  // Only rooms the user is actually a member of are shown — rooms are private now.
+  const { data: memberships } = await sb.from('chat_room_members').select('room_id, chat_rooms(id, name, creator_id, status)').eq('user_id', currentUser.id);
+  const rooms = (memberships||[]).map(m=>m.chat_rooms).filter(r=>r && r.status==='approved');
+  document.getElementById('roomsRail').innerHTML = rooms.map(r=>
+    `<div class="room-item ${r.id===activeRoomId?'active':''}" onclick="openRoomChat('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">${escapeHtml(r.name)}</div>`
+  ).join('');
+}
+
+/* ================= ROOM ADMIN PANEL (invites + members) ================= */
+async function openRoomAdminPanel(roomId, roomName){
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="view">
+      <div class="view-header">
+        <div><h1>إدارة غرفة: ${escapeHtml(roomName)}</h1><div class="sub">لينكات الدعوة والأعضاء</div></div>
+        <button class="btn btn-sm" onclick="openRoomChat('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')">→ رجوع للغرفة</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:18px">
+        <button class="btn btn-primary btn-sm" onclick="createInviteFlow('${roomId}')">+ إنشاء لينك دعوة</button>
+      </div>
+      <h3 style="margin-bottom:10px;font-size:15px">لينكات الدعوة</h3>
+      <div id="roomInvitesList"><div class="empty-state">جاري التحميل...</div></div>
+      <h3 style="margin:22px 0 10px;font-size:15px">الأعضاء</h3>
+      <div id="roomMembersList"><div class="empty-state">جاري التحميل...</div></div>
+    </div>`;
+  loadRoomInvites(roomId);
+  loadRoomMembers(roomId);
+}
+
+async function createInviteFlow(roomId){
+  const usesInput = prompt('أقصى عدد استخدام للينك (سيبها فاضية = بلا حدود):');
+  if(usesInput === null) return;
+  const maxUses = usesInput.trim() ? parseInt(usesInput.trim(), 10) : null;
+  const hoursInput = prompt('اللينك يخلص بعد كام ساعة؟ (سيبها فاضية = ما يخلصش):');
+  if(hoursInput === null) return;
+  const expiresHours = hoursInput.trim() ? parseInt(hoursInput.trim(), 10) : null;
+  const { data, error } = await sb.rpc('create_room_invite', { p_room_id: roomId, p_max_uses: maxUses, p_expires_in_hours: expiresHours });
+  if(error){ toast('تعذر إنشاء اللينك: '+error.message, 'error'); return; }
+  const invite = Array.isArray(data) ? data[0] : data;
+  const link = `${window.location.origin}${window.location.pathname}?invite=${invite.code}`;
+  try{ await navigator.clipboard.writeText(link); toast('تم إنشاء اللينك ونسخه', 'success'); }
+  catch(e){ toast('تم إنشاء اللينك: '+link, 'success'); }
+  loadRoomInvites(roomId);
+}
+
+async function loadRoomInvites(roomId){
+  const { data: invites, error } = await sb.rpc('list_room_invites', { p_room_id: roomId });
+  const el = document.getElementById('roomInvitesList');
+  if(!el) return;
+  if(error){ el.innerHTML = `<div class="empty-state" style="color:var(--red)">تعذر التحميل: ${escapeHtml(error.message)}</div>`; return; }
+  if(!invites?.length){ el.innerHTML = `<div class="empty-state" style="padding:20px">لسه مفيش لينكات دعوة — أنشئ واحد</div>`; return; }
+  el.innerHTML = invites.map(inv=>{
+    const link = `${window.location.origin}${window.location.pathname}?invite=${inv.code}`;
+    const expired = inv.expires_at && new Date(inv.expires_at) < new Date();
+    const exhausted = inv.max_uses !== null && inv.uses_count >= inv.max_uses;
+    const dead = !inv.is_active || expired || exhausted;
+    return `<div class="invite-row ${dead?'revoked':''}">
+      <div style="flex:1">
+        <div class="code">${escapeHtml(link)}</div>
+        <div class="meta">استُخدم ${inv.uses_count}${inv.max_uses!==null?` / ${inv.max_uses}`:''} مرة
+          ${inv.expires_at?` · ينتهي ${new Date(inv.expires_at).toLocaleString('ar-EG')}`:''}
+          ${!inv.is_active?' · ملغي':expired?' · منتهي':exhausted?' · وصل للحد الأقصى':' · فعّال'}
+        </div>
+      </div>
+      <button class="btn btn-sm" onclick="copyInviteLink('${link}')">نسخ</button>
+      ${inv.is_active ? `<button class="btn btn-sm" style="color:var(--red)" onclick="revokeInvite('${inv.id}','${roomId}')">إلغاء</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function copyInviteLink(link){
+  try{ await navigator.clipboard.writeText(link); toast('تم نسخ اللينك', 'success'); }
+  catch(e){ toast(link, 'success'); }
+}
+
+async function revokeInvite(inviteId, roomId){
+  if(!confirm('تلغي لينك الدعوة ده؟ محدش هيقدر يدخل بيه تاني')) return;
+  const { error } = await sb.rpc('revoke_room_invite', { p_invite_id: inviteId });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  loadRoomInvites(roomId);
+}
+
+async function loadRoomMembers(roomId){
+  const { data: members, error } = await sb.rpc('list_room_members', { p_room_id: roomId });
+  const el = document.getElementById('roomMembersList');
+  if(!el) return;
+  if(error){ el.innerHTML = `<div class="empty-state" style="color:var(--red)">تعذر التحميل: ${escapeHtml(error.message)}</div>`; return; }
+  const { data: room } = await sb.from('chat_rooms').select('creator_id').eq('id', roomId).single();
+  el.innerHTML = (members||[]).map(m=>`
+    <div class="member-row">
+      <div class="avatar" id="memav-${m.user_id}" style="width:28px;height:28px;font-size:12px;cursor:pointer" onclick="viewProfile('${m.user_id}')">${(m.username||'?')[0].toUpperCase()}</div>
+      <div class="name" style="cursor:pointer" onclick="viewProfile('${m.user_id}')">${escapeHtml(m.full_name||m.username||'مستخدم')} ${m.user_id===room?.creator_id?' 👑':''}</div>
+      ${m.user_id!==room?.creator_id ? `
+        <button class="btn btn-sm" onclick="kickMember('${roomId}','${m.user_id}', false)">طرد</button>
+        <button class="btn btn-sm" style="color:var(--red)" onclick="kickMember('${roomId}','${m.user_id}', true)">طرد + حظر</button>
+      ` : ''}
+    </div>`).join('');
+  (members||[]).forEach(m=>{ if(m.avatar_file_id) loadAvatarInto(`memav-${m.user_id}`, m.avatar_file_id); });
+}
+
+async function kickMember(roomId, userId, ban){
+  if(!confirm(ban ? 'تطرد وتحظر العضو ده؟ مش هيقدر يدخل الغرفة تاني حتى بلينك جديد' : 'تطرد العضو ده من الغرفة؟')) return;
+  const { error } = await sb.rpc('kick_room_member', { p_room_id: roomId, p_user_id: userId, p_ban: ban });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم', 'success');
+  loadRoomMembers(roomId);
+}
+
+let replyingTo = null;
+async function loadRoomMessages(roomId){
+  const { data: msgs } = await sb.from('chat_messages').select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))').eq('room_id', roomId).order('created_at').limit(100);
+  renderMessages(msgs||[]);
+  refreshPinnedBanner(roomId);
+}
+
+function canModerateRoom(){
+  return ['owner','super_admin','admin','moderator'].includes(currentProfile.role) || (activeRoomCreatorId && activeRoomCreatorId === currentUser.id);
+}
+
+function canDeleteMessage(m){
+  return m.sender_id === currentUser.id
+    || ['owner','super_admin','admin','moderator'].includes(currentProfile.role)
+    || (activeRoomCreatorId && activeRoomCreatorId === currentUser.id);
+}
+
+function renderMessages(msgs){
+  const box = document.getElementById('chatMessages');
+  if(!box) return;
+  box.innerHTML = msgs.map(m=>renderOneMessage(m, m.profiles?.username, m.profiles?.avatar_file_id)).join('');
+  box.scrollTop = box.scrollHeight;
+  msgs.forEach(m=>{
+    if(m.profiles?.avatar_file_id) loadAvatarInto(`msgav-${m.id}`, m.profiles.avatar_file_id);
+    if(!m.is_removed && m.telegram_file_id) loadMessageMedia(m);
+  });
+}
+
+function renderOneMessage(m, username, avatarFileId){
+  const mine = m.sender_id===currentUser.id;
+  const initials = (username||'?')[0]?.toUpperCase()||'?';
+  return `
+    <div class="msg-row ${mine?'mine':''}">
+      <div class="msg-avatar" id="msgav-${m.id}" onclick="viewProfile('${m.sender_id}')">${initials}</div>
+      <div class="msg ${mine?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setReplyTarget('${m.id}', '${escapeHtml((username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||(m.message_type==='voice'?'رسالة صوتية':m.content)||'').slice(0,60)).replace(/'/g,"\\'")}')"`}>
+        <div class="sender"><span style="cursor:pointer" onclick="event.stopPropagation();viewProfile('${m.sender_id}')">@${username||''}</span> <span style="color:var(--ink-faint);font-weight:400">· ${formatMsgTime(m.created_at)}${m.edited_at?" · (معدّلة)":""}</span>
+          ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
+            ${(m.room_id && canModerateRoom()) ? `<span style="cursor:pointer" onclick="event.stopPropagation();togglePinMessage('${m.id}', ${!m.is_pinned})" title="${m.is_pinned?'إلغاء التثبيت':'تثبيت'}">${m.is_pinned?'📌':'📍'}</span>` : ''}
+            ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل">✏️</span>` : ''}
+            ${canDeleteMessage(m) ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteMessage('${m.id}')" title="حذف الرسالة">🗑️</span>` : ''}
+          </span>` : ''}
+        </div>
+        ${m.is_removed ? `<i style="color:var(--ink-faint)">تم حذف هذه الرسالة</i>` : `
+          ${m.reply ? `<div style="border-right:3px solid var(--amber);padding-right:8px;margin-bottom:6px;opacity:.75;font-size:12px">@${m.reply.profiles?.username||''}: ${escapeHtml((m.reply.content||'').slice(0,50))}</div>` : ''}
+          ${renderMessageBody(m)}
+        `}
+      </div>
+    </div>`;
+}
+
+function renderMessageBody(m){
+  if(m.message_type==='voice'){
+    return `<div class="msg-voice" id="msgmedia-${m.id}">🎤 <span style="font-size:12px;color:var(--ink-faint)">${m.duration_seconds?formatDuration(m.duration_seconds):''}</span></div>`;
+  }
+  if(m.message_type==='image'){
+    return `<div class="msg-media" id="msgmedia-${m.id}">${escapeHtml(m.content||'')}</div>`;
+  }
+  if(m.message_type==='video'){
+    return `<div class="msg-media" id="msgmedia-${m.id}">${escapeHtml(m.content||'')}</div>`;
+  }
+  if(m.message_type==='document'){
+    return `<div id="msgmedia-${m.id}">📎 ${escapeHtml(m.content||'ملف')}</div>`;
+  }
+  return escapeHtml(m.content||'');
+}
+
+function formatDuration(sec){
+  const m = Math.floor(sec/60), s = sec%60;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+async function loadMessageMedia(m){
+  const el = document.getElementById(`msgmedia-${m.id}`);
+  if(!el) return;
+  const cached = getCachedFile(m.telegram_file_id);
+  const url = cached || await getTelegramFileBlobUrl(m.telegram_file_id);
+  if(!url) return;
+  if(!cached && m.message_type!=='voice'){
+    try{
+      const res = await fetch(url); const blob = await res.blob();
+      const dataUrl = await blobToDataURL(blob);
+      setCachedFile(m.telegram_file_id, dataUrl);
+    }catch(e){ /* best-effort caching only */ }
+  }
+  if(m.message_type==='voice'){
+    el.innerHTML = `<audio controls src="${url}"></audio> <span style="font-size:12px;color:var(--ink-faint)">${m.duration_seconds?formatDuration(m.duration_seconds):''}</span>`;
+  } else if(m.message_type==='image'){
+    el.innerHTML = `<img src="${url}" onclick="event.stopPropagation();window.open('${url}','_blank')">`;
+  } else if(m.message_type==='video'){
+    el.innerHTML = `<video controls src="${url}"></video>`;
+  }
+}
+
+async function togglePinMessage(msgId, pinTo){
+  const { error } = await sb.from('chat_messages').update({ is_pinned: pinTo }).eq('id', msgId);
+  if(error){ toast('خطأ: '+error.message, 'error'); }
+  // UI updates via the realtime UPDATE subscription (fires for the actor too)
+}
+
+async function editMessage(msgId, currentContent){
+  const newContent = prompt('عدّل رسالتك:', currentContent);
+  if(newContent===null || !newContent.trim() || newContent===currentContent) return;
+  const { error } = await sb.from('chat_messages').update({ content: newContent.trim(), edited_at: new Date().toISOString() }).eq('id', msgId);
+  if(error){ toast('تعذر التعديل: '+error.message, 'error'); }
+}
+
+async function deleteMessage(msgId){
+  if(!confirm('تحذف الرسالة دي؟')) return;
+  const { error } = await sb.from('chat_messages').update({ is_removed: true }).eq('id', msgId);
+  if(error){ toast('تعذر الحذف: '+error.message, 'error'); }
+}
+
+function setReplyTarget(msgId, username, preview){
+  replyingTo = msgId;
+  const bar = document.getElementById('replyBar');
+  if(bar){ bar.style.display='flex'; document.getElementById('replyBarText').textContent = `رد على @${username}: ${preview}`; }
+}
+function cancelReply(){
+  replyingTo = null;
+  const bar = document.getElementById('replyBar');
+  if(bar) bar.style.display='none';
+}
+
+function isScrolledNearBottom(box){
+  if(!box) return true;
+  return (box.scrollHeight - box.scrollTop - box.clientHeight) < 120;
+}
+
+function subscribeToRoom(roomId){
+  if(roomChannel) sb.removeChannel(roomChannel);
+  roomChannel = sb.channel('room-'+roomId)
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'chat_messages', filter:`room_id=eq.${roomId}` }, async (payload)=>{
+      const box = document.getElementById('chatMessages');
+      const wasNearBottom = isScrolledNearBottom(box);
+      const { data: full } = await sb.from('chat_messages')
+        .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
+        .eq('id', payload.new.id).single();
+      if(!full || !box) return;
+      // Avoid duplicating a message we already rendered optimistically or via a prior event
+      if(document.getElementById(`msgav-${full.id}`)) return;
+      box.insertAdjacentHTML('beforeend', renderOneMessage(full, full.profiles?.username, full.profiles?.avatar_file_id));
+      if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
+      if(full.telegram_file_id) loadMessageMedia(full);
+      if(wasNearBottom) box.scrollTop = box.scrollHeight;
+    })
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'chat_messages', filter:`room_id=eq.${roomId}` }, async (payload)=>{
+      // Covers edits, deletes (is_removed), and pin toggles — re-render just this one row.
+      const { data: full } = await sb.from('chat_messages')
+        .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
+        .eq('id', payload.new.id).single();
+      if(!full) return;
+      const row = document.getElementById(`msgav-${full.id}`)?.closest('.msg-row');
+      if(row) row.outerHTML = renderOneMessage(full, full.profiles?.username, full.profiles?.avatar_file_id);
+      if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
+      if(!full.is_removed && full.telegram_file_id) loadMessageMedia(full);
+      refreshPinnedBanner(roomId);
+    }).subscribe();
+}
+
+async function refreshPinnedBanner(roomId){
+  const { data: pinned } = await sb.from('chat_messages').select('id, content').eq('room_id', roomId).eq('is_pinned', true).eq('is_removed', false).order('created_at', {ascending:false}).limit(1);
+  const banner = document.getElementById('pinnedBanner');
+  if(!banner) return;
+  if(!pinned?.length){ banner.innerHTML=''; return; }
+  const last = pinned[0];
+  banner.innerHTML = `<div style="padding:8px 20px;background:rgba(79,143,255,.08);border-bottom:1px solid var(--border);font-size:12px;display:flex;align-items:center;gap:8px">
+    <span>📌</span><span style="flex:1">${escapeHtml((last.content||'').slice(0,80))}</span>
+    <span style="cursor:pointer;color:var(--ink-faint)" onclick="togglePinMessage('${last.id}', false)">إلغاء التثبيت</span>
+  </div>`;
+}
+
+let typingChannel = null;
+let typingTimeout = null;
+let typingUsers = new Map();
+function subscribeToTyping(roomId){
+  if(typingChannel) sb.removeChannel(typingChannel);
+  typingUsers = new Map();
+  typingChannel = sb.channel('typing-'+roomId)
+    .on('broadcast', { event:'typing' }, (payload)=>{
+      const { user_id, username } = payload.payload;
+      if(user_id === currentUser.id) return;
+      typingUsers.set(user_id, username);
+      renderTypingIndicator();
+      clearTimeout(typingUsers.get('_timeout_'+user_id));
+      const t = setTimeout(()=>{ typingUsers.delete(user_id); renderTypingIndicator(); }, 3000);
+      typingUsers.set('_timeout_'+user_id, t);
+    }).subscribe();
+}
+
+function renderTypingIndicator(){
+  const el = document.getElementById('typingIndicator');
+  if(!el) return;
+  const names = [...typingUsers.entries()].filter(([k])=>!k.startsWith('_timeout_')).map(([,v])=>v);
+  el.textContent = names.length ? `${names.join('، ')} بيكتب...` : '';
+}
+
+function broadcastTyping(){
+  if(!typingChannel || !activeRoomId) return;
+  clearTimeout(typingTimeout);
+  typingChannel.send({ type:'broadcast', event:'typing', payload:{ user_id: currentUser.id, username: currentProfile.username } });
+}
+
+let sendingChatMessage = false;
+async function sendChatMessage(){
+  if(sendingChatMessage) return;
+  const input = document.getElementById('chatInput');
+  const content = input.value.trim();
+  if(!content || !activeRoomId) return;
+  sendingChatMessage = true;
+  input.disabled = true;
+  const { error } = await sb.from('chat_messages').insert({ room_id: activeRoomId, sender_id: currentUser.id, content, message_type:'text', reply_to_id: replyingTo });
+  input.disabled = false;
+  sendingChatMessage = false;
+  if(error){ toast('تعذر الإرسال: '+error.message, 'error'); return; }
+  input.value='';
+  input.focus();
+  cancelReply();
+}
+
+async function sendChatFile(input){
+  const file = input.files[0];
+  if(!file || !activeRoomId) return;
+  try{
+    const kind = file.type.startsWith('image')?'photo':file.type.startsWith('video')?'video':'document';
+    const up = await uploadToTelegram(file, kind);
+    await sb.from('chat_messages').insert({
+      room_id: activeRoomId, sender_id: currentUser.id, message_type: kind==='photo'?'image':kind,
+      telegram_file_id: up.file_id, content: file.name
+    });
+    input.value = '';
+  }catch(e){ toast('فشل رفع الملف: '+e.message, 'error'); }
+}
+
+/* ================= VOICE MESSAGES (shared: rooms + DMs) ================= */
+let voiceRecorder = null;
+let voiceChunks = [];
+let voiceStartTime = 0;
+let voiceTimerInterval = null;
+let voiceStream = null;
+
+async function startVoiceRecording(context){
+  if(voiceRecorder && voiceRecorder.state==='recording') return;
+  if(!navigator.mediaDevices || !window.MediaRecorder){
+    toast('تسجيل الصوت مش مدعوم في المتصفح ده', 'error'); return;
+  }
+  try{
+    voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  }catch(e){
+    toast('محتاجين إذن الميكروفون عشان تبعت رسالة صوتية', 'error'); return;
+  }
+  voiceChunks = [];
+  voiceRecorder = new MediaRecorder(voiceStream);
+  voiceRecorder.ondataavailable = (e)=>{ if(e.data.size>0) voiceChunks.push(e.data); };
+  voiceRecorder.start();
+  voiceStartTime = Date.now();
+  const barId = context==='room' ? 'roomRecordBar' : 'dmRecordBar';
+  const timeId = context==='room' ? 'roomRecordTime' : 'dmRecordTime';
+  document.getElementById(barId)?.classList.add('active');
+  voiceTimerInterval = setInterval(()=>{
+    const sec = Math.floor((Date.now()-voiceStartTime)/1000);
+    const el = document.getElementById(timeId);
+    if(el) el.textContent = formatDuration(sec);
+  }, 250);
+}
+
+function cancelVoiceRecording(context){
+  if(voiceRecorder && voiceRecorder.state==='recording'){
+    voiceRecorder.onstop = null;
+    voiceRecorder.stop();
+  }
+  cleanupVoiceRecording(context);
+}
+
+function cleanupVoiceRecording(context){
+  clearInterval(voiceTimerInterval);
+  voiceTimerInterval = null;
+  if(voiceStream){ voiceStream.getTracks().forEach(t=>t.stop()); voiceStream = null; }
+  const barId = context==='room' ? 'roomRecordBar' : 'dmRecordBar';
+  document.getElementById(barId)?.classList.remove('active');
+  voiceRecorder = null;
+  voiceChunks = [];
+}
+
+async function stopVoiceRecording(context){
+  if(!voiceRecorder || voiceRecorder.state!=='recording'){ cleanupVoiceRecording(context); return; }
+  const durationSec = Math.round((Date.now()-voiceStartTime)/1000);
+  const finalizedBlob = await new Promise((resolve)=>{
+    voiceRecorder.onstop = ()=> resolve(new Blob(voiceChunks, { type: voiceRecorder.mimeType || 'audio/webm' }));
+    voiceRecorder.stop();
+  });
+  cleanupVoiceRecording(context);
+  if(durationSec < 1){ toast('التسجيل قصير جدًا', 'error'); return; }
+  const file = new File([finalizedBlob], `voice-${Date.now()}.webm`, { type: finalizedBlob.type });
+  try{
+    const up = await uploadToTelegram(file, 'voice');
+    if(context==='room'){
+      if(!activeRoomId) return;
+      await sb.from('chat_messages').insert({
+        room_id: activeRoomId, sender_id: currentUser.id, message_type:'voice',
+        telegram_file_id: up.file_id, duration_seconds: durationSec, reply_to_id: replyingTo
+      });
+      cancelReply();
+    } else {
+      if(!activeDmUserId) return;
+      await sb.from('chat_messages').insert({
+        sender_id: currentUser.id, receiver_id: activeDmUserId, message_type:'voice',
+        telegram_file_id: up.file_id, duration_seconds: durationSec, reply_to_id: dmReplyingTo
+      });
+      cancelDmReply();
+    }
+  }catch(e){ toast('فشل إرسال الرسالة الصوتية: '+e.message, 'error'); }
+}
+
+/* ================= PROFILE ================= */
+async function renderProfile(container, userId){
+  const isOwn = userId === currentUser.id;
+  let p;
+  if(isOwn){ p = currentProfile; }
+  else{
+    const { data, error } = await sb.from('profiles').select('*').eq('id', userId).single();
+    if(error || !data){ container.innerHTML = `<div class="view"><div class="empty-state">تعذر تحميل هذا المستخدم</div></div>`; return; }
+    p = data;
+  }
+
+  let isFollowing = false;
+  if(!isOwn){
+    const { data: f } = await sb.from('user_follows').select('*').eq('follower_id', currentUser.id).eq('following_id', p.id).maybeSingle();
+    isFollowing = !!f;
+  }
+  const [{count:followers}, {count:following}] = await Promise.all([
+    sb.from('user_follows').select('*',{count:'exact',head:true}).eq('following_id', p.id),
+    sb.from('user_follows').select('*',{count:'exact',head:true}).eq('follower_id', p.id),
+  ]);
+
+  const links = [
+    p.github_url ? `<a href="${escapeHtml(p.github_url)}" target="_blank">GitHub</a>` : '',
+    p.linkedin_url ? `<a href="${escapeHtml(p.linkedin_url)}" target="_blank">LinkedIn</a>` : '',
+    p.portfolio_url ? `<a href="${escapeHtml(p.portfolio_url)}" target="_blank">Portfolio</a>` : '',
+    p.website_url ? `<a href="${escapeHtml(p.website_url)}" target="_blank">Website</a>` : '',
+  ].filter(Boolean).join('');
+
+  container.innerHTML = `
+    <div class="view">
+      <div class="profile-header">
+        <div class="profile-cover" id="profileCover" ${isOwn?'onclick="document.getElementById(\'coverUploadInput\').click()"':''}>
+          ${isOwn ? `<span class="cover-hint">📷 غيّر صورة الغلاف</span><input type="file" id="coverUploadInput" accept="image/*" style="display:none" onchange="uploadCover(this)">` : ''}
+        </div>
+        <div class="profile-body">
+          <div class="profile-top">
+            <div class="avatar-lg" id="profileAvatarLg" style="position:relative;cursor:${isOwn?'pointer':'default'}" ${isOwn?'onclick="document.getElementById(\'avatarUploadInput\').click()"':''}>${(p.username||'?')[0].toUpperCase()}</div>
+            <div>
+              <h2 style="font-family:var(--font-display);font-size:22px">${escapeHtml(p.full_name||p.username)}</h2>
+              <div style="color:var(--ink-faint);font-family:var(--font-mono);font-size:13px">@${p.username} · ${p.role}</div>
+            </div>
+            ${isOwn ? `<input type="file" id="avatarUploadInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)">` : ''}
+          </div>
+          <div style="color:var(--ink-dim);font-size:14px">${escapeHtml(p.bio||(isOwn?'مفيش نبذة لسه — اضغط تعديل عشان تضيف واحدة':''))}</div>
+          ${links ? `<div class="social-links">${links}</div>` : ''}
+          <div class="profile-stats">
+            <div><div class="n">${p.xp}</div><div class="l">XP</div></div>
+            <div><div class="n">${p.level}</div><div class="l">Level</div></div>
+            <div><div class="n">${p.reputation}</div><div class="l">Reputation</div></div>
+            <div><div class="n">${followers||0}</div><div class="l">متابِع</div></div>
+            <div><div class="n">${following||0}</div><div class="l">يتابع</div></div>
+          </div>
+          <div style="margin-top:12px">${(p.skills||[]).map(s=>`<span class="tag">${escapeHtml(s)}</span>`).join('') || '<span style="color:var(--ink-faint);font-size:12px">مفيش مهارات مضافة</span>'}</div>
+          ${isOwn
+            ? `<button class="btn btn-sm" style="margin-top:16px" onclick="editProfile()">تعديل الملف الشخصي</button>`
+            : `<button class="btn btn-sm ${isFollowing?'':'btn-primary'}" style="margin-top:16px" onclick="toggleFollow('${p.id}', ${isFollowing})">${isFollowing?'إلغاء المتابعة':'متابعة'}</button>
+               <button class="btn btn-sm" style="margin-top:16px" onclick="openDmConversation('${p.id}','${escapeHtml(p.username)}')">✉️ رسالة</button>`}
+        </div>
+      </div>
+      <div class="profile-tabs">
+        <div class="profile-tab active" data-ptab="posts" onclick="switchProfileTab('posts','${p.id}',${isOwn})">المنشورات</div>
+        <div class="profile-tab" data-ptab="portfolio" onclick="switchProfileTab('portfolio','${p.id}',${isOwn})">معرض المشاريع</div>
+        <div class="profile-tab" data-ptab="gallery" onclick="switchProfileTab('gallery','${p.id}',${isOwn})">معرض الصور</div>
+        <div class="profile-tab" data-ptab="activity" onclick="switchProfileTab('activity','${p.id}',${isOwn})">النشاط</div>
+      </div>
+      <div id="profileTabContent"><div class="empty-state">جاري التحميل...</div></div>
+    </div>`;
+
+  if(p.avatar_file_id) loadAvatarInto('profileAvatarLg', p.avatar_file_id);
+  if(p.cover_file_id) loadCoverInto('profileCover', p.cover_file_id);
+  switchProfileTab('posts', p.id, isOwn);
+}
+
+async function loadCoverInto(elId, fileId){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const cached = getCachedFile(fileId);
+  if(cached){ el.style.backgroundImage = `url(${cached})`; el.style.backgroundSize='cover'; el.style.backgroundPosition='center'; return; }
+  const url = await getTelegramFileBlobUrl(fileId);
+  if(url) { el.style.backgroundImage = `url(${url})`; el.style.backgroundSize='cover'; el.style.backgroundPosition='center'; }
+}
+
+async function uploadCover(input){
+  const file = input.files[0];
+  if(!file) return;
+  try{
+    const up = await uploadToTelegram(file, 'photo');
+    const { error } = await sb.from('profiles').update({ cover_file_id: up.file_id }).eq('id', currentUser.id);
+    if(error) throw error;
+    currentProfile.cover_file_id = up.file_id;
+    toast('تم تحديث صورة الغلاف', 'success');
+    loadCoverInto('profileCover', up.file_id);
+  }catch(e){ toast('فشل رفع صورة الغلاف: '+e.message, 'error'); }
+}
+
+async function switchProfileTab(tab, userId, isOwn){
+  document.querySelectorAll('.profile-tab').forEach(t=>t.classList.toggle('active', t.dataset.ptab===tab));
+  const el = document.getElementById('profileTabContent');
+  el.innerHTML = '<div class="empty-state">جاري التحميل...</div>';
+
+  if(tab==='posts'){
+    const { data: posts } = await sb.from('posts').select('*').eq('author_id', userId).eq('is_removed', false).order('created_at', {ascending:false});
+    el.innerHTML = (posts&&posts.length) ? posts.map(post=>`
+      <div class="post-card"><div class="post-content">${escapeHtml(post.content||'')}</div><div class="meta" style="font-family:var(--font-mono);font-size:12px;color:var(--ink-faint)">${timeAgo(post.created_at)}</div></div>
+    `).join('') : `<div class="empty-state">${isOwn?'لسه معملتش أي منشورات':'مفيش منشورات لسه'}</div>`;
+
+  } else if(tab==='portfolio'){
+    const { data: items } = await sb.from('portfolio_items').select('*').eq('user_id', userId).order('sort_order');
+    el.innerHTML = (isOwn ? `<button class="btn btn-sm" style="margin-bottom:14px" onclick="addPortfolioItem('${userId}')">+ إضافة مشروع</button>` : '') +
+      `<div class="portfolio-grid">${(items||[]).map(it=>`
+        <div class="portfolio-card">
+          <h4>${escapeHtml(it.title)}</h4>
+          <p>${escapeHtml(it.description||'')}</p>
+          ${it.project_url?`<a href="${escapeHtml(it.project_url)}" target="_blank">عرض المشروع ↗</a>`:''}
+          ${isOwn?`<div style="margin-top:8px"><span style="font-size:11px;color:var(--red);cursor:pointer" onclick="deletePortfolioItem('${it.id}','${userId}')">حذف</span></div>`:''}
+        </div>`).join('') || '<div class="empty-state">لسه مفيش مشاريع مضافة</div>'}</div>`;
+
+  } else if(tab==='gallery'){
+    const { data: items } = await sb.from('gallery_items').select('*').eq('user_id', userId).order('created_at',{ascending:false});
+    el.innerHTML = (isOwn ? `<button class="btn btn-sm" style="margin-bottom:14px" onclick="document.getElementById('galleryUploadInput').click()">+ رفع صورة</button><input type="file" id="galleryUploadInput" accept="image/*" style="display:none" onchange="addGalleryItem(this,'${userId}')">` : '') +
+      `<div class="gallery-grid" id="galleryGrid">${(items&&items.length) ? items.map(it=>`<div id="gal-${it.id}"></div>`).join('') : '<div class="empty-state">لسه مفيش صور</div>'}</div>`;
+    (items||[]).forEach(it=>loadGalleryThumb(it.id, it.image_file_id, isOwn));
+
+  } else if(tab==='activity'){
+    const [{data:posts},{data:articles}] = await Promise.all([
+      sb.from('posts').select('id, content, created_at').eq('author_id', userId).eq('is_removed', false).order('created_at',{ascending:false}).limit(15),
+      sb.from('articles').select('id, title, created_at').eq('author_id', userId).eq('is_draft', false).order('created_at',{ascending:false}).limit(15),
+    ]);
+    const events = [
+      ...(posts||[]).map(p=>({type:'post', time:p.created_at, text:'نشر: '+(p.content||'').slice(0,60)})),
+      ...(articles||[]).map(a=>({type:'article', time:a.created_at, text:'كتب مقال: '+a.title})),
+    ].sort((a,b)=>new Date(b.time)-new Date(a.time));
+    el.innerHTML = events.length ? events.map(e=>`
+      <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <span>${e.type==='post'?'📝':'📰'}</span><div style="flex:1">${escapeHtml(e.text)}</div><span style="color:var(--ink-faint);font-size:11px;font-family:var(--font-mono)">${timeAgo(e.time)}</span>
+      </div>`).join('') : `<div class="empty-state">لسه مفيش نشاط</div>`;
+  }
+}
+
+async function addPortfolioItem(userId){
+  const title = prompt('اسم المشروع:');
+  if(!title) return;
+  const description = prompt('وصف قصير:') || '';
+  const project_url = prompt('رابط المشروع (اختياري):') || null;
+  const { error } = await sb.from('portfolio_items').insert({ user_id: currentUser.id, title, description, project_url });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم إضافة المشروع', 'success');
+  switchProfileTab('portfolio', userId, true);
+}
+
+async function deletePortfolioItem(itemId, userId){
+  if(!confirm('تحذف المشروع ده؟')) return;
+  await sb.from('portfolio_items').delete().eq('id', itemId);
+  switchProfileTab('portfolio', userId, true);
+}
+
+async function addGalleryItem(input, userId){
+  const file = input.files[0];
+  if(!file) return;
+  try{
+    const up = await uploadToTelegram(file, 'photo');
+    const { error } = await sb.from('gallery_items').insert({ user_id: currentUser.id, image_file_id: up.file_id });
+    if(error) throw error;
+    toast('تمت الإضافة', 'success');
+    switchProfileTab('gallery', userId, true);
+  }catch(e){ toast('فشل الرفع: '+e.message, 'error'); }
+}
+
+async function loadGalleryThumb(itemId, fileId, isOwn){
+  const url = getCachedFile(fileId) || await getTelegramFileBlobUrl(fileId);
+  if(url && !getCachedFile(fileId)){ /* post/gallery images aren't persisted to cache to save quota, only fetched */ }
+  const holder = document.getElementById(`gal-${itemId}`);
+  if(!holder || !url) return;
+  holder.innerHTML = `<img class="gallery-thumb" src="${url}">${isOwn?`<div style="text-align:center;font-size:11px;color:var(--red);cursor:pointer;margin-top:2px" onclick="deleteGalleryItem('${itemId}')">حذف</div>`:''}`;
+}
+
+async function deleteGalleryItem(itemId){
+  if(!confirm('تحذف الصورة دي؟')) return;
+  await sb.from('gallery_items').delete().eq('id', itemId);
+  document.getElementById(`gal-${itemId}`)?.parentElement?.removeChild(document.getElementById(`gal-${itemId}`));
+}
+
+async function uploadAvatar(input){
+  const file = input.files[0];
+  if(!file) return;
+  try{
+    const up = await uploadToTelegram(file, 'photo');
+    const { error } = await sb.from('profiles').update({ avatar_file_id: up.file_id }).eq('id', currentUser.id);
+    if(error) throw error;
+    currentProfile.avatar_file_id = up.file_id;
+    toast('تم تحديث الصورة الشخصية', 'success');
+    loadAvatarInto('profileAvatarLg', up.file_id);
+    loadAvatarInto('miniAvatar', up.file_id);
+  }catch(e){ toast('فشل رفع الصورة: '+e.message, 'error'); }
+}
+
+async function toggleFollow(targetId, currentlyFollowing){
+  if(currentlyFollowing){
+    await sb.from('user_follows').delete().eq('follower_id', currentUser.id).eq('following_id', targetId);
+  }else{
+    await sb.from('user_follows').insert({ follower_id: currentUser.id, following_id: targetId });
+  }
+  renderProfile(document.getElementById('viewContainer'), targetId);
+}
+
+function editProfile(){
+  const bio = prompt('النبذة الشخصية:', currentProfile.bio||'');
+  if(bio===null) return;
+  const skillsStr = prompt('مهاراتك (افصل بفاصلة):', (currentProfile.skills||[]).join(', ')) || '';
+  const skills = skillsStr.split(',').map(s=>s.trim()).filter(Boolean);
+  const github_url = prompt('رابط GitHub (اختياري):', currentProfile.github_url||'') || null;
+  const linkedin_url = prompt('رابط LinkedIn (اختياري):', currentProfile.linkedin_url||'') || null;
+  const portfolio_url = prompt('رابط Portfolio (اختياري):', currentProfile.portfolio_url||'') || null;
+  sb.from('profiles').update({ bio, skills, github_url, linkedin_url, portfolio_url }).eq('id', currentUser.id).then(({error})=>{
+    if(error){ toast('خطأ: '+error.message, 'error'); return; }
+    Object.assign(currentProfile, { bio, skills, github_url, linkedin_url, portfolio_url });
+    toast('تم تحديث الملف الشخصي', 'success');
+    nav('profile');
+  });
+}
+
+/* ================= BOOKMARKS ================= */
+async function renderBookmarks(container){
+  container.innerHTML = `<div class="view">
+    <div class="view-header"><h1>المحفوظات</h1></div>
+    <div id="bookmarksList"><div class="empty-state">جاري التحميل...</div></div>
+  </div>`;
+  const { data: marks, error } = await sb.from('bookmarks').select('*').eq('user_id', currentUser.id).order('created_at', {ascending:false});
+  const listEl = document.getElementById('bookmarksList');
+  if(error){ listEl.innerHTML = `<div class="empty-state">تعذر التحميل: ${escapeHtml(error.message)}</div>`; return; }
+  if(!marks.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">🔖</div>لسه مفيش حاجة محفوظة</div>`; return; }
+
+  const postIds = marks.filter(m=>m.target_type==='post').map(m=>m.target_id);
+  const articleIds = marks.filter(m=>m.target_type==='article').map(m=>m.target_id);
+  const [{data:posts}, {data:articles}] = await Promise.all([
+    postIds.length ? sb.from('posts').select('id, content, created_at, profiles!posts_author_id_fkey(username)').in('id', postIds) : Promise.resolve({data:[]}),
+    articleIds.length ? sb.from('articles').select('id, title, created_at, profiles(username)').in('id', articleIds) : Promise.resolve({data:[]}),
+  ]);
+  listEl.innerHTML =
+    (posts||[]).map(p=>`<div class="post-card"><div class="meta" style="margin-bottom:6px">منشور من @${p.profiles?.username||''}</div><div class="post-content">${escapeHtml(p.content||'')}</div></div>`).join('') +
+    (articles||[]).map(a=>`<div class="article-card"><h3>${escapeHtml(a.title)}</h3><div class="article-meta">@${a.profiles?.username||''}</div></div>`).join('');
+}
+
+/* ================= DIRECT MESSAGES ================= */
+async function renderMessagesList(container){
+  container.innerHTML = `<div class="view">
+    <div class="view-header"><h1>الرسائل الخاصة</h1></div>
+    <div id="dmConversationsList"><div class="empty-state">جاري التحميل...</div></div>
+  </div>`;
+  const { data: msgs, error } = await sb.from('chat_messages').select('id, content, message_type, sender_id, receiver_id, created_at').is('room_id', null).or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`).order('created_at', {ascending:false}).limit(200);
+  const listEl = document.getElementById('dmConversationsList');
+  if(error){ listEl.innerHTML = `<div class="empty-state" style="color:var(--red)">تعذر التحميل: ${escapeHtml(error.message)}</div>`; toast('خطأ: '+error.message,'error'); return; }
+  const others = new Map();
+  for(const m of (msgs||[])){
+    const otherId = m.sender_id===currentUser.id ? m.receiver_id : m.sender_id;
+    if(!others.has(otherId)) others.set(otherId, m);
+  }
+  if(!others.size){ listEl.innerHTML = `<div class="empty-state"><div class="icon">✉️</div>لسه مفيش محادثات — ابعت رسالة من بروفايل أي حد</div>`; return; }
+  const otherIds = [...others.keys()];
+  const { data: profs } = await sb.from('profiles').select('id, username, full_name, avatar_file_id').in('id', otherIds);
+  const profMap = new Map((profs||[]).map(p=>[p.id,p]));
+  const previewFor = (m)=> m.message_type==='voice' ? '🎤 رسالة صوتية' : m.message_type==='image' ? '📷 صورة' : m.message_type==='video' ? '🎬 فيديو' : m.message_type==='document' ? '📎 ملف' : (m.content||'');
+  listEl.innerHTML = otherIds.map(oid=>{
+    const p = profMap.get(oid); const lastMsg = others.get(oid);
+    return `<div class="room-card" style="cursor:pointer;display:flex;align-items:center;gap:12px" onclick="openDmConversation('${oid}','${escapeHtml(p?.username||'')}')">
+      <div class="avatar" id="dmlist-av-${oid}" onclick="event.stopPropagation();viewProfile('${oid}')">${(p?.username||'?')[0].toUpperCase()}</div>
+      <div class="room-info"><div class="name">${escapeHtml(p?.full_name||p?.username||'مستخدم')}</div><div class="desc">${escapeHtml(previewFor(lastMsg).slice(0,50))}</div></div>
+    </div>`;
+  }).join('');
+  otherIds.forEach(oid=>{ const p = profMap.get(oid); if(p?.avatar_file_id) loadAvatarInto(`dmlist-av-${oid}`, p.avatar_file_id); });
+}
+
+let activeDmUserId = null;
+let activeDmUsername = null;
+let dmChannel = null;
+async function openDmConversation(otherId, otherUsername){
+  activeDmUserId = otherId;
+  activeDmUsername = otherUsername;
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `<div class="chat-view">
+    <div style="flex:1;display:flex;flex-direction:column">
+      <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:600;display:flex;align-items:center;gap:10px">
+        <button class="btn btn-sm" onclick="nav('messages')">→</button>
+        <span class="avatar" id="dmHeaderAvatar" style="width:28px;height:28px;font-size:12px;cursor:pointer" onclick="viewProfile('${otherId}')">${(otherUsername||'?')[0].toUpperCase()}</span>
+        <span style="cursor:pointer" onclick="viewProfile('${otherId}')">@${escapeHtml(otherUsername)}</span>
+      </div>
+      <div id="dmPinnedBanner"></div>
+      <div class="chat-messages" id="dmMessages"><div class="empty-state">جاري التحميل...</div></div>
+      <div id="dmTypingIndicator" style="padding:4px 20px;font-size:12px;color:var(--ink-faint);min-height:20px"></div>
+      <div id="dmReplyBar" style="display:none;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border-top:1px solid var(--border);font-size:12px;color:var(--ink-dim)">
+        <span id="dmReplyBarText" style="flex:1"></span>
+        <button class="icon-btn" style="width:24px;height:24px" onclick="cancelDmReply()">×</button>
+      </div>
+      <div id="dmRecordBar" class="record-bar"><span class="record-dot"></span><span id="dmRecordTime">0:00</span> جاري التسجيل...
+        <button class="btn btn-sm" onclick="cancelVoiceRecording('dm')">إلغاء</button>
+        <button class="btn btn-primary btn-sm" onclick="stopVoiceRecording('dm')">إرسال</button>
+      </div>
+      <div class="chat-input-bar">
+        <label class="file-label">📎<input type="file" id="dmFile" style="display:none" onchange="sendDmFile(this)"></label>
+        <span class="mic-btn" id="dmMicBtn" onclick="startVoiceRecording('dm')">🎤</span>
+        <input type="text" id="dmInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter'){event.preventDefault();sendDmMessage();}">
+        <button class="btn btn-primary btn-sm" onclick="sendDmMessage()">إرسال</button>
+      </div>
+    </div>
+  </div>`;
+  const { data: p } = await sb.from('profiles').select('avatar_file_id').eq('id', otherId).single();
+  if(p?.avatar_file_id) loadAvatarInto('dmHeaderAvatar', p.avatar_file_id);
+  await loadDmMessages();
+  if(dmChannel){ sb.removeChannel(dmChannel); dmChannel = null; }
+  dmChannel = sb.channel('dm-'+[currentUser.id,otherId].sort().join('-'))
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'chat_messages' }, async (payload)=>{
+      const m = payload.new;
+      if(m.room_id) return;
+      const belongsHere = (m.sender_id===currentUser.id && m.receiver_id===activeDmUserId) || (m.sender_id===activeDmUserId && m.receiver_id===currentUser.id);
+      if(!belongsHere) return;
+      const box = document.getElementById('dmMessages');
+      if(!box) return;
+      if(document.getElementById(`msgav-${m.id}`)) return; // already rendered
+      const wasNearBottom = isScrolledNearBottom(box);
+      const { data: full } = await sb.from('chat_messages')
+        .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
+        .eq('id', m.id).single();
+      if(!full) return;
+      if(box.querySelector('.empty-state')) box.innerHTML = ''; // clear "start the conversation" placeholder
+      box.insertAdjacentHTML('beforeend', renderOneDmMessage(full));
+      if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
+      if(full.telegram_file_id) loadMessageMedia(full);
+      if(wasNearBottom) box.scrollTop = box.scrollHeight;
+      if(m.sender_id===activeDmUserId) sb.rpc('mark_dm_read', { p_other_user_id: activeDmUserId }).then(()=>checkUnreadBadges());
+    })
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'chat_messages' }, async (payload)=>{
+      const m = payload.new;
+      if(m.room_id) return;
+      const belongsHere = (m.sender_id===currentUser.id && m.receiver_id===activeDmUserId) || (m.sender_id===activeDmUserId && m.receiver_id===currentUser.id);
+      if(!belongsHere) return;
+      const { data: full } = await sb.from('chat_messages')
+        .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
+        .eq('id', m.id).single();
+      if(!full) return;
+      const row = document.getElementById(`msgav-${full.id}`)?.closest('.msg-row');
+      if(row) row.outerHTML = renderOneDmMessage(full);
+      if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
+      if(!full.is_removed && full.telegram_file_id) loadMessageMedia(full);
+    })
+    .on('broadcast', { event:'typing' }, (payload)=>{
+      if(payload.payload.user_id !== activeDmUserId) return;
+      const el = document.getElementById('dmTypingIndicator');
+      if(!el) return;
+      el.textContent = 'بيكتب...';
+      clearTimeout(window._dmTypingTimeout);
+      window._dmTypingTimeout = setTimeout(()=>{ el.textContent=''; }, 3000);
+    }).subscribe();
+  sb.rpc('mark_dm_read', { p_other_user_id: otherId }).then(()=>checkUnreadBadges());
+}
+
+function broadcastDmTyping(){
+  if(!dmChannel || !activeDmUserId) return;
+  dmChannel.send({ type:'broadcast', event:'typing', payload:{ user_id: currentUser.id } });
+}
+
+let dmReplyingTo = null;
+function setDmReplyTarget(msgId, username, preview){
+  dmReplyingTo = msgId;
+  const bar = document.getElementById('dmReplyBar');
+  if(bar){ bar.style.display='flex'; document.getElementById('dmReplyBarText').textContent = `رد على @${username}: ${preview}`; }
+}
+function cancelDmReply(){
+  dmReplyingTo = null;
+  const bar = document.getElementById('dmReplyBar');
+  if(bar) bar.style.display='none';
+}
+
+async function loadDmMessages(){
+  // Fetch all of my DMs (simple, reliable filter) then filter client-side to this conversation —
+  // avoids fragile nested or()/and() filter strings that can silently fail server-side.
+  const { data: msgs, error } = await sb.from('chat_messages')
+    .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
+    .is('room_id', null)
+    .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
+    .order('created_at')
+    .limit(500);
+  const box = document.getElementById('dmMessages');
+  if(!box) return;
+  if(error){ box.innerHTML = `<div class="empty-state" style="color:var(--red)">تعذر تحميل الرسائل: ${escapeHtml(error.message)}</div>`; toast('خطأ: '+error.message,'error'); return; }
+  const convo = (msgs||[]).filter(m =>
+    (m.sender_id===currentUser.id && m.receiver_id===activeDmUserId) ||
+    (m.sender_id===activeDmUserId && m.receiver_id===currentUser.id)
+  );
+  box.innerHTML = convo.length ? convo.map(m=>renderOneDmMessage(m)).join('')
+    : `<div class="empty-state" style="padding:20px">ابدأ المحادثة 👋</div>`;
+  box.scrollTop = box.scrollHeight;
+  convo.forEach(m=>{
+    if(m.profiles?.avatar_file_id) loadAvatarInto(`msgav-${m.id}`, m.profiles.avatar_file_id);
+    if(!m.is_removed && m.telegram_file_id) loadMessageMedia(m);
+  });
+}
+
+function renderOneDmMessage(m){
+  const mine = m.sender_id===currentUser.id;
+  const username = m.profiles?.username || (mine ? currentProfile.username : activeDmUsername);
+  const initials = (username||'?')[0]?.toUpperCase()||'?';
+  return `
+    <div class="msg-row ${mine?'mine':''}">
+      <div class="msg-avatar" id="msgav-${m.id}" onclick="viewProfile('${m.sender_id}')">${initials}</div>
+      <div class="msg ${mine?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setDmReplyTarget('${m.id}', '${escapeHtml((username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||(m.message_type==='voice'?'رسالة صوتية':'')).slice(0,60)).replace(/'/g,"\\'")}')"`}>
+        <div class="sender"><span style="color:var(--ink-faint);font-weight:400">${formatMsgTime(m.created_at)}${m.edited_at?" · (معدّلة)":""}</span>
+          ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
+            ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editDmMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل">✏️</span>` : ''}
+            ${mine ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteDmMessage('${m.id}')" title="حذف الرسالة">🗑️</span>` : ''}
+          </span>` : ''}
+        </div>
+        ${m.is_removed ? `<i style="color:var(--ink-faint)">تم حذف هذه الرسالة</i>` : `
+          ${m.reply ? `<div style="border-right:3px solid var(--amber);padding-right:8px;margin-bottom:6px;opacity:.75;font-size:12px">@${m.reply.profiles?.username||''}: ${escapeHtml((m.reply.content||'').slice(0,50))}</div>` : ''}
+          ${renderMessageBody(m)}
+        `}
+      </div>
+    </div>`;
+}
+
+async function editDmMessage(msgId, currentContent){
+  const newContent = prompt('عدّل رسالتك:', currentContent);
+  if(newContent===null || !newContent.trim() || newContent===currentContent) return;
+  const { error } = await sb.from('chat_messages').update({ content: newContent.trim(), edited_at: new Date().toISOString() }).eq('id', msgId);
+  if(error){ toast('تعذر التعديل: '+error.message, 'error'); }
+}
+
+async function deleteDmMessage(msgId){
+  if(!confirm('تحذف الرسالة دي؟')) return;
+  const { error } = await sb.from('chat_messages').update({ is_removed: true }).eq('id', msgId);
+  if(error){ toast('تعذر الحذف: '+error.message, 'error'); }
+}
+
+async function sendDmMessage(){
+  const input = document.getElementById('dmInput');
+  const content = input.value.trim();
+  if(!content || !activeDmUserId) return;
+  input.disabled = true;
+  const { error } = await sb.from('chat_messages').insert({ sender_id: currentUser.id, receiver_id: activeDmUserId, content, message_type:'text', reply_to_id: dmReplyingTo });
+  input.disabled = false;
+  if(error){ toast('تعذر الإرسال: '+error.message, 'error'); return; }
+  input.value='';
+  input.focus();
+  cancelDmReply();
+}
+
+async function sendDmFile(input){
+  const file = input.files[0];
+  if(!file || !activeDmUserId) return;
+  try{
+    const kind = file.type.startsWith('image')?'photo':file.type.startsWith('video')?'video':'document';
+    const up = await uploadToTelegram(file, kind);
+    await sb.from('chat_messages').insert({
+      sender_id: currentUser.id, receiver_id: activeDmUserId, message_type: kind==='photo'?'image':kind,
+      telegram_file_id: up.file_id, content: file.name
+    });
+    input.value = '';
+  }catch(e){ toast('فشل رفع الملف: '+e.message, 'error'); }
+}
+
+/* ================= ADMIN ================= */
+async function renderAdmin(container){
+  container.innerHTML = `
+    <div class="view" style="max-width:900px">
+      <div class="view-header"><h1>لوحة التحكم</h1></div>
+      <div class="admin-tabs">
+        <div class="admin-tab active" data-tab="overview" onclick="switchAdminTab('overview')">نظرة عامة</div>
+        <div class="admin-tab" data-tab="rooms" onclick="switchAdminTab('rooms')">طلبات الغرف</div>
+        <div class="admin-tab" data-tab="allrooms" onclick="switchAdminTab('allrooms')">كل الغرف</div>
+        <div class="admin-tab" data-tab="reports" onclick="switchAdminTab('reports')">البلاغات</div>
+        <div class="admin-tab" data-tab="users" onclick="switchAdminTab('users')">المستخدمين</div>
+      </div>
+      <div id="adminContent"></div>
+    </div>`;
+  switchAdminTab('overview');
+}
+
+async function switchAdminTab(tab){
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  const el = document.getElementById('adminContent');
+  el.innerHTML = '<div class="empty-state">جاري التحميل...</div>';
+  if(tab==='overview'){
+    const [{count:users},{count:posts},{count:articles},{count:rooms},{count:pendingRooms},{count:pendingReports},{count:banned}] = await Promise.all([
+      sb.from('profiles').select('id',{count:'exact',head:true}),
+      sb.from('posts').select('id',{count:'exact',head:true}).eq('is_removed',false),
+      sb.from('articles').select('id',{count:'exact',head:true}).eq('is_draft',false),
+      sb.from('chat_rooms').select('id',{count:'exact',head:true}).eq('status','approved'),
+      sb.from('chat_rooms').select('id',{count:'exact',head:true}).eq('status','pending'),
+      sb.from('reports').select('id',{count:'exact',head:true}).eq('status','pending'),
+      sb.from('profiles').select('id',{count:'exact',head:true}).eq('is_banned',true),
+    ]);
+    const stat = (n,l)=>`<div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center"><div style="font-family:var(--font-mono);font-size:24px;font-weight:600">${n??0}</div><div style="font-size:12px;color:var(--ink-faint);margin-top:4px">${l}</div></div>`;
+    el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
+      ${stat(users,'مستخدم')}${stat(posts,'منشور')}${stat(articles,'مقال منشور')}${stat(rooms,'غرفة مفعّلة')}
+      ${stat(pendingRooms,'طلب غرفة معلّق')}${stat(pendingReports,'بلاغ معلّق')}${stat(banned,'مستخدم محظور')}
+    </div>`;
+  } else if(tab==='rooms'){
+    const { data: rooms, error } = await sb.from('chat_rooms').select('id, name, description, creator_id, created_at, profiles!creator_id(username)').eq('status','pending').order('created_at');
+    if(error){ el.innerHTML = `<div class="empty-state" style="color:var(--red)">خطأ: ${escapeHtml(error.message)}</div>`; toast('خطأ في تحميل الطلبات: '+error.message, 'error'); return; }
+    el.innerHTML = (rooms&&rooms.length) ? rooms.map(r=>`
+      <div class="room-card">
+        <div class="room-info"><div class="name">${escapeHtml(r.name)} ${r.creator_id ? `<span id="pc-${r.id}"></span>`:''}</div><div class="desc">${escapeHtml(r.description||'')} — طلب بواسطة @${r.profiles?.username}</div></div>
+        <button class="btn btn-sm" onclick="viewRoomPasscode('${r.id}')">🔑 كلمة السر</button>
+        <button class="btn btn-sm" style="background:var(--teal);border-color:var(--teal);color:#0B0E14" onclick="reviewRoom('${r.id}','approved')">قبول</button>
+        <button class="btn btn-danger btn-sm" onclick="reviewRoom('${r.id}','rejected')">رفض</button>
+      </div>`).join('') : `<div class="empty-state">مفيش طلبات جديدة</div>`;
+  } else if(tab==='allrooms'){
+    const { data: rooms, error } = await sb.rpc('admin_list_all_rooms');
+    if(error){ el.innerHTML = `<div class="empty-state" style="color:var(--red)">خطأ: ${escapeHtml(error.message)}</div>`; toast('خطأ: '+error.message, 'error'); return; }
+    el.innerHTML = (rooms&&rooms.length) ? rooms.map(r=>`
+      <div class="room-card">
+        <div class="room-info">
+          <div class="name">${escapeHtml(r.name)} <span class="room-number-tag">#${r.room_number}</span>
+            <span class="status-pill ${r.status}">${r.status==='pending'?'معلّقة':r.status==='approved'?'مفعّلة':'مرفوضة'}</span>
+            ${r.is_disabled?'<span class="status-pill rejected">معطّلة</span>':''}
+          </div>
+          <div class="desc">${escapeHtml(r.description||'')} — بواسطة @${r.creator_username||'—'} · ${r.member_count} عضو</div>
+        </div>
+        <button class="btn btn-sm" onclick="adminEnterRoom('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">دخول</button>
+        <button class="btn btn-sm" onclick="adminEditRoomPrompt('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}','${escapeHtml(r.description||'').replace(/'/g,"\\'")}')">✏️ تعديل</button>
+        <button class="btn btn-sm" onclick="adminToggleRoomDisabled('${r.id}', ${!r.is_disabled})">${r.is_disabled?'تفعيل':'تعطيل'}</button>
+        <button class="btn btn-danger btn-sm" onclick="adminDeleteRoomConfirm('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">حذف نهائي</button>
+      </div>`).join('') : `<div class="empty-state">مفيش غرف خالص</div>`;
+  } else if(tab==='reports'){
+    const { data: reports, error } = await sb.from('reports').select('*, profiles!reports_reporter_id_fkey(username)').eq('status','pending').order('created_at');
+    if(error){ el.innerHTML = `<div class="empty-state" style="color:var(--red)">خطأ: ${escapeHtml(error.message)}</div>`; toast('خطأ في تحميل البلاغات: '+error.message, 'error'); return; }
+    el.innerHTML = (reports&&reports.length) ? reports.map(r=>`
+      <div class="room-card">
+        <div class="room-info"><div class="name">بلاغ على ${r.target_type}</div><div class="desc">${escapeHtml(r.reason)} — بواسطة @${r.profiles?.username}</div></div>
+        <button class="btn btn-sm" onclick="reviewReport('${r.id}','dismissed')">تجاهل</button>
+        <button class="btn btn-danger btn-sm" onclick="removeReportedContent('${r.id}','${r.target_type}','${r.target_id}')">حذف المحتوى</button>
+      </div>`).join('') : `<div class="empty-state">مفيش بلاغات جديدة</div>`;
+  } else if(tab==='users'){
+    const { data: users, error } = await sb.from('profiles').select('*').order('created_at', {ascending:false}).limit(50);
+    if(error){ el.innerHTML = `<div class="empty-state" style="color:var(--red)">خطأ: ${escapeHtml(error.message)}</div>`; toast('خطأ في تحميل المستخدمين: '+error.message, 'error'); return; }
+    el.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">` + (users||[]).map(u=>`
+      <div class="room-card">
+        <div class="room-info">
+          <div class="name">${escapeHtml(u.full_name||u.username)} <span style="color:var(--ink-faint);font-size:12px">@${u.username}</span> ${u.is_banned?'<span class="status-pill rejected">محظور</span>':''}</div>
+          <div class="desc">${u.role} · XP ${u.xp}</div>
+        </div>
+        ${u.role!=='owner' ? `
+          <select class="chip-select" onchange="changeUserRole('${u.id}', this.value)">
+            ${['new_member','member','premium','mentor','verified_expert','moderator','admin'].map(r=>`<option value="${r}" ${r===u.role?'selected':''}>${r}</option>`).join('')}
+          </select>
+          <button class="btn btn-sm" onclick="toggleBanUser('${u.id}', ${u.is_banned})">${u.is_banned?'فك الحظر':'حظر'}</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteUserAccount('${u.id}', '${escapeHtml(u.username)}')">حذف نهائي</button>
+        ` : `<span style="color:var(--ink-faint);font-size:12px">حساب المالك — محمي</span>`}
+      </div>`).join('') + `</div>`;
+  }
+}
+
+async function viewRoomPasscode(roomId){
+  const { data, error } = await sb.rpc('get_room_passcode', { p_room_id: roomId });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  alert(data ? `كلمة سر الغرفة: ${data}` : 'الغرفة دي بدون كلمة سر');
+}
+
+async function adminEnterRoom(roomId, roomName){
+  const { error } = await sb.rpc('admin_join_any_room', { p_room_id: roomId });
+  if(error){ toast('تعذر الدخول: '+error.message, 'error'); return; }
+  openRoomChat(roomId, roomName);
+}
+
+async function adminEditRoomPrompt(roomId, currentName, currentDesc){
+  const newName = prompt('اسم الغرفة:', currentName);
+  if(newName === null || !newName.trim()) return;
+  const newDesc = prompt('وصف الغرفة:', currentDesc);
+  if(newDesc === null) return;
+  const { error } = await sb.rpc('admin_edit_room', { p_room_id: roomId, p_name: newName.trim(), p_description: newDesc.trim() });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم تعديل الغرفة', 'success');
+  switchAdminTab('allrooms');
+}
+
+async function adminToggleRoomDisabled(roomId, disable){
+  if(disable && !confirm('تعطّل الغرفة دي؟ الأعضاء مش هيقدروا يبعتوا رسايل فيها لحد ما تفعّلها تاني')) return;
+  const { error } = await sb.rpc('admin_set_room_disabled', { p_room_id: roomId, p_disabled: disable });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast(disable ? 'تم تعطيل الغرفة' : 'تم تفعيل الغرفة', 'success');
+  switchAdminTab('allrooms');
+}
+
+async function adminDeleteRoomConfirm(roomId, roomName){
+  if(!confirm(`متأكد إنك عايز تمسح غرفة "${roomName}" نهائيًا؟ هيتمسح كل رسايلها وأعضاءها. الإجراء ده مينفعش يترجع.`)) return;
+  const { error } = await sb.rpc('admin_delete_room', { p_room_id: roomId });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم حذف الغرفة', 'success');
+  switchAdminTab('allrooms');
+}
+
+async function toggleBanUser(userId, currentlyBanned){
+  const { error } = await sb.rpc('admin_set_ban', { p_user_id: userId, p_banned: !currentlyBanned });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast(currentlyBanned ? 'تم فك الحظر' : 'تم حظر المستخدم', 'success');
+  switchAdminTab('users');
+}
+
+async function deleteUserAccount(userId, username){
+  if(!confirm(`متأكد إنك عايز تمسح حساب @${username} نهائيًا؟ الإجراء ده مينفعش يترجع.`)) return;
+  try{
+    const { data:{ session } } = await sb.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/admin-user-actions`, {
+      method:'POST',
+      headers:{ 'Authorization':`Bearer ${session.access_token}`, 'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json' },
+      body: JSON.stringify({ action:'delete', target_user_id: userId })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'فشل الحذف');
+    toast('تم حذف الحساب نهائيًا', 'success');
+    switchAdminTab('users');
+  }catch(e){ toast('خطأ: '+e.message, 'error'); }
+}
+
+async function reviewRoom(roomId, status){
+  const { error } = await sb.from('chat_rooms').update({ status, reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq('id', roomId);
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast(status==='approved'?'تم قبول الغرفة':'تم رفض الغرفة', 'success');
+  switchAdminTab('rooms');
+  checkAdminBadge();
+}
+
+async function reviewReport(reportId, status){
+  const { error } = await sb.from('reports').update({ status, reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq('id', reportId);
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم تحديث البلاغ', 'success');
+  switchAdminTab('reports');
+}
+
+async function removeReportedContent(reportId, targetType, targetId){
+  if(!confirm('هتحذف المحتوى المُبلّغ عنه ده نهائيًا من الموقع؟')) return;
+  const { error: rpcError } = await sb.rpc('admin_remove_reported_content', { p_target_type: targetType, p_target_id: targetId });
+  if(rpcError){ toast('خطأ: '+rpcError.message, 'error'); return; }
+  await sb.from('reports').update({ status:'actioned', reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq('id', reportId);
+  toast('تم حذف المحتوى', 'success');
+  switchAdminTab('reports');
+}
+
+async function changeUserRole(userId, role){
+  const { error } = await sb.from('profiles').update({ role }).eq('id', userId);
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم تحديث الصلاحية', 'success');
+}
+
+/* ================= NOTIFICATIONS ================= */
+async function checkNotifications(){
+  const { count } = await sb.from('notifications').select('*', {count:'exact', head:true}).eq('user_id', currentUser.id).eq('is_read', false);
+  document.getElementById('notifDot').style.display = count > 0 ? 'block' : 'none';
+}
+
+let lastNotifications = [];
+async function toggleNotifications(){
+  const panel = document.getElementById('notifPanel');
+  if(panel.style.display==='block'){ panel.style.display='none'; return; }
+  const { data: notifs } = await sb.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at',{ascending:false}).limit(20);
+  lastNotifications = notifs || [];
+  if(!lastNotifications.length){
+    panel.innerHTML = `<div style="padding:16px;color:var(--ink-faint);font-size:13px;text-align:center">مفيش إشعارات</div>`;
+  }else{
+    panel.innerHTML = lastNotifications.map(n=>`
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;${n.is_read?'opacity:.6':''}" onclick="handleNotificationClick('${n.id}')">
+        <div style="font-size:13px">${escapeHtml(n.content)}</div>
+        <div style="font-size:11px;color:var(--ink-faint);font-family:var(--font-mono);margin-top:3px">${timeAgo(n.created_at)}</div>
+      </div>`).join('');
+  }
+  panel.style.display='block';
+  await sb.from('notifications').update({ is_read:true }).eq('user_id', currentUser.id);
+  checkNotifications();
+  if(['owner','super_admin','admin','moderator'].includes(currentProfile.role)) checkAdminBadge();
+}
+
+function handleNotificationClick(id){
+  const n = lastNotifications.find(x=>x.id===id);
+  document.getElementById('notifPanel').style.display='none';
+  if(!n) return;
+  if(n.type==='system' && n.content.includes('طلب غرفة')){
+    nav('admin');
+    setTimeout(()=>switchAdminTab('rooms'), 50);
+  }else if(n.type==='room_approved' || n.type==='room_rejected'){
+    nav('rooms');
+  }
+}
+
+/* ================= SEARCH ================= */
+let searchTimeout;
+function handleSearch(q){
+  clearTimeout(searchTimeout);
+  const box = document.getElementById('searchResults');
+  if(!q.trim()){ box.style.display='none'; return; }
+  searchTimeout = setTimeout(async ()=>{
+    const [{data:users}, {data:posts}, {data:articles}] = await Promise.all([
+      sb.from('profiles').select('id, username, full_name, avatar_file_id').or(`username.ilike.%${q}%,full_name.ilike.%${q}%`).limit(5),
+      sb.from('posts').select('id, content').textSearch('search_vector', q, {config:'arabic', type:'plain'}).eq('is_removed', false).limit(5),
+      sb.from('articles').select('id, title').textSearch('search_vector', q, {config:'arabic', type:'plain'}).eq('is_draft', false).limit(5),
+    ]);
+    const noResults = !(users?.length || posts?.length || articles?.length);
+    if(noResults){
+      box.innerHTML = `<div style="padding:16px;color:var(--ink-faint);font-size:13px;text-align:center">مفيش نتائج لـ "${escapeHtml(q)}"</div>`;
+      box.style.display='block'; return;
+    }
+    let html = '';
+    if(users?.length){
+      html += `<div style="padding:8px 14px;font-size:11px;color:var(--ink-faint);font-family:var(--font-mono)">مستخدمين</div>`;
+      html += users.map(u=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer" onmousedown="viewProfile('${u.id}')">
+          <div class="avatar" style="width:30px;height:30px;font-size:12px">${(u.username||'?')[0].toUpperCase()}</div>
+          <div><div style="font-size:13px;font-weight:600">${escapeHtml(u.full_name||u.username)}</div><div style="font-size:11px;color:var(--ink-faint)">@${escapeHtml(u.username)}</div></div>
+        </div>`).join('');
+    }
+    if(posts?.length){
+      html += `<div style="padding:8px 14px;font-size:11px;color:var(--ink-faint);font-family:var(--font-mono);border-top:1px solid var(--border)">منشورات</div>`;
+      html += posts.map(p=>`<div style="padding:8px 14px;font-size:13px;color:var(--ink-dim)">${escapeHtml((p.content||'').slice(0,70))}</div>`).join('');
+    }
+    if(articles?.length){
+      html += `<div style="padding:8px 14px;font-size:11px;color:var(--ink-faint);font-family:var(--font-mono);border-top:1px solid var(--border)">مقالات</div>`;
+      html += articles.map(a=>`<div style="padding:8px 14px;font-size:13px;color:var(--ink-dim);cursor:pointer" onmousedown="nav('articles')">${escapeHtml(a.title)}</div>`).join('');
+    }
+    box.innerHTML = html;
+    box.style.display='block';
+  }, 400);
+}
+
+/* ================= AI ASSISTANT ================= */
+function toggleAiPanel(){ document.getElementById('aiPanel').classList.toggle('active'); }
+let aiHistory = [];
+async function sendAiMessage(){
+  const input = document.getElementById('aiInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  const body = document.getElementById('aiBody');
+  const mode = document.getElementById('aiMode').value;
+  body.innerHTML += `<div class="ai-msg user">${escapeHtml(msg)}</div>`;
+  input.value='';
+  aiHistory.push({ role:'user', content: msg });
+  body.innerHTML += `<div class="ai-msg" id="aiThinking">جاري التفكير...</div>`;
+  body.scrollTop = body.scrollHeight;
+  try{
+    const { data:{ session } } = await sb.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-assistant`, {
+      method:'POST',
+      headers:{ 'Authorization':`Bearer ${session.access_token}`, 'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json' },
+      body: JSON.stringify({ messages: aiHistory, mode })
+    });
+    const data = await res.json();
+    document.getElementById('aiThinking').remove();
+    if(!res.ok){ throw new Error(data.error || 'فشل الطلب'); }
+    body.innerHTML += `<div class="ai-msg">${escapeHtml(data.reply)}</div>`;
+    aiHistory.push({ role:'assistant', content: data.reply });
+    body.scrollTop = body.scrollHeight;
+  }catch(e){
+    document.getElementById('aiThinking')?.remove();
+    body.innerHTML += `<div class="ai-msg" style="color:var(--red)">تعذر الحصول على رد: ${escapeHtml(e.message)}. تأكد إن OPENROUTER_API_KEY متظبط في إعدادات المشروع.</div>`;
+  }
+}
+
+/* ================= UTILS ================= */
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function timeAgo(iso){
+  const s = Math.floor((Date.now() - new Date(iso).getTime())/1000);
+  if(s<60) return 'الآن';
+  if(s<3600) return Math.floor(s/60)+' د';
+  if(s<86400) return Math.floor(s/3600)+' س';
+  return Math.floor(s/86400)+' يوم';
+}
+
+function formatMsgTime(iso){
+  const d = new Date(iso);
+  const now = new Date();
+  const time = d.toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' });
+  const isToday = d.toDateString() === now.toDateString();
+  if(isToday) return time;
+  const yesterday = new Date(now); yesterday.setDate(now.getDate()-1);
+  if(d.toDateString() === yesterday.toDateString()) return `أمس ${time}`;
+  const dateStr = d.toLocaleDateString('ar-EG', { day:'numeric', month:'short', year: d.getFullYear()!==now.getFullYear() ? 'numeric' : undefined });
+  return `${dateStr} ${time}`;
+}
+
+/* ================= PWA / PUSH NOTIFICATIONS ================= */
+const VAPID_PUBLIC_KEY = 'BHVZyQYWtyaTD2v6CaD3vh1TS_2dvgfiJUIRxodfxPgjlHZnLFTXuveCRDuaPeZ9CKox2oEpi8oi1PU76leyu5k';
+
+function urlB64ToUint8Array(base64String){
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  const output = new Uint8Array(raw.length);
+  for(let i=0; i<raw.length; i++) output[i] = raw.charCodeAt(i);
+  return output;
+}
+
+async function registerServiceWorker(){
+  if(!('serviceWorker' in navigator)) return null;
+  try{ return await navigator.serviceWorker.register('/sw.js'); }
+  catch(e){ console.warn('SW registration failed', e); return null; }
+}
+
+async function setupPushNotifications(){
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  const reg = await registerServiceWorker();
+  if(!reg) return;
+  // Don't prompt automatically on every load — only if the user already granted
+  // permission before (silently re-subscribe, e.g. after clearing site data),
+  // or after they explicitly tap the "enable notifications" control.
+  if(Notification.permission === 'granted'){
+    await subscribeToPush(reg);
+  }
+  updateNotifToggleUI();
+}
+
+async function subscribeToPush(reg){
+  try{
+    let sub = await reg.pushManager.getSubscription();
+    if(!sub){
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY),
+      });
+    }
+    const json = sub.toJSON();
+    await sb.from('push_subscriptions').upsert({
+      user_id: currentUser.id,
+      endpoint: json.endpoint,
+      p256dh: json.keys.p256dh,
+      auth: json.keys.auth,
+    }, { onConflict: 'endpoint' });
+    return true;
+  }catch(e){
+    console.warn('Push subscribe failed', e);
+    return false;
+  }
+}
+
+async function requestNotificationPermission(){
+  if(!('Notification' in window)){ toast('المتصفح ده مش بيدعم الإشعارات', 'error'); return; }
+  if(Notification.permission === 'denied'){
+    toast('الإشعارات متمنوعة من إعدادات المتصفح — لازم تفعّلها يدويًا من هناك', 'error');
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  if(perm !== 'granted'){ updateNotifToggleUI(); return; }
+  const reg = await registerServiceWorker();
+  if(!reg) return;
+  const ok = await subscribeToPush(reg);
+  if(ok) toast('تم تفعيل الإشعارات 🔔', 'success');
+  updateNotifToggleUI();
+}
+
+function updateNotifToggleUI(){
+  const btn = document.getElementById('notifToggleBtn');
+  if(!btn) return;
+  const supported = ('Notification' in window) && ('serviceWorker' in navigator) && ('PushManager' in window);
+  if(!supported){ btn.style.display = 'none'; return; }
+  btn.style.display = 'flex';
+  const granted = Notification.permission === 'granted';
+  btn.textContent = granted ? '🔔 الإشعارات مفعّلة' : '🔕 فعّل الإشعارات';
+  btn.classList.toggle('active', granted);
+}
+
+/* ================= BOOTSTRAP ================= */
+/* ================= THEME ================= */
+function toggleTheme(){
+  const isLight = document.body.classList.toggle('light-mode');
+  try{ localStorage.setItem('dv-theme', isLight ? 'light' : 'dark'); }catch(e){}
+  const icon = isLight ? '☀️' : '🌙';
+  const btn1 = document.getElementById('themeToggleBtn'); if(btn1) btn1.textContent = icon;
+  const btn2 = document.getElementById('themeToggleBtnLanding'); if(btn2) btn2.textContent = icon;
+}
+(function applySavedTheme(){
+  let saved = null;
+  try{ saved = localStorage.getItem('dv-theme'); }catch(e){}
+  if(saved === 'light'){
+    document.body.classList.add('light-mode');
+    const btn1 = document.getElementById('themeToggleBtn'); if(btn1) btn1.textContent = '☀️';
+    const btn2 = document.getElementById('themeToggleBtnLanding'); if(btn2) btn2.textContent = '☀️';
+  }
+})();
+
+loadCategoriesForLanding();
+async function loadCategoriesForLanding(){
+  const { data } = await sb.from('categories').select('*').order('sort_order');
+  if(data){ categories = data; document.getElementById('sectionGrid').innerHTML = data.map(c=>`<div class="section-chip">${c.name_ar}</div>`).join(''); loadLandingStats(); }
+}
+initSession();
+</script>
+</body>
+</html>
