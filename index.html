@@ -958,6 +958,7 @@ function nav(view){
   const navEl = document.querySelector(`.nav-item[data-view="${view}"]`);
   if(navEl) navEl.classList.add('active');
   const c = document.getElementById('viewContainer');
+  if(view!=='rooms' && roomsListChannel){ sb.removeChannel(roomsListChannel); roomsListChannel = null; }
   if(view==='profile') viewedProfileId = null; // clicking the nav item always means "my own profile"
   if(view==='feed') renderFeed(c);
   else if(view==='articles') renderArticles(c);
@@ -1422,6 +1423,7 @@ function openArticleEditor(){
 }
 
 /* ================= CHAT ROOMS ================= */
+let roomsListChannel = null;
 async function renderRooms(container){
   container.innerHTML = `
     <div class="view">
@@ -1434,10 +1436,16 @@ async function renderRooms(container){
       </div>
       <div id="roomsList"><div class="empty-state">جاري التحميل...</div></div>
     </div>`;
+  await loadRoomsList();
+  subscribeToRoomsList();
+}
+
+async function loadRoomsList(){
   const { data: rooms, error } = await sb.from('chat_rooms')
     .select('id, name, description, category_id, creator_id, status, room_number, created_at, categories(name_ar)')
     .order('created_at', {ascending:false});
   const listEl = document.getElementById('roomsList');
+  if(!listEl) return;
   if(error || !rooms?.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">💬</div>لسه مفيش غرف — اطلب أول غرفة أو ادخل بلينك دعوة</div>`; return; }
   listEl.innerHTML = rooms.map(r=>`
     <div class="room-card">
@@ -1449,6 +1457,24 @@ async function renderRooms(container){
       ${r.status==='approved' ? `<button class="btn btn-sm" onclick="openRoomChat('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">دخول</button>` : ''}
       ${r.creator_id===currentUser.id ? `<button class="btn btn-sm" onclick="openRoomAdminPanel('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">⚙️ إدارة</button>` : ''}
     </div>`).join('');
+}
+
+function subscribeToRoomsList(){
+  if(roomsListChannel){ sb.removeChannel(roomsListChannel); roomsListChannel = null; }
+  roomsListChannel = sb.channel('rooms-list-'+currentUser.id)
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'chat_rooms' }, (payload)=>{
+      const before = payload.old, after = payload.new;
+      if(after.creator_id === currentUser.id && before.status !== after.status){
+        if(after.status === 'approved') toast(`تمت الموافقة على غرفة "${after.name}" 🎉`, 'success');
+        else if(after.status === 'rejected') toast(`تم رفض طلب غرفة "${after.name}"`, 'error');
+      }
+      loadRoomsList();
+    })
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'chat_room_members', filter:`user_id=eq.${currentUser.id}` }, ()=>{
+      loadRoomsList();
+      checkUnreadBadges();
+    })
+    .subscribe();
 }
 
 function promptJoinByInvite(){
