@@ -1,0 +1,19 @@
+{
+  "name": "DevVerse — أكبر مجتمع عربي للتقنية",
+  "short_name": "DevVerse",
+  "description": "مجتمع عربي للمطورين — منشورات، مقالات، غرف دردشة، ورسائل خاصة",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0B0E14",
+  "theme_color": "#0B0E14",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
