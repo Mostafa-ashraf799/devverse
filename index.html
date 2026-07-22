@@ -1460,18 +1460,33 @@ async function renderRooms(container){
 async function loadRoomsList(){
   const listEl = document.getElementById('roomsList');
   if(!listEl) return; // rooms view isn't the active screen right now — nothing to refresh
-  const { data: rooms, error } = await sb.from('chat_rooms')
-    .select('id, name, description, category_id, creator_id, status, room_number, created_at, categories(name_ar)')
-    .order('created_at', {ascending:false});
-  if(error || !rooms?.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">💬</div>لسه مفيش غرف — اطلب أول غرفة أو ادخل بلينك دعوة</div>`; return; }
+
+  // Query via explicit membership + creator-owned rooms, instead of relying purely on
+  // RLS to narrow a blanket "select * from chat_rooms" — more robust and matches
+  // exactly what "my rooms" should mean regardless of any RLS edge case.
+  const [memberRes, creatorRes] = await Promise.all([
+    sb.from('chat_room_members').select('chat_rooms(id, name, description, category_id, creator_id, status, room_number, created_at, categories(name_ar))').eq('user_id', currentUser.id),
+    sb.from('chat_rooms').select('id, name, description, category_id, creator_id, status, room_number, created_at, categories(name_ar)').eq('creator_id', currentUser.id),
+  ]);
+
+  if(memberRes.error){ listEl.innerHTML = `<div class="empty-state" style="color:var(--red)">تعذر تحميل الغرف: ${escapeHtml(memberRes.error.message)}</div>`; toast('خطأ: '+memberRes.error.message, 'error'); return; }
+  if(creatorRes.error){ listEl.innerHTML = `<div class="empty-state" style="color:var(--red)">تعذر تحميل الغرف: ${escapeHtml(creatorRes.error.message)}</div>`; toast('خطأ: '+creatorRes.error.message, 'error'); return; }
+
+  const roomsById = new Map();
+  for(const row of (memberRes.data||[])){ if(row.chat_rooms) roomsById.set(row.chat_rooms.id, row.chat_rooms); }
+  for(const room of (creatorRes.data||[])){ roomsById.set(room.id, room); }
+  const rooms = [...roomsById.values()].sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
+
+  if(!rooms.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">💬</div>لسه مفيش غرف — اطلب أول غرفة أو ادخل بلينك دعوة</div>`; return; }
   listEl.innerHTML = rooms.map(r=>`
     <div class="room-card">
       <div class="room-info">
         <div class="name">${escapeHtml(r.name)} <span class="room-number-tag">#${r.room_number}</span> ${r.categories?`<span class="post-cat">${r.categories.name_ar}</span>`:''}</div>
         <div class="desc">${escapeHtml(r.description||'')}</div>
       </div>
-      <span class="status-pill ${r.status}">${r.status==='pending'?'بانتظار الموافقة':r.status==='approved'?'مفعّلة':'مرفوضة'}</span>
+      <span class="status-pill ${r.status}">${r.status==='pending'?'بانتظار الموافقة':r.status==='approved'?'مفعّلة':r.status==='rejected'?'مرفوضة':r.status}</span>
       ${r.status==='approved' ? `<button class="btn btn-sm" onclick="openRoomChat('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">دخول</button>` : ''}
+      ${(r.creator_id===currentUser.id && r.status==='approved') ? `<button class="btn btn-sm" onclick="createInviteFlow('${r.id}')">🔗 لينك دعوة</button>` : ''}
       ${r.creator_id===currentUser.id ? `<button class="btn btn-sm" onclick="openRoomAdminPanel('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">⚙️ إدارة</button>` : ''}
     </div>`).join('');
 }
