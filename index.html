@@ -254,6 +254,7 @@ button{font-family:var(--font-body); cursor:pointer;}
 .composer textarea:focus{outline:none;}
 .composer-bar{display:flex; align-items:center; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border);}
 .chip-select{background:var(--surface); border:1px solid var(--border); color:var(--ink-dim); font-size:12px; padding:6px 10px; border-radius:6px;}
+.chip-select.active{background:var(--amber); border-color:var(--amber); color:#0B0E14; font-weight:600;}
 .file-label{font-size:12px; color:var(--ink-faint); cursor:pointer; padding:6px 10px;}
 .file-label:hover{color:var(--amber);}
 
@@ -541,6 +542,9 @@ button{font-family:var(--font-body); cursor:pointer;}
       <div class="modal-error" id="loginError"></div>
       <div class="field"><label>البريد الإلكتروني</label><input type="email" id="loginEmail"></div>
       <div class="field"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-dim);margin-bottom:14px;cursor:pointer">
+        <input type="checkbox" id="rememberEmailCheck" style="width:auto"> افتكر إيميلي في المتصفح ده
+      </label>
       <button class="btn btn-primary" style="width:100%" onclick="doLogin()">دخول</button>
       <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--border)"></div>أو<div style="flex:1;height:1px;background:var(--border)"></div></div>
       <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGoogleAuth()">🔵 الدخول بحساب جوجل</button>
@@ -605,6 +609,26 @@ button{font-family:var(--font-body); cursor:pointer;}
   </div>
 </div>
 
+<!-- ============ NOTIFICATION SETUP GUIDANCE MODAL ============ -->
+<div class="modal-overlay" id="notifGuideOverlay">
+  <div class="modal" style="max-width:420px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <h2 style="margin:0">🔔 خطوة أخيرة مهمة</h2>
+      <button class="icon-btn" onclick="closeNotifGuide()">×</button>
+    </div>
+    <div class="sub" style="margin-bottom:16px">الإشعارات اشتغلت، لكن بعض الموبايلات بتقفل التطبيقات في الخلفية توفيرًا للبطارية — لو مفعّلتش الإعداد ده، الإشعارات ممكن توصلك بس وانت فاتح الموقع.</div>
+    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="chip-select" style="cursor:pointer" onclick="showNotifGuideFor('samsung')" id="notifTabSamsung">Samsung</button>
+      <button class="chip-select" style="cursor:pointer" onclick="showNotifGuideFor('xiaomi')" id="notifTabXiaomi">Xiaomi / Redmi</button>
+      <button class="chip-select" style="cursor:pointer" onclick="showNotifGuideFor('huawei')" id="notifTabHuawei">Huawei / Honor</button>
+      <button class="chip-select" style="cursor:pointer" onclick="showNotifGuideFor('other')" id="notifTabOther">أندرويد تاني</button>
+      <button class="chip-select" style="cursor:pointer" onclick="showNotifGuideFor('ios')" id="notifTabIos">iPhone</button>
+    </div>
+    <div id="notifGuideContent" style="font-size:13px;line-height:2;color:var(--ink-dim)"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="closeNotifGuide()">تمام، فهمت</button>
+  </div>
+</div>
+
 
 <!-- ============ APP SHELL ============ -->
 <div id="app">
@@ -628,7 +652,7 @@ button{font-family:var(--font-body); cursor:pointer;}
         <div class="avatar" id="miniAvatar">؟</div>
         <div><div class="name" id="miniName">—</div><div class="role" id="miniRole">member</div></div>
       </div>
-      <button class="btn btn-ghost btn-sm" id="notifToggleBtn" style="width:100%; margin-bottom:8px; display:none" onclick="requestNotificationPermission()">🔕 فعّل الإشعارات</button>
+      <button class="btn btn-ghost btn-sm" id="notifToggleBtn" style="width:100%; margin-bottom:8px; display:none" onclick="handleNotifBtnClick()">🔕 فعّل الإشعارات</button>
       <button class="btn btn-ghost btn-sm" style="width:100%" onclick="doLogout()">تسجيل الخروج</button>
     </div>
   </aside>
@@ -754,6 +778,7 @@ function openAuth(which){
   document.getElementById('signupForm').style.display = which==='signup' ? 'block':'none';
   document.getElementById('confirmForm').style.display = which==='confirm' ? 'block':'none';
   document.getElementById('magicForm').style.display = which==='magic' ? 'block':'none';
+  if(which==='login') prefillRememberedEmail();
 }
 function closeAuth(){ document.getElementById('authOverlay').classList.remove('active'); }
 
@@ -789,12 +814,29 @@ async function resendConfirmCode(){
 async function doLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
+  const remember = document.getElementById('rememberEmailCheck').checked;
   const errEl = document.getElementById('loginError');
   errEl.style.display='none';
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if(error){ errEl.textContent = translateError(error.message); errEl.style.display='block'; return; }
+  try{
+    if(remember) localStorage.setItem('dv-remembered-email', email);
+    else localStorage.removeItem('dv-remembered-email');
+  }catch(e){ /* localStorage unavailable — not critical, skip silently */ }
   closeAuth();
   await initSession();
+}
+
+function prefillRememberedEmail(){
+  try{
+    const saved = localStorage.getItem('dv-remembered-email');
+    if(saved){
+      const emailInput = document.getElementById('loginEmail');
+      if(emailInput) emailInput.value = saved;
+      const checkbox = document.getElementById('rememberEmailCheck');
+      if(checkbox) checkbox.checked = true;
+    }
+  }catch(e){ /* localStorage unavailable — skip silently */ }
 }
 
 async function doGoogleAuth(){
@@ -1156,7 +1198,7 @@ async function submitPost(){
 }
 
 async function loadPosts(){
-  let q = sb.from('posts').select('*, profiles!posts_author_id_fkey(username, full_name, role, avatar_file_id), categories(name_ar), repost:repost_of(id, content, post_type, created_at, profiles!posts_author_id_fkey(username, full_name))').eq('is_removed', false).order('created_at', {ascending:false}).limit(30);
+  let q = sb.from('posts').select('*, profiles!posts_author_id_fkey(username, full_name, role, avatar_file_id), categories(name_ar), repost:repost_of(id, content, post_type, telegram_file_id, created_at, profiles!posts_author_id_fkey(username, full_name))').eq('is_removed', false).order('created_at', {ascending:false}).limit(30);
   if(activeCategoryFilter) q = q.eq('category_id', activeCategoryFilter);
   if(activeTagFilter) q = q.contains('tags', [activeTagFilter]);
   const { data: posts, error } = await q;
@@ -1180,6 +1222,7 @@ async function loadPosts(){
       <div style="border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px; background:var(--surface)">
         <div style="font-size:12px; color:var(--ink-faint); margin-bottom:6px">@${p.repost.profiles?.username||''} · ${timeAgo(p.repost.created_at)}</div>
         <div style="font-size:13.5px">${escapeHtml(p.repost.content||'')}</div>
+        ${p.repost.telegram_file_id ? `<div class="post-file" id="file-${p.repost.id}-in-${p.id}" data-lazy-file="${p.repost.id}-in-${p.id}" data-lazy-type="${p.repost.post_type}" data-lazy-fileid="${escapeHtml(p.repost.telegram_file_id)}" style="margin-top:8px"><div style="padding:16px;text-align:center;color:var(--ink-faint);font-size:12px">📎 هيتحمّل لما توصله</div></div>` : ''}
       </div>` : '';
     el.innerHTML = `
       <div class="post-head">
@@ -1192,7 +1235,7 @@ async function loadPosts(){
       ${p.content ? `<div class="post-content ${p.post_type==='code'?'code':''}">${escapeHtml(p.content||'')}</div>` : ''}
       ${tagsHtml}
       ${p.post_type==='poll' ? `<div id="poll-${p.id}"><div class="empty-state" style="padding:16px">جاري تحميل الاستطلاع...</div></div>` : ''}
-      ${p.telegram_file_id ? `<div class="post-file" id="file-${p.id}"><div style="padding:20px;text-align:center;color:var(--ink-faint);font-size:12px">جاري تحميل الملف...</div></div>` : ''}
+      ${p.telegram_file_id ? `<div class="post-file" id="file-${p.id}" data-lazy-file="${p.id}" data-lazy-type="${p.post_type}" data-lazy-fileid="${escapeHtml(p.telegram_file_id)}"><div style="padding:20px;text-align:center;color:var(--ink-faint);font-size:12px">📎 هيتحمّل لما توصله</div></div>` : ''}
       <div class="post-actions">
         <div class="act ${likedSet.has(p.id)?'liked':''}" onclick="toggleLike('${p.id}', this)">❤️ <span id="likecount-${p.id}">‎</span></div>
         <div class="act" onclick="toggleComments('${p.id}')">💬 تعليق</div>
@@ -1204,10 +1247,29 @@ async function loadPosts(){
       <div class="comments-box" id="comments-${p.id}"></div>`;
     listEl.appendChild(el);
     if(p.profiles?.avatar_file_id) loadAvatarInto(`avatar-post-${p.id}`, p.profiles.avatar_file_id);
-    if(p.telegram_file_id) loadPostFile(p.id, p.post_type, p.telegram_file_id);
     if(p.post_type==='poll') loadPollWidget(p.id);
     loadLikeCount(p.id);
   }
+  observeLazyFiles();
+}
+
+// Lazy-load post images/videos only once their placeholder actually scrolls into
+// view, instead of fetching every attachment in the feed up front — saves data,
+// especially on mobile connections, for posts the user never scrolls to.
+let lazyFileObserver = null;
+function observeLazyFiles(){
+  if(!lazyFileObserver){
+    lazyFileObserver = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          const el = entry.target;
+          lazyFileObserver.unobserve(el);
+          loadPostFile(el.dataset.lazyFile, el.dataset.lazyType, el.dataset.lazyFileid);
+        }
+      });
+    }, { rootMargin: '300px' }); // start loading a bit before it's actually on screen, for smoothness
+  }
+  document.querySelectorAll('[data-lazy-file]').forEach(el=>lazyFileObserver.observe(el));
 }
 
 async function toggleBookmark(postId, el){
@@ -1304,11 +1366,24 @@ async function loadAvatarInto(elId, fileId){
 }
 
 async function loadPostFile(postId, type, fileId){
-  const url = await getTelegramFileBlobUrl(fileId);
   const holder = document.getElementById(`file-${postId}`);
   if(!holder) return;
+  const cached = getCachedFile(fileId);
+  if(cached){
+    holder.innerHTML = type==='video' ? `<video src="${cached}" controls></video>` : `<img src="${cached}">`;
+    return;
+  }
+  const url = await getTelegramFileBlobUrl(fileId);
   if(!url){ holder.innerHTML = `<div style="padding:16px;color:var(--ink-faint);font-size:12px">تعذر تحميل الملف</div>`; return; }
   holder.innerHTML = type==='video' ? `<video src="${url}" controls></video>` : `<img src="${url}">`;
+  // Cache images (small enough for localStorage); skip videos to avoid blowing the quota.
+  if(type!=='video'){
+    try{
+      const res = await fetch(url); const blob = await res.blob();
+      const dataUrl = await blobToDataURL(blob);
+      setCachedFile(fileId, dataUrl);
+    }catch(e){ /* best-effort caching only */ }
+  }
 }
 
 async function loadLikeCount(postId){
@@ -2967,16 +3042,19 @@ async function registerServiceWorker(){
 }
 
 async function setupPushNotifications(){
+  // Show/hide the button based on browser support alone — this must run
+  // regardless of whether service worker registration below succeeds,
+  // otherwise a registration hiccup silently hides the button forever.
+  updateNotifToggleUI();
   if(!('serviceWorker' in navigator) || !('PushManager' in window)) return;
   const reg = await registerServiceWorker();
-  if(!reg) return;
+  if(!reg){ console.warn('Push setup: service worker registration failed'); return; }
   // Don't prompt automatically on every load — only if the user already granted
   // permission before (silently re-subscribe, e.g. after clearing site data),
   // or after they explicitly tap the "enable notifications" control.
   if(Notification.permission === 'granted'){
     await subscribeToPush(reg);
   }
-  updateNotifToggleUI();
 }
 
 async function subscribeToPush(reg){
@@ -3002,6 +3080,11 @@ async function subscribeToPush(reg){
   }
 }
 
+function handleNotifBtnClick(){
+  if(Notification.permission === 'granted') openNotifGuide();
+  else requestNotificationPermission();
+}
+
 async function requestNotificationPermission(){
   if(!('Notification' in window)){ toast('المتصفح ده مش بيدعم الإشعارات', 'error'); return; }
   if(Notification.permission === 'denied'){
@@ -3013,8 +3096,57 @@ async function requestNotificationPermission(){
   const reg = await registerServiceWorker();
   if(!reg) return;
   const ok = await subscribeToPush(reg);
-  if(ok) toast('تم تفعيل الإشعارات 🔔', 'success');
+  if(ok){
+    toast('تم تفعيل الإشعارات 🔔', 'success');
+    openNotifGuide();
+  }
   updateNotifToggleUI();
+}
+
+/* ---------- Notification setup guidance (background delivery on Android/iOS) ---------- */
+const NOTIF_GUIDE_CONTENT = {
+  samsung: `
+    <b>1.</b> الإعدادات ← العناية بالجهاز والبطارية ← البطارية ← حدود استخدام الخلفية<br>
+    تأكد إن <b>Chrome</b> مش في قايمة "التطبيقات النائمة" أو "المُقيّدة تلقائيًا" — لو موجود امسحه.<br><br>
+    <b>2.</b> الإعدادات ← التطبيقات ← Chrome ← البطارية<br>
+    اختار <b>"بدون قيود" (Unrestricted)</b> بدل "محسّن".`,
+  xiaomi: `
+    <b>1.</b> الإعدادات ← التطبيقات ← إدارة التطبيقات ← Chrome<br>
+    فعّل <b>"البدء التلقائي" (Autostart)</b>.<br><br>
+    <b>2.</b> من نفس الصفحة ← توفير البطارية<br>
+    اختار <b>"بدون قيود" (No restrictions)</b> بدل الوضع الموفّر.`,
+  huawei: `
+    <b>1.</b> الإعدادات ← البطارية ← إطلاق التطبيقات (App launch)<br>
+    دور على Chrome وشيّل الوضع التلقائي، وفعّل يدويًا: <b>البدء التلقائي</b>، <b>البدء الثانوي</b>، و<b>التشغيل في الخلفية</b> الثلاثة.`,
+  other: `
+    <b>1.</b> افتح إعدادات البطارية بتاعة جهازك ودور على أي إعداد اسمه "تحسين البطارية" أو "Battery Optimization".<br>
+    <b>2.</b> دور على Chrome (أو المتصفح اللي بتستخدمه) واستثنيه من التحسين، أو اختار "بدون قيود".`,
+  ios: `
+    على آيفون، الإشعارات في الخلفية بتشتغل بس لو الموقع <b>مضاف للشاشة الرئيسية</b> (Add to Home Screen) وبتفتحه من الأيقونة دي مش من المتصفح مباشرة.<br><br>
+    لو مضفتوش لسه: دوس زرار المشاركة في Safari ← "إضافة إلى الشاشة الرئيسية".`,
+};
+
+function detectDeviceForNotifGuide(){
+  const ua = navigator.userAgent || '';
+  if(/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+  if(/SM-|Samsung/i.test(ua)) return 'samsung';
+  if(/Xiaomi|Redmi|MI /i.test(ua)) return 'xiaomi';
+  if(/Huawei|Honor/i.test(ua)) return 'huawei';
+  return 'other';
+}
+
+function openNotifGuide(){
+  document.getElementById('notifGuideOverlay').classList.add('active');
+  showNotifGuideFor(detectDeviceForNotifGuide());
+}
+function closeNotifGuide(){
+  document.getElementById('notifGuideOverlay').classList.remove('active');
+}
+function showNotifGuideFor(device){
+  document.getElementById('notifGuideContent').innerHTML = NOTIF_GUIDE_CONTENT[device] || NOTIF_GUIDE_CONTENT.other;
+  ['samsung','xiaomi','huawei','other','ios'].forEach(d=>{
+    document.getElementById('notifTab'+d.charAt(0).toUpperCase()+d.slice(1))?.classList.toggle('active', d===device);
+  });
 }
 
 function updateNotifToggleUI(){
@@ -3024,7 +3156,7 @@ function updateNotifToggleUI(){
   if(!supported){ btn.style.display = 'none'; return; }
   btn.style.display = 'flex';
   const granted = Notification.permission === 'granted';
-  btn.textContent = granted ? '🔔 الإشعارات مفعّلة' : '🔕 فعّل الإشعارات';
+  btn.textContent = granted ? '🔔 الإشعارات مفعّلة (اضغط لخطوات الإعداد)' : '🔕 فعّل الإشعارات';
   btn.classList.toggle('active', granted);
 }
 
