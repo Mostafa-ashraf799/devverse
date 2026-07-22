@@ -594,6 +594,17 @@ button{font-family:var(--font-body); cursor:pointer;}
   </div>
 </div>
 
+<!-- ============ ROOM MEMBERS MODAL ============ -->
+<div class="modal-overlay" id="roomMembersOverlay">
+  <div class="modal" style="max-width:380px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 id="roomMembersModalTitle" style="margin:0">أعضاء الغرفة</h2>
+      <button class="icon-btn" onclick="closeRoomMembersModal()">×</button>
+    </div>
+    <div id="roomMembersModalList" style="max-height:60vh;overflow-y:auto"><div class="empty-state">جاري التحميل...</div></div>
+  </div>
+</div>
+
 
 <!-- ============ APP SHELL ============ -->
 <div id="app">
@@ -824,6 +835,10 @@ async function doLogout(){
   currentUser = null; currentProfile = null;
   if(unreadBadgesInterval){ clearInterval(unreadBadgesInterval); unreadBadgesInterval = null; }
   if(roomsListChannel){ sb.removeChannel(roomsListChannel); roomsListChannel = null; }
+  if(roomsListPollInterval){ clearInterval(roomsListPollInterval); roomsListPollInterval = null; }
+  if(roomPollInterval){ clearInterval(roomPollInterval); roomPollInterval = null; }
+  if(dmPollInterval){ clearInterval(dmPollInterval); dmPollInterval = null; }
+  myRoomStatusSnapshot = {};
   document.getElementById('app').classList.remove('active');
   document.getElementById('landing').style.display = 'flex';
 }
@@ -960,6 +975,8 @@ function nav(view){
   const navEl = document.querySelector(`.nav-item[data-view="${view}"]`);
   if(navEl) navEl.classList.add('active');
   const c = document.getElementById('viewContainer');
+  if(view!=='rooms' && roomPollInterval){ clearInterval(roomPollInterval); roomPollInterval = null; activeRoomId = null; }
+  if(view!=='messages' && dmPollInterval){ clearInterval(dmPollInterval); dmPollInterval = null; activeDmUserId = null; }
   if(view==='profile') viewedProfileId = null; // clicking the nav item always means "my own profile"
   if(view==='feed') renderFeed(c);
   else if(view==='articles') renderArticles(c);
@@ -1461,22 +1478,59 @@ async function loadRoomsList(){
 
 // Set up once at login — stays active regardless of which screen the user is on,
 // so approval/rejection toasts land even if they're not looking at the rooms list.
+let roomsListPollInterval = null;
+let myRoomStatusSnapshot = {}; // roomId -> last known status, so we can detect approve/reject transitions
+
+// Polling is the primary mechanism here (not just a backup) since Realtime delivery
+// has proven unreliable in this project's environment. Runs every 5s whenever the
+// user is logged in, regardless of which screen they're on — so approval toasts
+// land no matter where they are in the app, same as how WhatsApp/Telegram check in
+// periodically rather than relying purely on a push channel.
+function startRoomsListPolling(){
+  if(roomsListPollInterval) clearInterval(roomsListPollInterval);
+  pollMyRooms(); // run once immediately, then on an interval
+  roomsListPollInterval = setInterval(pollMyRooms, 5000);
+}
+
+async function pollMyRooms(){
+  if(!currentUser) return;
+  const { data: rooms, error } = await sb.from('chat_rooms')
+    .select('id, name, status')
+    .eq('creator_id', currentUser.id);
+  if(error || !rooms) return;
+
+  let anyChanged = false;
+  for(const r of rooms){
+    const prev = myRoomStatusSnapshot[r.id];
+    if(prev !== undefined && prev !== r.status){
+      anyChanged = true;
+      if(r.status === 'approved') toast(`تمت الموافقة على غرفة "${r.name}" 🎉`, 'success');
+      else if(r.status === 'rejected') toast(`تم رفض طلب غرفة "${r.name}"`, 'error');
+    }
+    myRoomStatusSnapshot[r.id] = r.status;
+  }
+
+  // Refresh the on-screen list if it's actually visible, or if something changed
+  // (e.g. newly approved rooms need their member-row / "دخول" button to appear).
+  if(document.getElementById('roomsList') && anyChanged) loadRoomsList();
+
+  checkUnreadBadges();
+}
+
 function subscribeToRoomsList(){
+  // Realtime kept as a bonus fast-path — if it fires, great, the UI updates instantly.
+  // If it doesn't (as has been the case), the 5s poll above still guarantees delivery.
   if(roomsListChannel){ sb.removeChannel(roomsListChannel); roomsListChannel = null; }
   roomsListChannel = sb.channel('rooms-list-'+currentUser.id)
-    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'chat_rooms', filter:`creator_id=eq.${currentUser.id}` }, (payload)=>{
-      const before = payload.old, after = payload.new;
-      if(before.status !== after.status){
-        if(after.status === 'approved') toast(`تمت الموافقة على غرفة "${after.name}" 🎉`, 'success');
-        else if(after.status === 'rejected') toast(`تم رفض طلب غرفة "${after.name}"`, 'error');
-      }
-      loadRoomsList();
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'chat_rooms', filter:`creator_id=eq.${currentUser.id}` }, ()=>{
+      pollMyRooms();
     })
     .on('postgres_changes', { event:'INSERT', schema:'public', table:'chat_room_members', filter:`user_id=eq.${currentUser.id}` }, ()=>{
       loadRoomsList();
       checkUnreadBadges();
     })
     .subscribe();
+  startRoomsListPolling();
 }
 
 function promptJoinByInvite(){
@@ -1532,6 +1586,27 @@ function requestNewRoom(){
     });
 }
 
+async function openRoomMembersModal(roomId, roomName){
+  document.getElementById('roomMembersModalTitle').textContent = `أعضاء ${roomName}`;
+  document.getElementById('roomMembersOverlay').classList.add('active');
+  const listEl = document.getElementById('roomMembersModalList');
+  listEl.innerHTML = `<div class="empty-state">جاري التحميل...</div>`;
+  const { data: members, error } = await sb.rpc('list_room_members', { p_room_id: roomId });
+  const { data: room } = await sb.from('chat_rooms').select('creator_id').eq('id', roomId).single();
+  if(error){ listEl.innerHTML = `<div class="empty-state" style="color:var(--red)">تعذر التحميل: ${escapeHtml(error.message)}</div>`; return; }
+  if(!members?.length){ listEl.innerHTML = `<div class="empty-state">مفيش أعضاء</div>`; return; }
+  listEl.innerHTML = members.map(m=>`
+    <div class="member-row">
+      <div class="avatar" id="rmm-av-${m.user_id}" style="width:32px;height:32px;font-size:13px;cursor:pointer" onclick="closeRoomMembersModal();viewProfile('${m.user_id}')">${(m.username||'?')[0].toUpperCase()}</div>
+      <div class="name" style="cursor:pointer" onclick="closeRoomMembersModal();viewProfile('${m.user_id}')">${escapeHtml(m.full_name||m.username||'مستخدم')} ${m.user_id===room?.creator_id?' 👑':''}</div>
+    </div>`).join('');
+  members.forEach(m=>{ if(m.avatar_file_id) loadAvatarInto(`rmm-av-${m.user_id}`, m.avatar_file_id); });
+}
+
+function closeRoomMembersModal(){
+  document.getElementById('roomMembersOverlay').classList.remove('active');
+}
+
 async function openRoomChat(roomId, roomName){
   activeRoomId = roomId;
   replyingTo = null;
@@ -1547,7 +1622,7 @@ async function openRoomChat(roomId, roomName){
       <div style="flex:1;display:flex;flex-direction:column">
         <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:600;display:flex;align-items:center;gap:10px">
           <button class="btn btn-sm" onclick="nav('rooms')">→</button>
-          <span>${escapeHtml(roomName)} <span class="room-number-tag">#${roomInfo?.room_number ?? ''}</span></span>
+          <span style="cursor:pointer" onclick="openRoomMembersModal('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')">${escapeHtml(roomName)} <span class="room-number-tag">#${roomInfo?.room_number ?? ''}</span> 👥</span>
           <button class="btn btn-sm" style="margin-right:auto" id="roomMuteBtn" onclick="toggleRoomMute('${roomId}')">${isMuted ? '🔕 مكتومة' : '🔔 إشعارات مفعّلة'}</button>
           ${isRoomAdmin ? `<button class="btn btn-sm" onclick="openRoomAdminPanel('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')">⚙️ إدارة الغرفة</button>` : ''}
         </div>
@@ -1700,6 +1775,7 @@ async function loadRoomMessages(roomId){
   const { data: msgs } = await sb.from('chat_messages').select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))').eq('room_id', roomId).order('created_at').limit(100);
   renderMessages(msgs||[]);
   refreshPinnedBanner(roomId);
+  lastSeenRoomMsgAt[roomId] = (msgs && msgs.length) ? msgs[msgs.length-1].created_at : new Date(0).toISOString();
 }
 
 function canModerateRoom(){
@@ -1823,35 +1899,69 @@ function isScrolledNearBottom(box){
   return (box.scrollHeight - box.scrollTop - box.clientHeight) < 120;
 }
 
+let roomPollInterval = null;
+let lastSeenRoomMsgAt = {}; // roomId -> ISO timestamp of the newest message we've rendered
+
 function subscribeToRoom(roomId){
   if(roomChannel) sb.removeChannel(roomChannel);
   roomChannel = sb.channel('room-'+roomId)
     .on('postgres_changes', { event:'INSERT', schema:'public', table:'chat_messages', filter:`room_id=eq.${roomId}` }, async (payload)=>{
-      const box = document.getElementById('chatMessages');
-      const wasNearBottom = isScrolledNearBottom(box);
-      const { data: full } = await sb.from('chat_messages')
-        .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
-        .eq('id', payload.new.id).single();
-      if(!full || !box) return;
-      // Avoid duplicating a message we already rendered optimistically or via a prior event
-      if(document.getElementById(`msgav-${full.id}`)) return;
-      box.insertAdjacentHTML('beforeend', renderOneMessage(full, full.profiles?.username, full.profiles?.avatar_file_id));
-      if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
-      if(full.telegram_file_id) loadMessageMedia(full);
-      if(wasNearBottom) box.scrollTop = box.scrollHeight;
+      await appendRoomMessageIfNew(payload.new.id);
     })
     .on('postgres_changes', { event:'UPDATE', schema:'public', table:'chat_messages', filter:`room_id=eq.${roomId}` }, async (payload)=>{
-      // Covers edits, deletes (is_removed), and pin toggles — re-render just this one row.
-      const { data: full } = await sb.from('chat_messages')
-        .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
-        .eq('id', payload.new.id).single();
-      if(!full) return;
-      const row = document.getElementById(`msgav-${full.id}`)?.closest('.msg-row');
-      if(row) row.outerHTML = renderOneMessage(full, full.profiles?.username, full.profiles?.avatar_file_id);
-      if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
-      if(!full.is_removed && full.telegram_file_id) loadMessageMedia(full);
-      refreshPinnedBanner(roomId);
+      await patchRoomMessage(payload.new.id, roomId);
     }).subscribe();
+
+  // Polling safety-net: catches anything realtime misses (network hiccups, missed
+  // events, or realtime being unavailable). Only fetches messages newer than the
+  // last one we've already rendered, so it never causes a full-list reload/flicker.
+  if(roomPollInterval) clearInterval(roomPollInterval);
+  roomPollInterval = setInterval(()=> pollRoomMessages(roomId), 3000);
+}
+
+async function appendRoomMessageIfNew(msgId){
+  const box = document.getElementById('chatMessages');
+  if(!box) return;
+  if(document.getElementById(`msgav-${msgId}`)) return; // already rendered
+  const wasNearBottom = isScrolledNearBottom(box);
+  const { data: full } = await sb.from('chat_messages')
+    .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
+    .eq('id', msgId).single();
+  if(!full) return;
+  if(document.getElementById(`msgav-${full.id}`)) return; // re-check after the await, in case of a race
+  box.insertAdjacentHTML('beforeend', renderOneMessage(full, full.profiles?.username, full.profiles?.avatar_file_id));
+  if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
+  if(full.telegram_file_id) loadMessageMedia(full);
+  if(wasNearBottom) box.scrollTop = box.scrollHeight;
+  if(full.room_id) lastSeenRoomMsgAt[full.room_id] = full.created_at;
+}
+
+async function patchRoomMessage(msgId, roomId){
+  const { data: full } = await sb.from('chat_messages')
+    .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
+    .eq('id', msgId).single();
+  if(!full) return;
+  const row = document.getElementById(`msgav-${full.id}`)?.closest('.msg-row');
+  if(row) row.outerHTML = renderOneMessage(full, full.profiles?.username, full.profiles?.avatar_file_id);
+  if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
+  if(!full.is_removed && full.telegram_file_id) loadMessageMedia(full);
+  refreshPinnedBanner(roomId);
+}
+
+async function pollRoomMessages(roomId){
+  if(roomId !== activeRoomId) return; // user navigated away — stop wasting requests
+  const since = lastSeenRoomMsgAt[roomId];
+  if(!since) return; // initial load hasn't finished tagging a baseline yet
+  const { data: rows } = await sb.from('chat_messages')
+    .select('id, created_at')
+    .eq('room_id', roomId)
+    .gt('created_at', since)
+    .order('created_at', { ascending: true })
+    .limit(50);
+  if(!rows?.length) return;
+  for(const row of rows){
+    await appendRoomMessageIfNew(row.id);
+  }
 }
 
 async function refreshPinnedBanner(roomId){
@@ -2323,34 +2433,14 @@ async function openDmConversation(otherId, otherUsername){
       if(m.room_id) return;
       const belongsHere = (m.sender_id===currentUser.id && m.receiver_id===activeDmUserId) || (m.sender_id===activeDmUserId && m.receiver_id===currentUser.id);
       if(!belongsHere) return;
-      const box = document.getElementById('dmMessages');
-      if(!box) return;
-      if(document.getElementById(`msgav-${m.id}`)) return; // already rendered
-      const wasNearBottom = isScrolledNearBottom(box);
-      const { data: full } = await sb.from('chat_messages')
-        .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
-        .eq('id', m.id).single();
-      if(!full) return;
-      if(box.querySelector('.empty-state')) box.innerHTML = ''; // clear "start the conversation" placeholder
-      box.insertAdjacentHTML('beforeend', renderOneDmMessage(full));
-      if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
-      if(full.telegram_file_id) loadMessageMedia(full);
-      if(wasNearBottom) box.scrollTop = box.scrollHeight;
-      if(m.sender_id===activeDmUserId) sb.rpc('mark_dm_read', { p_other_user_id: activeDmUserId }).then(()=>checkUnreadBadges());
+      await appendDmMessageIfNew(m.id);
     })
     .on('postgres_changes', { event:'UPDATE', schema:'public', table:'chat_messages' }, async (payload)=>{
       const m = payload.new;
       if(m.room_id) return;
       const belongsHere = (m.sender_id===currentUser.id && m.receiver_id===activeDmUserId) || (m.sender_id===activeDmUserId && m.receiver_id===currentUser.id);
       if(!belongsHere) return;
-      const { data: full } = await sb.from('chat_messages')
-        .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
-        .eq('id', m.id).single();
-      if(!full) return;
-      const row = document.getElementById(`msgav-${full.id}`)?.closest('.msg-row');
-      if(row) row.outerHTML = renderOneDmMessage(full);
-      if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
-      if(!full.is_removed && full.telegram_file_id) loadMessageMedia(full);
+      await patchDmMessage(m.id);
     })
     .on('broadcast', { event:'typing' }, (payload)=>{
       if(payload.payload.user_id !== activeDmUserId) return;
@@ -2361,6 +2451,61 @@ async function openDmConversation(otherId, otherUsername){
       window._dmTypingTimeout = setTimeout(()=>{ el.textContent=''; }, 3000);
     }).subscribe();
   sb.rpc('mark_dm_read', { p_other_user_id: otherId }).then(()=>checkUnreadBadges());
+
+  // Polling safety-net, same approach as rooms — guarantees delivery even if realtime misses an event.
+  if(dmPollInterval) clearInterval(dmPollInterval);
+  dmPollInterval = setInterval(()=> pollDmMessages(otherId), 3000);
+}
+
+let dmPollInterval = null;
+let lastSeenDmMsgAt = {}; // otherUserId -> ISO timestamp of the newest message we've rendered in that conversation
+
+async function appendDmMessageIfNew(msgId){
+  const box = document.getElementById('dmMessages');
+  if(!box) return;
+  if(document.getElementById(`msgav-${msgId}`)) return;
+  const wasNearBottom = isScrolledNearBottom(box);
+  const { data: full } = await sb.from('chat_messages')
+    .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
+    .eq('id', msgId).single();
+  if(!full) return;
+  if(document.getElementById(`msgav-${full.id}`)) return; // re-check after the await
+  if(box.querySelector('.empty-state')) box.innerHTML = '';
+  box.insertAdjacentHTML('beforeend', renderOneDmMessage(full));
+  if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
+  if(full.telegram_file_id) loadMessageMedia(full);
+  if(wasNearBottom) box.scrollTop = box.scrollHeight;
+  if(activeDmUserId) lastSeenDmMsgAt[activeDmUserId] = full.created_at;
+  if(full.sender_id===activeDmUserId) sb.rpc('mark_dm_read', { p_other_user_id: activeDmUserId }).then(()=>checkUnreadBadges());
+}
+
+async function patchDmMessage(msgId){
+  const { data: full } = await sb.from('chat_messages')
+    .select('*, profiles!sender_id(username, avatar_file_id), reply:reply_to_id(id, content, profiles!sender_id(username))')
+    .eq('id', msgId).single();
+  if(!full) return;
+  const row = document.getElementById(`msgav-${full.id}`)?.closest('.msg-row');
+  if(row) row.outerHTML = renderOneDmMessage(full);
+  if(full.profiles?.avatar_file_id) loadAvatarInto(`msgav-${full.id}`, full.profiles.avatar_file_id);
+  if(!full.is_removed && full.telegram_file_id) loadMessageMedia(full);
+}
+
+async function pollDmMessages(otherId){
+  if(otherId !== activeDmUserId) return;
+  const since = lastSeenDmMsgAt[otherId];
+  if(!since) return;
+  const { data: rows } = await sb.from('chat_messages')
+    .select('id, created_at, sender_id, receiver_id, room_id')
+    .is('room_id', null)
+    .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
+    .gt('created_at', since)
+    .order('created_at', { ascending: true })
+    .limit(50);
+  if(!rows?.length) return;
+  for(const row of rows){
+    const belongsHere = (row.sender_id===currentUser.id && row.receiver_id===otherId) || (row.sender_id===otherId && row.receiver_id===currentUser.id);
+    if(belongsHere) await appendDmMessageIfNew(row.id);
+  }
 }
 
 function broadcastDmTyping(){
@@ -2403,6 +2548,7 @@ async function loadDmMessages(){
     if(m.profiles?.avatar_file_id) loadAvatarInto(`msgav-${m.id}`, m.profiles.avatar_file_id);
     if(!m.is_removed && m.telegram_file_id) loadMessageMedia(m);
   });
+  if(activeDmUserId) lastSeenDmMsgAt[activeDmUserId] = convo.length ? convo[convo.length-1].created_at : new Date(0).toISOString();
 }
 
 function renderOneDmMessage(m){
