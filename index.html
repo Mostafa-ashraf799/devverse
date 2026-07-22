@@ -13,6 +13,12 @@
 <meta name="apple-mobile-web-app-title" content="DevVerse">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+i.fa-solid, i.fa-regular, i.fa-brands{ line-height:1; }
+.nav-item i, .island-item .ic i, .icon-btn i, .btn i, .act i, .empty-state .icon i{ margin-left:6px; }
+[dir="rtl"] .island-item .ic i{ margin-left:0; }
+</style>
 <style>
 :root{
   --bg:#0B0E14;
@@ -133,7 +139,11 @@ button{font-family:var(--font-body); cursor:pointer;}
 }
 .feature-card:hover{border-color:var(--amber-dim); transform:translateY(-3px);}
 .feature-card:hover::before{opacity:1;}
-.feature-icon{font-size:28px; margin-bottom:14px;}
+.feature-icon{
+  font-size:20px; margin-bottom:16px; color:var(--amber);
+  width:46px; height:46px; display:flex; align-items:center; justify-content:center;
+  background:rgba(79,143,255,.12); border-radius:12px;
+}
 .feature-card h3{font-family:var(--font-display); font-size:18px; margin-bottom:8px; position:relative;}
 .feature-card p{font-size:13.5px; color:var(--ink-dim); line-height:1.7; position:relative;}
 
@@ -160,6 +170,8 @@ button{font-family:var(--font-body); cursor:pointer;}
   display:none; align-items:center; justify-content:center; z-index:100;
 }
 .modal-overlay.active{display:flex;}
+@keyframes modalPop{from{opacity:0; transform:scale(.95) translateY(6px);} to{opacity:1; transform:scale(1) translateY(0);}}
+.modal-overlay.active .modal, .modal-overlay.active .upload-modal{animation:modalPop .18s ease;}
 .modal{
   background:var(--bg-elevated); border:1px solid var(--border); border-radius:14px;
   padding:32px; width:400px; max-width:90vw;
@@ -401,10 +413,37 @@ button{font-family:var(--font-body); cursor:pointer;}
 .ai-input-bar{display:flex; gap:8px; padding:12px; border-top:1px solid var(--border);}
 .ai-input-bar textarea{flex:1; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--ink); font-size:13px; resize:none; height:36px; font-family:var(--font-body);}
 
-.toast-wrap{position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; gap:8px;}
-.toast{background:var(--bg-elevated); border:1px solid var(--border); padding:12px 20px; border-radius:8px; font-size:13px; box-shadow:0 8px 24px rgba(0,0,0,.3);}
-.toast.error{border-color:var(--red); color:var(--red);}
-.toast.success{border-color:var(--teal); color:var(--teal);}
+.toast-wrap{position:fixed; top:20px; right:20px; z-index:200; display:flex; flex-direction:column; gap:10px; max-width:360px; width:calc(100vw - 40px);}
+@keyframes toastIn{from{opacity:0; transform:translateY(-14px) scale(.96);} to{opacity:1; transform:translateY(0) scale(1);}}
+@keyframes toastOut{from{opacity:1; transform:translateY(0) scale(1); max-height:80px;} to{opacity:0; transform:translateY(-10px) scale(.96); max-height:0; margin-bottom:-10px; padding-top:0; padding-bottom:0;}}
+@keyframes toastBar{from{width:100%;} to{width:0%;}}
+.toast{
+  position:relative; display:flex; align-items:flex-start; gap:12px;
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:12px;
+  padding:14px 16px; font-size:13.5px; line-height:1.5; color:var(--ink);
+  box-shadow:0 12px 32px rgba(0,0,0,.35); overflow:hidden;
+  animation:toastIn .28s cubic-bezier(.2,.9,.3,1.3);
+}
+.toast.leaving{animation:toastOut .25s ease forwards;}
+.toast::before{content:''; position:absolute; top:0; bottom:0; right:0; width:4px; background:var(--amber);}
+.toast .toast-ic{
+  flex-shrink:0; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:13px; background:rgba(79,143,255,.15); color:var(--amber); margin-top:1px;
+}
+.toast .toast-msg{flex:1; padding-top:3px;}
+.toast .toast-close{
+  flex-shrink:0; background:none; border:none; color:var(--ink-faint); font-size:15px; cursor:pointer;
+  width:20px; height:20px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:.15s;
+}
+.toast .toast-close:hover{background:var(--surface-hover); color:var(--ink);}
+.toast .toast-progress{position:absolute; bottom:0; right:0; left:0; height:2.5px; background:rgba(79,143,255,.35);}
+.toast .toast-progress::after{content:''; display:block; height:100%; background:var(--amber); animation:toastBar 3.5s linear forwards;}
+.toast.success::before{background:var(--teal);}
+.toast.success .toast-ic{background:rgba(184,196,217,.18); color:var(--teal);}
+.toast.success .toast-progress::after{background:var(--teal);}
+.toast.error::before{background:var(--red);}
+.toast.error .toast-ic{background:rgba(232,93,93,.15); color:var(--red);}
+.toast.error .toast-progress::after{background:var(--red);}
 
 /* ---------- Mobile: floating island bottom nav ---------- */
 .island-nav{display:none;}
@@ -441,7 +480,7 @@ button{font-family:var(--font-body); cursor:pointer;}
   <nav class="landing-nav">
     <div class="logo">Dev<span class="bracket">::</span>Verse</div>
     <div class="landing-nav-actions">
-      <button class="icon-btn" id="themeToggleBtnLanding" onclick="toggleTheme()" title="الوضع الفاتح/الليلي">🌙</button>
+      <button class="icon-btn" id="themeToggleBtnLanding" onclick="toggleTheme()" title="الوضع الفاتح/الليلي"><i class="fa-solid fa-moon"></i></button>
       <button class="btn" onclick="openAuth('login')">تسجيل الدخول</button>
       <button class="btn btn-primary" onclick="openAuth('signup')">إنشاء حساب</button>
     </div>
@@ -483,32 +522,32 @@ button{font-family:var(--font-body); cursor:pointer;}
     <h2>مبني عشان تشتغل فعليًا، مش مجرد واجهة</h2>
     <div class="features-grid">
       <div class="feature-card">
-        <div class="feature-icon">💬</div>
+        <div class="feature-icon"><i class="fa-solid fa-comment-dots"></i></div>
         <h3>غرف دردشة حقيقية</h3>
         <p>شات لايف بالرد على الرسائل، مراجعة الأدمن قبل التفعيل، وحماية اختيارية بكلمة سر لأي غرفة.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">📝</div>
+        <div class="feature-icon"><i class="fa-solid fa-pen-to-square"></i></div>
         <h3>مقالات ومنشورات</h3>
         <p>انشر مقال تقني أو سؤال سريع، مع دعم كامل للبحث العربي والتصنيف حسب القسم.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">✨</div>
+        <div class="feature-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
         <h3>مساعد ذكاء اصطناعي</h3>
         <p>شرح كود، إصلاح أخطاء، أو تلخيص مقال — مساعد مدمج في الموقع يفهم اللي محتاجه.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🛡️</div>
+        <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
         <h3>إدارة ومراجعة حقيقية</h3>
         <p>لوحة تحكم كاملة: مراجعة الغرف والبلاغات، إدارة الصلاحيات، وحماية من السبام.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">👤</div>
+        <div class="feature-icon"><i class="fa-solid fa-user"></i></div>
         <h3>ملف شخصي احترافي</h3>
         <p>اعرض مهاراتك، تابع مبرمجين تانيين، واتابع نشاطك من مكان واحد.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🔎</div>
+        <div class="feature-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
         <h3>بحث ذكي</h3>
         <p>دور على مستخدمين، منشورات، أو مقالات بالعربي في ثواني.</p>
       </div>
@@ -535,7 +574,7 @@ button{font-family:var(--font-body); cursor:pointer;}
 <!-- ============ AUTH MODAL ============ -->
 <div class="modal-overlay" id="authOverlay">
   <div class="modal" style="position:relative">
-    <button class="modal-close" onclick="closeAuth()">×</button>
+    <button class="modal-close" onclick="closeAuth()"><i class="fa-solid fa-xmark"></i></button>
     <div id="loginForm">
       <h2>تسجيل الدخول</h2>
       <div class="sub">أهلاً بيك تاني في المجتمع</div>
@@ -547,9 +586,9 @@ button{font-family:var(--font-body); cursor:pointer;}
       </label>
       <button class="btn btn-primary" style="width:100%" onclick="doLogin()">دخول</button>
       <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--border)"></div>أو<div style="flex:1;height:1px;background:var(--border)"></div></div>
-      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGoogleAuth()">🔵 الدخول بحساب جوجل</button>
-      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGithubAuth()">⚫ الدخول بحساب GitHub</button>
-      <button class="btn" style="width:100%" onclick="openAuth('magic')">✉️ الدخول بلينك سحري (بدون باسورد)</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGoogleAuth()"><i class="fa-brands fa-google"></i> الدخول بحساب جوجل</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGithubAuth()"><i class="fa-brands fa-github"></i> الدخول بحساب GitHub</button>
+      <button class="btn" style="width:100%" onclick="openAuth('magic')"><i class="fa-solid fa-envelope"></i> الدخول بلينك سحري (بدون باسورد)</button>
       <div class="modal-switch">مش عندك حساب؟ <a onclick="openAuth('signup')">إنشاء حساب</a></div>
     </div>
     <div id="magicForm" style="display:none">
@@ -571,13 +610,13 @@ button{font-family:var(--font-body); cursor:pointer;}
       <div class="field"><label>كلمة المرور</label><input type="password" id="signupPassword" placeholder="6 أحرف على الأقل"></div>
       <button class="btn btn-primary" style="width:100%" onclick="doSignup()">إنشاء الحساب</button>
       <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--border)"></div>أو<div style="flex:1;height:1px;background:var(--border)"></div></div>
-      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGoogleAuth()">🔵 التسجيل بحساب جوجل</button>
-      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGithubAuth()">⚫ التسجيل بحساب GitHub</button>
-      <button class="btn" style="width:100%" onclick="openAuth('magic')">✉️ التسجيل بلينك سحري (بدون باسورد)</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGoogleAuth()"><i class="fa-brands fa-google"></i> التسجيل بحساب جوجل</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGithubAuth()"><i class="fa-brands fa-github"></i> التسجيل بحساب GitHub</button>
+      <button class="btn" style="width:100%" onclick="openAuth('magic')"><i class="fa-solid fa-envelope"></i> التسجيل بلينك سحري (بدون باسورد)</button>
       <div class="modal-switch">عندك حساب؟ <a onclick="openAuth('login')">تسجيل الدخول</a></div>
     </div>
     <div id="confirmForm" style="display:none">
-      <h2>تحقق من إيميلك 📩</h2>
+      <h2>تحقق من إيميلك <i class="fa-solid fa-envelope-open-text"></i></h2>
       <div class="sub" id="confirmSub">بعتنالك لينك تأكيد</div>
       <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px; font-size:13px; color:var(--ink-dim); margin-bottom:16px">
         دوس على اللينك اللي وصلك في الإيميل عشان تفعّل حسابك، وبعدها ارجع سجّل دخول عادي.
@@ -603,7 +642,7 @@ button{font-family:var(--font-body); cursor:pointer;}
   <div class="modal" style="max-width:380px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <h2 id="roomMembersModalTitle" style="margin:0">أعضاء الغرفة</h2>
-      <button class="icon-btn" onclick="closeRoomMembersModal()">×</button>
+      <button class="icon-btn" onclick="closeRoomMembersModal()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div id="roomMembersModalList" style="max-height:60vh;overflow-y:auto"><div class="empty-state">جاري التحميل...</div></div>
   </div>
@@ -613,8 +652,8 @@ button{font-family:var(--font-body); cursor:pointer;}
 <div class="modal-overlay" id="notifGuideOverlay">
   <div class="modal" style="max-width:420px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <h2 style="margin:0">🔔 خطوة أخيرة مهمة</h2>
-      <button class="icon-btn" onclick="closeNotifGuide()">×</button>
+      <h2 style="margin:0"><i class="fa-solid fa-bell"></i> خطوة أخيرة مهمة</h2>
+      <button class="icon-btn" onclick="closeNotifGuide()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="sub" style="margin-bottom:16px">الإشعارات اشتغلت، لكن بعض الموبايلات بتقفل التطبيقات في الخلفية توفيرًا للبطارية — لو مفعّلتش الإعداد ده، الإشعارات ممكن توصلك بس وانت فاتح الموقع.</div>
     <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
@@ -629,19 +668,35 @@ button{font-family:var(--font-body); cursor:pointer;}
   </div>
 </div>
 
+<div class="modal-overlay" id="promptModalOverlay" onclick="if(event.target===this)closePromptModal(false)">
+  <div class="modal" style="width:400px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <span class="toast-ic" id="promptModalIcon" style="width:36px;height:36px;font-size:16px;flex-shrink:0"><i class="fa-solid fa-circle-question"></i></span>
+      <h2 id="promptModalTitle" style="margin:0;font-size:16px;font-family:var(--font-body);font-weight:600;line-height:1.6"></h2>
+    </div>
+    <div class="field" id="promptModalFieldWrap" style="margin-bottom:6px">
+      <input type="text" id="promptModalInput" onkeydown="if(event.key==='Enter'){event.preventDefault();closePromptModal(true);}if(event.key==='Escape'){closePromptModal(false);}">
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:22px">
+      <button class="btn" onclick="closePromptModal(false)">إلغاء</button>
+      <button class="btn btn-primary" id="promptModalOk" onclick="closePromptModal(true)">تأكيد</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ============ APP SHELL ============ -->
 <div id="app">
   <aside class="sidebar">
     <div class="sidebar-logo"><div class="logo" style="font-size:18px">Dev<span class="bracket">::</span>Verse</div></div>
     <div class="nav-section">
-      <div class="nav-item active" data-view="feed" onclick="nav('feed')">🏠 الرئيسية</div>
-      <div class="nav-item" data-view="articles" onclick="nav('articles')">📝 المقالات</div>
-      <div class="nav-item" data-view="rooms" onclick="nav('rooms')">💬 غرف الدردشة <span class="badge" id="roomsBadge" style="display:none">0</span></div>
-      <div class="nav-item" data-view="messages" onclick="nav('messages')">✉️ الرسائل الخاصة <span class="badge" id="dmBadge" style="display:none">0</span></div>
-      <div class="nav-item" data-view="bookmarks" onclick="nav('bookmarks')">🔖 المحفوظات</div>
-      <div class="nav-item" data-view="profile" onclick="nav('profile')">👤 ملفي الشخصي</div>
-      <div class="nav-item" data-view="admin" id="adminNavItem" onclick="nav('admin')" style="display:none">🛡️ لوحة التحكم <span class="badge" id="adminBadge" style="display:none">0</span></div>
+      <div class="nav-item active" data-view="feed" onclick="nav('feed')"><i class="fa-solid fa-house"></i> الرئيسية</div>
+      <div class="nav-item" data-view="articles" onclick="nav('articles')"><i class="fa-solid fa-pen-to-square"></i> المقالات</div>
+      <div class="nav-item" data-view="rooms" onclick="nav('rooms')"><i class="fa-solid fa-comment-dots"></i> غرف الدردشة <span class="badge" id="roomsBadge" style="display:none">0</span></div>
+      <div class="nav-item" data-view="messages" onclick="nav('messages')"><i class="fa-solid fa-envelope"></i> الرسائل الخاصة <span class="badge" id="dmBadge" style="display:none">0</span></div>
+      <div class="nav-item" data-view="bookmarks" onclick="nav('bookmarks')"><i class="fa-solid fa-bookmark"></i> المحفوظات</div>
+      <div class="nav-item" data-view="profile" onclick="nav('profile')"><i class="fa-solid fa-user"></i> ملفي الشخصي</div>
+      <div class="nav-item" data-view="admin" id="adminNavItem" onclick="nav('admin')" style="display:none"><i class="fa-solid fa-shield-halved"></i> لوحة التحكم <span class="badge" id="adminBadge" style="display:none">0</span></div>
     </div>
     <div class="nav-section">
       <div class="nav-label">الأقسام</div>
@@ -652,7 +707,7 @@ button{font-family:var(--font-body); cursor:pointer;}
         <div class="avatar" id="miniAvatar">؟</div>
         <div><div class="name" id="miniName">—</div><div class="role" id="miniRole">member</div></div>
       </div>
-      <button class="btn btn-ghost btn-sm" id="notifToggleBtn" style="width:100%; margin-bottom:8px; display:none" onclick="handleNotifBtnClick()">🔕 فعّل الإشعارات</button>
+      <button class="btn btn-ghost btn-sm" id="notifToggleBtn" style="width:100%; margin-bottom:8px; display:none" onclick="handleNotifBtnClick()"><i class="fa-solid fa-bell-slash"></i> فعّل الإشعارات</button>
       <button class="btn btn-ghost btn-sm" style="width:100%" onclick="doLogout()">تسجيل الخروج</button>
     </div>
   </aside>
@@ -660,14 +715,14 @@ button{font-family:var(--font-body); cursor:pointer;}
   <main class="main">
     <div class="topbar">
       <div class="search-box">
-        <span class="icon">🔍</span>
+        <span class="icon"><i class="fa-solid fa-magnifying-glass"></i></span>
         <input type="text" id="searchInput" placeholder="ابحث عن منشورات، مقالات، مستخدمين..." oninput="handleSearch(this.value)" onblur="setTimeout(()=>document.getElementById('searchResults').style.display='none', 200)">
         <div id="searchResults" style="display:none; position:absolute; top:110%; right:0; left:0; background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; max-height:400px; overflow-y:auto; z-index:50; box-shadow:0 12px 30px rgba(0,0,0,.4)"></div>
       </div>
       <div class="topbar-actions">
-        <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="الوضع الفاتح/الليلي">🌙</button>
+        <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="الوضع الفاتح/الليلي"><i class="fa-solid fa-moon"></i></button>
         <div style="position:relative">
-          <button class="icon-btn" onclick="toggleNotifications()">🔔<span class="notif-dot" id="notifDot" style="display:none"></span></button>
+          <button class="icon-btn" onclick="toggleNotifications()"><i class="fa-solid fa-bell"></i><span class="notif-dot" id="notifDot" style="display:none"></span></button>
           <div id="notifPanel" style="display:none; position:absolute; top:110%; left:0; width:320px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; max-height:420px; overflow-y:auto; z-index:60; box-shadow:0 12px 30px rgba(0,0,0,.4)"></div>
         </div>
       </div>
@@ -677,40 +732,40 @@ button{font-family:var(--font-body); cursor:pointer;}
 </div>
 
 <nav class="island-nav">
-  <div class="island-item nav-item active" data-view="feed" onclick="nav('feed')"><span class="ic">🏠</span>الرئيسية</div>
-  <div class="island-item nav-item" data-view="rooms" onclick="nav('rooms')"><span class="ic">💬</span>غرف<span class="badge" id="roomsBadgeMobile" style="display:none">0</span></div>
-  <div class="island-item nav-item" data-view="articles" onclick="nav('articles')"><span class="ic">📝</span>مقالات</div>
-  <div class="island-item nav-item" data-view="profile" onclick="nav('profile')"><span class="ic">👤</span>ملفي</div>
-  <div class="island-item" onclick="toggleMoreSheet()"><span class="ic">⋯</span>المزيد<span class="dot" id="moreDot"></span></div>
+  <div class="island-item nav-item active" data-view="feed" onclick="nav('feed')"><span class="ic"><i class="fa-solid fa-house"></i></span>الرئيسية</div>
+  <div class="island-item nav-item" data-view="rooms" onclick="nav('rooms')"><span class="ic"><i class="fa-solid fa-comment-dots"></i></span>غرف<span class="badge" id="roomsBadgeMobile" style="display:none">0</span></div>
+  <div class="island-item nav-item" data-view="articles" onclick="nav('articles')"><span class="ic"><i class="fa-solid fa-pen-to-square"></i></span>مقالات</div>
+  <div class="island-item nav-item" data-view="profile" onclick="nav('profile')"><span class="ic"><i class="fa-solid fa-user"></i></span>ملفي</div>
+  <div class="island-item" onclick="toggleMoreSheet()"><span class="ic"><i class="fa-solid fa-ellipsis"></i></span>المزيد<span class="dot" id="moreDot"></span></div>
 </nav>
 
 <div class="modal-overlay" id="moreSheetOverlay" onclick="if(event.target===this)toggleMoreSheet()">
   <div class="modal" style="width:320px; max-height:70vh; overflow-y:auto">
     <h2 style="font-size:18px; margin-bottom:14px">المزيد</h2>
-    <div class="nav-item" onclick="toggleMoreSheet(); toggleAiPanel()" style="margin-bottom:6px">✨ المساعد الذكي</div>
-    <div class="nav-item" id="adminNavItemMobile" onclick="toggleMoreSheet(); nav('admin')" style="display:none; margin-bottom:6px">🛡️ لوحة التحكم</div>
-    <div class="nav-item" onclick="toggleMoreSheet(); nav('messages')" style="margin-bottom:6px">✉️ الرسائل الخاصة <span class="badge" id="dmBadgeMobile" style="display:none">0</span></div>
-    <div class="nav-item" onclick="toggleMoreSheet(); nav('bookmarks')" style="margin-bottom:6px">🔖 المحفوظات</div>
-    <button class="btn btn-ghost btn-sm" id="notifToggleBtnMobile" style="width:100%; margin-bottom:14px; display:none" onclick="toggleMoreSheet(); handleNotifBtnClick()">🔕 فعّل الإشعارات</button>
+    <div class="nav-item" onclick="toggleMoreSheet(); toggleAiPanel()" style="margin-bottom:6px"><i class="fa-solid fa-wand-magic-sparkles"></i> المساعد الذكي</div>
+    <div class="nav-item" id="adminNavItemMobile" onclick="toggleMoreSheet(); nav('admin')" style="display:none; margin-bottom:6px"><i class="fa-solid fa-shield-halved"></i> لوحة التحكم</div>
+    <div class="nav-item" onclick="toggleMoreSheet(); nav('messages')" style="margin-bottom:6px"><i class="fa-solid fa-envelope"></i> الرسائل الخاصة <span class="badge" id="dmBadgeMobile" style="display:none">0</span></div>
+    <div class="nav-item" onclick="toggleMoreSheet(); nav('bookmarks')" style="margin-bottom:6px"><i class="fa-solid fa-bookmark"></i> المحفوظات</div>
+    <button class="btn btn-ghost btn-sm" id="notifToggleBtnMobile" style="width:100%; margin-bottom:14px; display:none" onclick="toggleMoreSheet(); handleNotifBtnClick()"><i class="fa-solid fa-bell-slash"></i> فعّل الإشعارات</button>
     <div class="nav-label" style="margin-top:10px">الأقسام</div>
     <div id="mobileCategories" style="max-height:220px; overflow-y:auto; margin-bottom:14px"></div>
     <button class="btn btn-ghost btn-sm" style="width:100%" onclick="doLogout()">تسجيل الخروج</button>
   </div>
 </div>
 
-<button class="ai-fab" id="aiFab" onclick="toggleAiPanel()" title="مساعد الذكاء الاصطناعي">✨</button>
+<button class="ai-fab" id="aiFab" onclick="toggleAiPanel()" title="مساعد الذكاء الاصطناعي"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
 <div class="ai-panel" id="aiPanel">
   <div class="ai-head">
-    <b>🤖 المساعد الذكي</b>
+    <b><i class="fa-solid fa-robot"></i> المساعد الذكي</b>
     <select class="ai-mode" id="aiMode">
       <option value="general">عام</option>
       <option value="explain">شرح كود</option>
       <option value="fix">إصلاح خطأ</option>
       <option value="summarize">تلخيص</option>
     </select>
-    <button class="icon-btn" style="width:28px;height:28px" onclick="toggleAiPanel()">×</button>
+    <button class="icon-btn" style="width:28px;height:28px" onclick="toggleAiPanel()"><i class="fa-solid fa-xmark"></i></button>
   </div>
-  <div class="ai-body" id="aiBody"><div class="ai-msg">أهلاً! اسألني أي حاجة عن البرمجة أو التقنية 👋</div></div>
+  <div class="ai-body" id="aiBody"><div class="ai-msg">أهلاً! اسألني أي حاجة عن البرمجة أو التقنية <i class="fa-solid fa-hand"></i></div></div>
   <div class="ai-input-bar">
     <textarea id="aiInput" placeholder="اكتب سؤالك..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMessage();}"></textarea>
     <button class="btn btn-primary btn-sm" onclick="sendAiMessage()">إرسال</button>
@@ -735,14 +790,85 @@ let activeRoomId = null;
 let activeRoomCreatorId = null;
 let roomChannel = null;
 
+/* ================= CUSTOM PROMPT / CONFIRM MODAL ================= */
+let _promptResolve = null;
+let _promptIsConfirm = false;
+
+function _showPromptModal({ message, defaultValue = '', isConfirm = false, danger = false }) {
+  return new Promise(resolve => {
+    _promptResolve = resolve;
+    _promptIsConfirm = isConfirm;
+    document.getElementById('promptModalTitle').textContent = message || '';
+    const fieldWrap = document.getElementById('promptModalFieldWrap');
+    const input = document.getElementById('promptModalInput');
+    const icon = document.getElementById('promptModalIcon');
+    const okBtn = document.getElementById('promptModalOk');
+    if (isConfirm) {
+      fieldWrap.style.display = 'none';
+      icon.innerHTML = danger ? '<i class="fa-solid fa-triangle-exclamation"></i>' : '<i class="fa-solid fa-circle-question"></i>';
+      icon.style.background = danger ? 'rgba(232,93,93,.15)' : '';
+      icon.style.color = danger ? 'var(--red)' : '';
+      okBtn.textContent = danger ? 'تأكيد الحذف' : 'تأكيد';
+      okBtn.className = danger ? 'btn btn-danger' : 'btn btn-primary';
+    } else {
+      fieldWrap.style.display = 'block';
+      input.value = defaultValue || '';
+      icon.innerHTML = '<i class="fa-solid fa-pen"></i>';
+      icon.style.background = '';
+      icon.style.color = '';
+      okBtn.textContent = 'تأكيد';
+      okBtn.className = 'btn btn-primary';
+    }
+    document.getElementById('promptModalOverlay').classList.add('active');
+    setTimeout(() => { if (!isConfirm) input.focus(); }, 50);
+  });
+}
+
+function closePromptModal(confirmed) {
+  document.getElementById('promptModalOverlay').classList.remove('active');
+  const resolve = _promptResolve;
+  _promptResolve = null;
+  if (!resolve) return;
+  if (_promptIsConfirm) {
+    resolve(!!confirmed);
+  } else {
+    const input = document.getElementById('promptModalInput');
+    resolve(confirmed ? input.value.trim() : null);
+  }
+}
+
+function customPrompt(message, defaultValue = '') {
+  return _showPromptModal({ message, defaultValue, isConfirm: false });
+}
+
+function customConfirm(message, danger = false) {
+  return _showPromptModal({ message, isConfirm: true, danger });
+}
+
 /* ================= TOAST ================= */
+const TOAST_ICONS = {
+  success: 'fa-circle-check',
+  error: 'fa-circle-exclamation',
+  '': 'fa-circle-info',
+};
 function toast(msg, type=''){
   const wrap = document.getElementById('toastWrap');
   const el = document.createElement('div');
   el.className = 'toast ' + type;
-  el.textContent = msg;
+  const iconClass = TOAST_ICONS[type] || TOAST_ICONS[''];
+  el.innerHTML = `
+    <span class="toast-ic"><i class="fa-solid ${iconClass}"></i></span>
+    <span class="toast-msg"></span>
+    <button class="toast-close" onclick="dismissToast(this.parentElement)"><i class="fa-solid fa-xmark"></i></button>
+    <span class="toast-progress"></span>`;
+  el.querySelector('.toast-msg').textContent = msg;
   wrap.appendChild(el);
-  setTimeout(()=>el.remove(), 3500);
+  setTimeout(()=>dismissToast(el), 3500);
+}
+function dismissToast(el){
+  if(!el || el.classList.contains('leaving')) return;
+  el.classList.add('leaving');
+  setTimeout(()=>el.remove(), 260);
 }
 
 /* ================= LANDING TERMINAL ANIMATION ================= */
@@ -1061,7 +1187,7 @@ async function renderFeed(container){
             <option value="code">كود</option>
             <option value="poll">استطلاع رأي</option>
           </select>
-          <label class="file-label">📎 صورة/فيديو<input type="file" id="postFile" accept="image/*,video/*" style="display:none" onchange="handlePostFileChosen(this)"></label>
+          <label class="file-label"><i class="fa-solid fa-paperclip"></i> صورة/فيديو<input type="file" id="postFile" accept="image/*,video/*" style="display:none" onchange="handlePostFileChosen(this)"></label>
           <span id="postFileLabel" style="font-size:12px;color:var(--teal)"></span>
           <button class="btn btn-primary btn-sm" style="margin-right:auto" onclick="submitPost()">نشر</button>
         </div>
@@ -1149,11 +1275,11 @@ async function submitPost(){
   const tags = tagsRaw ? tagsRaw.split(',').map(t=>t.trim().replace(/^#/,'')).filter(Boolean) : [];
 
   if(post_type === 'poll'){
-    const question = document.getElementById('postContent').value.trim() || prompt('سؤال الاستطلاع:');
+    const question = document.getElementById('postContent').value.trim() || await customPrompt('سؤال الاستطلاع:');
     if(!question){ toast('اكتب سؤال الاستطلاع', 'error'); return; }
     const options = [];
     for(let i=1; i<=6; i++){
-      const opt = prompt(`اختيار رقم ${i} (اسيبه فاضي عشان توقف):`);
+      const opt = await customPrompt(`اختيار رقم ${i} (اسيبه فاضي عشان توقف):`);
       if(!opt) break;
       options.push(opt.trim());
     }
@@ -1205,7 +1331,7 @@ async function loadPosts(){
   const { data: posts, error } = await q;
   const listEl = document.getElementById('postsList');
   if(error){ listEl.innerHTML = `<div class="empty-state">تعذر تحميل المنشورات: ${escapeHtml(error.message)}</div>`; return; }
-  if(!posts.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">📭</div>لسه مفيش منشورات — كن أول من ينشر!</div>`; return; }
+  if(!posts.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon"><i class="fa-solid fa-inbox"></i></div>لسه مفيش منشورات — كن أول من ينشر!</div>`; return; }
 
   const { data: likes } = await sb.from('post_likes').select('post_id').eq('user_id', currentUser.id);
   const likedSet = new Set((likes||[]).map(l=>l.post_id));
@@ -1223,7 +1349,7 @@ async function loadPosts(){
       <div style="border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px; background:var(--surface)">
         <div style="font-size:12px; color:var(--ink-faint); margin-bottom:6px">@${p.repost.profiles?.username||''} · ${timeAgo(p.repost.created_at)}</div>
         <div style="font-size:13.5px">${escapeHtml(p.repost.content||'')}</div>
-        ${p.repost.telegram_file_id ? `<div class="post-file" id="file-${p.repost.id}-in-${p.id}" data-lazy-file="${p.repost.id}-in-${p.id}" data-lazy-type="${p.repost.post_type}" data-lazy-fileid="${escapeHtml(p.repost.telegram_file_id)}" style="margin-top:8px"><div style="padding:16px;text-align:center;color:var(--ink-faint);font-size:12px">📎 هيتحمّل لما توصله</div></div>` : ''}
+        ${p.repost.telegram_file_id ? `<div class="post-file" id="file-${p.repost.id}-in-${p.id}" data-lazy-file="${p.repost.id}-in-${p.id}" data-lazy-type="${p.repost.post_type}" data-lazy-fileid="${escapeHtml(p.repost.telegram_file_id)}" style="margin-top:8px"><div style="padding:16px;text-align:center;color:var(--ink-faint);font-size:12px"><i class="fa-solid fa-paperclip"></i> هيتحمّل لما توصله</div></div>` : ''}
       </div>` : '';
     el.innerHTML = `
       <div class="post-head">
@@ -1231,19 +1357,19 @@ async function loadPosts(){
         <div style="cursor:pointer" onclick="viewProfile('${p.author_id}')"><div class="name">${author}</div><div class="meta">@${p.profiles?.username||''} · ${timeAgo(p.created_at)}</div></div>
         ${p.categories ? `<div class="post-cat">${p.categories.name_ar}</div>` : ''}
       </div>
-      ${p.repost_of ? '<div style="font-size:12px;color:var(--ink-faint);margin-bottom:8px">🔁 أعاد نشر منشور</div>' : ''}
+      ${p.repost_of ? '<div style="font-size:12px;color:var(--ink-faint);margin-bottom:8px"><i class="fa-solid fa-retweet"></i> أعاد نشر منشور</div>' : ''}
       ${repostHtml}
       ${p.content ? `<div class="post-content ${p.post_type==='code'?'code':''}">${escapeHtml(p.content||'')}</div>` : ''}
       ${tagsHtml}
       ${p.post_type==='poll' ? `<div id="poll-${p.id}"><div class="empty-state" style="padding:16px">جاري تحميل الاستطلاع...</div></div>` : ''}
-      ${p.telegram_file_id ? `<div class="post-file" id="file-${p.id}" data-lazy-file="${p.id}" data-lazy-type="${p.post_type}" data-lazy-fileid="${escapeHtml(p.telegram_file_id)}"><div style="padding:20px;text-align:center;color:var(--ink-faint);font-size:12px">📎 هيتحمّل لما توصله</div></div>` : ''}
+      ${p.telegram_file_id ? `<div class="post-file" id="file-${p.id}" data-lazy-file="${p.id}" data-lazy-type="${p.post_type}" data-lazy-fileid="${escapeHtml(p.telegram_file_id)}"><div style="padding:20px;text-align:center;color:var(--ink-faint);font-size:12px"><i class="fa-solid fa-paperclip"></i> هيتحمّل لما توصله</div></div>` : ''}
       <div class="post-actions">
-        <div class="act ${likedSet.has(p.id)?'liked':''}" onclick="toggleLike('${p.id}', this)">❤️ <span id="likecount-${p.id}">‎</span></div>
-        <div class="act" onclick="toggleComments('${p.id}')">💬 تعليق</div>
-        <div class="act ${bookmarkedSet.has(p.id)?'liked':''}" onclick="toggleBookmark('${p.id}', this)">🔖 حفظ</div>
-        <div class="act" onclick="repostPost('${p.id}')">🔁 إعادة نشر</div>
-        <div class="act" onclick="sharePost('${p.id}')">📤 مشاركة</div>
-        ${(p.author_id===currentUser.id || ['owner','super_admin','admin','moderator'].includes(currentProfile.role)) ? `<div class="act" style="color:var(--red)" onclick="deletePost('${p.id}')">🗑️ حذف</div>` : ''}
+        <div class="act ${likedSet.has(p.id)?'liked':''}" onclick="toggleLike('${p.id}', this)"><i class="fa-solid fa-heart"></i> <span id="likecount-${p.id}">‎</span></div>
+        <div class="act" onclick="toggleComments('${p.id}')"><i class="fa-solid fa-comment-dots"></i> تعليق</div>
+        <div class="act ${bookmarkedSet.has(p.id)?'liked':''}" onclick="toggleBookmark('${p.id}', this)"><i class="fa-solid fa-bookmark"></i> حفظ</div>
+        <div class="act" onclick="repostPost('${p.id}')"><i class="fa-solid fa-retweet"></i> إعادة نشر</div>
+        <div class="act" onclick="sharePost('${p.id}')"><i class="fa-solid fa-share-nodes"></i> مشاركة</div>
+        ${(p.author_id===currentUser.id || ['owner','super_admin','admin','moderator'].includes(currentProfile.role)) ? `<div class="act" style="color:var(--red)" onclick="deletePost('${p.id}')"><i class="fa-solid fa-trash"></i> حذف</div>` : ''}
       </div>
       <div class="comments-box" id="comments-${p.id}"></div>`;
     listEl.appendChild(el);
@@ -1281,18 +1407,18 @@ async function toggleBookmark(postId, el){
   }else{
     const { error } = await sb.from('bookmarks').insert({ user_id: currentUser.id, target_type:'post', target_id: postId });
     if(error){ toast('خطأ: '+error.message, 'error'); return; }
-    el.classList.add('liked'); toast('اتحفظ ✅', 'success');
+    el.classList.add('liked'); toast('اتحفظ', 'success');
   }
 }
 
-function sharePost(postId){
+async function sharePost(postId){
   const url = `${window.location.origin}${window.location.pathname}#post-${postId}`;
-  if(navigator.clipboard){ navigator.clipboard.writeText(url); toast('اتنسخ اللينك 📋', 'success'); }
-  else{ prompt('انسخ اللينك:', url); }
+  if(navigator.clipboard){ navigator.clipboard.writeText(url); toast('اتنسخ اللينك', 'success'); }
+  else{ await customPrompt('انسخ اللينك:', url); }
 }
 
 async function repostPost(postId){
-  if(!confirm('تعيد نشر المنشور ده في فيدك؟')) return;
+  if(!await customConfirm('تعيد نشر المنشور ده في فيدك؟')) return;
   const { error } = await sb.from('posts').insert({ author_id: currentUser.id, content: null, post_type:'text', repost_of: postId });
   if(error){ toast('خطأ: '+error.message, 'error'); return; }
   toast('تم إعادة النشر', 'success');
@@ -1312,7 +1438,7 @@ async function loadPollWidget(postId){
       const pct = total ? Math.round((Number(r.votes)/total)*100) : 0;
       const isMine = myVote?.option_id === r.option_id;
       return `<div style="margin-bottom:8px;cursor:pointer" onclick="voteOnPoll('${poll.id}','${r.option_id}','${postId}')">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>${isMine?'✅ ':''}${escapeHtml(r.option_text)}</span><span style="color:var(--ink-faint)">${pct}%</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>${isMine?'<i class="fa-solid fa-circle-check"></i> ':''}${escapeHtml(r.option_text)}</span><span style="color:var(--ink-faint)">${pct}%</span></div>
         <div style="background:var(--bg);border-radius:6px;height:8px;overflow:hidden"><div style="background:${isMine?'var(--amber)':'var(--ink-faint)'};height:100%;width:${pct}%"></div></div>
       </div>`;
     }).join('')}
@@ -1394,7 +1520,7 @@ async function loadLikeCount(postId){
 }
 
 async function deletePost(postId){
-  if(!confirm('متأكد إنك عايز تحذف المنشور ده؟')) return;
+  if(!await customConfirm('متأكد إنك عايز تحذف المنشور ده؟', true)) return;
   const { error } = await sb.from('posts').update({ is_removed: true }).eq('id', postId);
   if(error){ toast('تعذر الحذف: '+error.message, 'error'); return; }
   toast('تم حذف المنشور', 'success');
@@ -1438,13 +1564,13 @@ async function renderArticles(container){
     <div class="view">
       <div class="view-header">
         <div><h1>المقالات</h1><div class="sub">مقالات تقنية من المجتمع</div></div>
-        <button class="btn btn-primary btn-sm" onclick="openArticleEditor()">✍️ كتابة مقال</button>
+        <button class="btn btn-primary btn-sm" onclick="openArticleEditor()"><i class="fa-solid fa-pen"></i> كتابة مقال</button>
       </div>
       <div id="articlesList"><div class="empty-state">جاري التحميل...</div></div>
     </div>`;
   const { data: articles, error } = await sb.from('articles').select('*, profiles(username, full_name)').eq('is_draft', false).eq('is_removed', false).order('created_at', {ascending:false});
   const listEl = document.getElementById('articlesList');
-  if(error || !articles?.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">📝</div>لسه مفيش مقالات منشورة</div>`; return; }
+  if(error || !articles?.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon"><i class="fa-solid fa-pen-to-square"></i></div>لسه مفيش مقالات منشورة</div>`; return; }
   listEl.innerHTML = articles.map(a=>`
     <div class="article-card" onclick="openArticleReader('${a.id}')">
       <h3>${escapeHtml(a.title)}</h3>
@@ -1464,13 +1590,13 @@ async function openArticleReader(articleId){
   const { data: bookmark } = await sb.from('bookmarks').select('*').eq('user_id', currentUser.id).eq('target_type','article').eq('target_id', articleId).maybeSingle();
   const { data: comments } = await sb.from('article_comments').select('*, profiles(username)').eq('article_id', articleId).eq('is_removed', false).order('created_at');
   c.innerHTML = `<div class="view">
-    <button class="btn btn-sm" style="margin-bottom:16px" onclick="nav('articles')">→ رجوع للمقالات</button>
+    <button class="btn btn-sm" style="margin-bottom:16px" onclick="nav('articles')"><i class="fa-solid fa-arrow-right"></i> رجوع للمقالات</button>
     <h1 style="font-family:var(--font-display);font-size:26px;margin-bottom:8px">${escapeHtml(a.title)}</h1>
     <div class="article-meta" style="margin-bottom:20px">${escapeHtml(a.profiles?.full_name||a.profiles?.username||'')} · ${timeAgo(a.created_at)} · ${a.views+1} مشاهدة</div>
     <div style="white-space:pre-wrap;line-height:1.9;font-size:15px;margin-bottom:20px">${escapeHtml(a.content_markdown||'')}</div>
     <div class="post-actions" style="margin-bottom:20px">
-      <div class="act ${myLike?'liked':''}" id="articleLikeAct" onclick="toggleArticleLike('${articleId}', this)">❤️ <span id="articleLikeCount">${likeCount||0}</span></div>
-      <div class="act ${bookmark?'liked':''}" onclick="toggleArticleBookmark('${articleId}', this)">🔖 حفظ</div>
+      <div class="act ${myLike?'liked':''}" id="articleLikeAct" onclick="toggleArticleLike('${articleId}', this)"><i class="fa-solid fa-heart"></i> <span id="articleLikeCount">${likeCount||0}</span></div>
+      <div class="act ${bookmark?'liked':''}" onclick="toggleArticleBookmark('${articleId}', this)"><i class="fa-solid fa-bookmark"></i> حفظ</div>
     </div>
     <div class="view-header"><h1 style="font-size:16px">التعليقات</h1></div>
     <div id="articleComments">${(comments||[]).map(cm=>`<div class="comment"><b class="name" style="cursor:pointer" onclick="viewProfile('${cm.author_id}')">@${cm.profiles?.username||''}</b> ${escapeHtml(cm.content)}</div>`).join('')}</div>
@@ -1489,7 +1615,7 @@ async function toggleArticleLike(articleId, el){
 async function toggleArticleBookmark(articleId, el){
   const saved = el.classList.contains('liked');
   if(saved){ await sb.from('bookmarks').delete().eq('user_id', currentUser.id).eq('target_type','article').eq('target_id', articleId); el.classList.remove('liked'); toast('اتشال من المحفوظات'); }
-  else{ await sb.from('bookmarks').insert({ user_id: currentUser.id, target_type:'article', target_id: articleId }); el.classList.add('liked'); toast('اتحفظ ✅','success'); }
+  else{ await sb.from('bookmarks').insert({ user_id: currentUser.id, target_type:'article', target_id: articleId }); el.classList.add('liked'); toast('اتحفظ','success'); }
 }
 
 async function submitArticleComment(articleId){
@@ -1502,10 +1628,10 @@ async function submitArticleComment(articleId){
   openArticleReader(articleId);
 }
 
-function openArticleEditor(){
-  const title = prompt('عنوان المقال:');
+async function openArticleEditor(){
+  const title = await customPrompt('عنوان المقال:');
   if(!title) return;
-  const content = prompt('محتوى المقال (Markdown):');
+  const content = await customPrompt('محتوى المقال (Markdown):');
   if(!content) return;
   const slug = title.trim().toLowerCase().replace(/[^ء-ي a-z0-9]/gi,'').replace(/\s+/g,'-') + '-' + Date.now();
   sb.from('articles').insert({ author_id: currentUser.id, title, slug, content_markdown: content, is_draft:false })
@@ -1524,7 +1650,7 @@ async function renderRooms(container){
       <div class="view-header">
         <div><h1>غرف الدردشة</h1><div class="sub">الغرف اللي انت عضو فيها بس — ادخل غرفة جديدة بلينك دعوة</div></div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-sm" onclick="promptJoinByInvite()">🔗 دخول بلينك دعوة</button>
+          <button class="btn btn-sm" onclick="promptJoinByInvite()"><i class="fa-solid fa-link"></i> دخول بلينك دعوة</button>
           <button class="btn btn-primary btn-sm" onclick="requestNewRoom()">+ طلب غرفة جديدة</button>
         </div>
       </div>
@@ -1542,7 +1668,7 @@ async function loadRoomsList(){
     .order('created_at', {ascending:false});
 
   if(error){ listEl.innerHTML = `<div class="empty-state" style="color:var(--red)">تعذر تحميل الغرف: ${escapeHtml(error.message)}</div>`; toast('خطأ: '+error.message, 'error'); return; }
-  if(!rooms?.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">💬</div>لسه مفيش غرف — اطلب أول غرفة أو ادخل بلينك دعوة</div>`; return; }
+  if(!rooms?.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon"><i class="fa-solid fa-comment-dots"></i></div>لسه مفيش غرف — اطلب أول غرفة أو ادخل بلينك دعوة</div>`; return; }
 
   // Resolve category names with a separate simple query instead of a nested embed —
   // avoids the RLS-on-nested-join pitfall that caused "permission denied" earlier.
@@ -1561,8 +1687,8 @@ async function loadRoomsList(){
       </div>
       <span class="status-pill ${r.status}">${r.status==='pending'?'بانتظار الموافقة':r.status==='approved'?'مفعّلة':r.status==='rejected'?'مرفوضة':r.status}</span>
       ${r.status==='approved' ? `<button class="btn btn-sm" onclick="openRoomChat('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">دخول</button>` : ''}
-      ${(r.creator_id===currentUser.id && r.status==='approved') ? `<button class="btn btn-sm" onclick="createInviteFlow('${r.id}')">🔗 لينك دعوة</button>` : ''}
-      ${r.creator_id===currentUser.id ? `<button class="btn btn-sm" onclick="openRoomAdminPanel('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">⚙️ إدارة</button>` : ''}
+      ${(r.creator_id===currentUser.id && r.status==='approved') ? `<button class="btn btn-sm" onclick="createInviteFlow('${r.id}')"><i class="fa-solid fa-link"></i> لينك دعوة</button>` : ''}
+      ${r.creator_id===currentUser.id ? `<button class="btn btn-sm" onclick="openRoomAdminPanel('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')"><i class="fa-solid fa-gear"></i> إدارة</button>` : ''}
     </div>`).join('');
 }
 
@@ -1594,7 +1720,7 @@ async function pollMyRooms(){
     const prev = myRoomStatusSnapshot[r.id];
     if(prev !== undefined && prev !== r.status){
       anyChanged = true;
-      if(r.status === 'approved') toast(`تمت الموافقة على غرفة "${r.name}" 🎉`, 'success');
+      if(r.status === 'approved') toast(`تمت الموافقة على غرفة "${r.name}"`, 'success');
       else if(r.status === 'rejected') toast(`تم رفض طلب غرفة "${r.name}"`, 'error');
     }
     myRoomStatusSnapshot[r.id] = r.status;
@@ -1623,8 +1749,8 @@ function subscribeToRoomsList(){
   startRoomsListPolling();
 }
 
-function promptJoinByInvite(){
-  const input = prompt('الصق لينك الدعوة أو الكود بتاعه:');
+async function promptJoinByInvite(){
+  const input = await customPrompt('الصق لينك الدعوة أو الكود بتاعه:');
   if(!input) return;
   // Accept either a raw code or a full URL like https://site.com/?invite=CODE
   let code = input.trim();
@@ -1664,10 +1790,10 @@ function checkUrlInviteOnLoad(){
   }
 }
 
-function requestNewRoom(){
-  const name = prompt('اسم الغرفة:');
+async function requestNewRoom(){
+  const name = await customPrompt('اسم الغرفة:');
   if(!name) return;
-  const description = prompt('وصف قصير للغرفة:') || '';
+  const description = await customPrompt('وصف قصير للغرفة:') || '';
   sb.from('chat_rooms').insert({ name, description, creator_id: currentUser.id, status:'pending' })
     .then(({error})=>{
       if(error){ toast('خطأ: '+error.message, 'error'); return; }
@@ -1688,7 +1814,7 @@ async function openRoomMembersModal(roomId, roomName){
   listEl.innerHTML = members.map(m=>`
     <div class="member-row">
       <div class="avatar" id="rmm-av-${m.user_id}" style="width:32px;height:32px;font-size:13px;cursor:pointer" onclick="closeRoomMembersModal();viewProfile('${m.user_id}')">${(m.username||'?')[0].toUpperCase()}</div>
-      <div class="name" style="cursor:pointer" onclick="closeRoomMembersModal();viewProfile('${m.user_id}')">${escapeHtml(m.full_name||m.username||'مستخدم')} ${m.user_id===room?.creator_id?' 👑':''}</div>
+      <div class="name" style="cursor:pointer" onclick="closeRoomMembersModal();viewProfile('${m.user_id}')">${escapeHtml(m.full_name||m.username||'مستخدم')} ${m.user_id===room?.creator_id?' <i class="fa-solid fa-crown"></i>':''}</div>
     </div>`).join('');
   members.forEach(m=>{ if(m.avatar_file_id) loadAvatarInto(`rmm-av-${m.user_id}`, m.avatar_file_id); });
 }
@@ -1711,10 +1837,10 @@ async function openRoomChat(roomId, roomName){
       <div class="rooms-rail" id="roomsRail"></div>
       <div style="flex:1;display:flex;flex-direction:column">
         <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:600;display:flex;align-items:center;gap:10px">
-          <button class="btn btn-sm" onclick="nav('rooms')">→</button>
-          <span style="cursor:pointer" onclick="openRoomMembersModal('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')">${escapeHtml(roomName)} <span class="room-number-tag">#${roomInfo?.room_number ?? ''}</span> 👥</span>
-          <button class="btn btn-sm" style="margin-right:auto" id="roomMuteBtn" onclick="toggleRoomMute('${roomId}')">${isMuted ? '🔕 مكتومة' : '🔔 إشعارات مفعّلة'}</button>
-          ${isRoomAdmin ? `<button class="btn btn-sm" onclick="openRoomAdminPanel('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')">⚙️ إدارة الغرفة</button>` : ''}
+          <button class="btn btn-sm" onclick="nav('rooms')"><i class="fa-solid fa-arrow-right"></i></button>
+          <span style="cursor:pointer" onclick="openRoomMembersModal('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')">${escapeHtml(roomName)} <span class="room-number-tag">#${roomInfo?.room_number ?? ''}</span> <i class="fa-solid fa-users"></i></span>
+          <button class="btn btn-sm" style="margin-right:auto" id="roomMuteBtn" onclick="toggleRoomMute('${roomId}')">${isMuted ? '<i class="fa-solid fa-bell-slash"></i> مكتومة' : '<i class="fa-solid fa-bell"></i> إشعارات مفعّلة'}</button>
+          ${isRoomAdmin ? `<button class="btn btn-sm" onclick="openRoomAdminPanel('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')"><i class="fa-solid fa-gear"></i> إدارة الغرفة</button>` : ''}
         </div>
         ${roomInfo?.is_disabled ? `<div style="padding:8px 20px;background:rgba(232,93,93,.1);color:var(--red);font-size:12px">هذه الغرفة معطّلة من الإدارة — الأعضاء العاديين مايقدروش يبعتوا رسايل فيها</div>` : ''}
         <div id="pinnedBanner"></div>
@@ -1722,15 +1848,15 @@ async function openRoomChat(roomId, roomName){
         <div id="typingIndicator" style="padding:4px 20px;font-size:12px;color:var(--ink-faint);min-height:20px"></div>
         <div id="replyBar" style="display:none;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border-top:1px solid var(--border);font-size:12px;color:var(--ink-dim)">
           <span id="replyBarText" style="flex:1"></span>
-          <button class="icon-btn" style="width:24px;height:24px" onclick="cancelReply()">×</button>
+          <button class="icon-btn" style="width:24px;height:24px" onclick="cancelReply()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div id="roomRecordBar" class="record-bar"><span class="record-dot"></span><span id="roomRecordTime">0:00</span> جاري التسجيل...
           <button class="btn btn-sm" onclick="cancelVoiceRecording('room')">إلغاء</button>
           <button class="btn btn-primary btn-sm" onclick="stopVoiceRecording('room')">إرسال</button>
         </div>
         <div class="chat-input-bar">
-          <label class="file-label">📎<input type="file" id="chatFile" style="display:none" onchange="sendChatFile(this)"></label>
-          <span class="mic-btn" id="roomMicBtn" onclick="startVoiceRecording('room')">🎤</span>
+          <label class="file-label"><i class="fa-solid fa-paperclip"></i><input type="file" id="chatFile" style="display:none" onchange="sendChatFile(this)"></label>
+          <span class="mic-btn" id="roomMicBtn" onclick="startVoiceRecording('room')"><i class="fa-solid fa-microphone"></i></span>
           <input type="text" id="chatInput" placeholder="اكتب رسالة... (اضغط على رسالة عشان ترد عليها)" oninput="broadcastTyping()" onkeydown="if(event.key==='Enter')sendChatMessage()">
           <button class="btn btn-primary btn-sm" onclick="sendChatMessage()">إرسال</button>
         </div>
@@ -1748,7 +1874,7 @@ async function toggleRoomMute(roomId){
   const currentlyMuted = btn?.textContent.includes('مكتومة');
   const { error } = await sb.rpc('toggle_room_mute', { p_room_id: roomId, p_muted: !currentlyMuted });
   if(error){ toast('خطأ: '+error.message, 'error'); return; }
-  if(btn) btn.textContent = currentlyMuted ? '🔔 إشعارات مفعّلة' : '🔕 مكتومة';
+  if(btn) btn.innerHTML = currentlyMuted ? '<i class="fa-solid fa-bell"></i> إشعارات مفعّلة' : '<i class="fa-solid fa-bell-slash"></i> مكتومة';
 }
 
 async function loadRoomsRail(){
@@ -1769,7 +1895,7 @@ async function openRoomAdminPanel(roomId, roomName){
     <div class="view">
       <div class="view-header">
         <div><h1>إدارة غرفة: ${escapeHtml(roomName)}</h1><div class="sub">لينكات الدعوة والأعضاء</div></div>
-        <button class="btn btn-sm" onclick="openRoomChat('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')">→ رجوع للغرفة</button>
+        <button class="btn btn-sm" onclick="openRoomChat('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')"><i class="fa-solid fa-arrow-right"></i> رجوع للغرفة</button>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:18px">
         <button class="btn btn-primary btn-sm" onclick="createInviteFlow('${roomId}')">+ إنشاء لينك دعوة</button>
@@ -1784,10 +1910,10 @@ async function openRoomAdminPanel(roomId, roomName){
 }
 
 async function createInviteFlow(roomId){
-  const usesInput = prompt('أقصى عدد استخدام للينك (سيبها فاضية = بلا حدود):');
+  const usesInput = await customPrompt('أقصى عدد استخدام للينك (سيبها فاضية = بلا حدود):');
   if(usesInput === null) return;
   const maxUses = usesInput.trim() ? parseInt(usesInput.trim(), 10) : null;
-  const hoursInput = prompt('اللينك يخلص بعد كام ساعة؟ (سيبها فاضية = ما يخلصش):');
+  const hoursInput = await customPrompt('اللينك يخلص بعد كام ساعة؟ (سيبها فاضية = ما يخلصش):');
   if(hoursInput === null) return;
   const expiresHours = hoursInput.trim() ? parseInt(hoursInput.trim(), 10) : null;
   const { data, error } = await sb.rpc('create_room_invite', { p_room_id: roomId, p_max_uses: maxUses, p_expires_in_hours: expiresHours });
@@ -1830,7 +1956,7 @@ async function copyInviteLink(link){
 }
 
 async function revokeInvite(inviteId, roomId){
-  if(!confirm('تلغي لينك الدعوة ده؟ محدش هيقدر يدخل بيه تاني')) return;
+  if(!await customConfirm('تلغي لينك الدعوة ده؟ محدش هيقدر يدخل بيه تاني')) return;
   const { error } = await sb.rpc('revoke_room_invite', { p_invite_id: inviteId });
   if(error){ toast('خطأ: '+error.message, 'error'); return; }
   loadRoomInvites(roomId);
@@ -1845,7 +1971,7 @@ async function loadRoomMembers(roomId){
   el.innerHTML = (members||[]).map(m=>`
     <div class="member-row">
       <div class="avatar" id="memav-${m.user_id}" style="width:28px;height:28px;font-size:12px;cursor:pointer" onclick="viewProfile('${m.user_id}')">${(m.username||'?')[0].toUpperCase()}</div>
-      <div class="name" style="cursor:pointer" onclick="viewProfile('${m.user_id}')">${escapeHtml(m.full_name||m.username||'مستخدم')} ${m.user_id===room?.creator_id?' 👑':''}</div>
+      <div class="name" style="cursor:pointer" onclick="viewProfile('${m.user_id}')">${escapeHtml(m.full_name||m.username||'مستخدم')} ${m.user_id===room?.creator_id?' <i class="fa-solid fa-crown"></i>':''}</div>
       ${m.user_id!==room?.creator_id ? `
         <button class="btn btn-sm" onclick="kickMember('${roomId}','${m.user_id}', false)">طرد</button>
         <button class="btn btn-sm" style="color:var(--red)" onclick="kickMember('${roomId}','${m.user_id}', true)">طرد + حظر</button>
@@ -1855,7 +1981,7 @@ async function loadRoomMembers(roomId){
 }
 
 async function kickMember(roomId, userId, ban){
-  if(!confirm(ban ? 'تطرد وتحظر العضو ده؟ مش هيقدر يدخل الغرفة تاني حتى بلينك جديد' : 'تطرد العضو ده من الغرفة؟')) return;
+  if(!await customConfirm(ban ? 'تطرد وتحظر العضو ده؟ مش هيقدر يدخل الغرفة تاني حتى بلينك جديد' : 'تطرد العضو ده من الغرفة؟', true)) return;
   const { error } = await sb.rpc('kick_room_member', { p_room_id: roomId, p_user_id: userId, p_ban: ban });
   if(error){ toast('خطأ: '+error.message, 'error'); return; }
   toast('تم', 'success');
@@ -1900,9 +2026,9 @@ function renderOneMessage(m, username, avatarFileId){
       <div class="msg ${mine?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setReplyTarget('${m.id}', '${escapeHtml((username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||(m.message_type==='voice'?'رسالة صوتية':m.content)||'').slice(0,60)).replace(/'/g,"\\'")}')"`}>
         <div class="sender"><span style="cursor:pointer" onclick="event.stopPropagation();viewProfile('${m.sender_id}')">@${username||''}</span> <span style="color:var(--ink-faint);font-weight:400">· ${formatMsgTime(m.created_at)}${m.edited_at?" · (معدّلة)":""}</span>
           ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
-            ${(m.room_id && canModerateRoom()) ? `<span style="cursor:pointer" onclick="event.stopPropagation();togglePinMessage('${m.id}', ${!m.is_pinned})" title="${m.is_pinned?'إلغاء التثبيت':'تثبيت'}">${m.is_pinned?'📌':'📍'}</span>` : ''}
-            ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل">✏️</span>` : ''}
-            ${canDeleteMessage(m) ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteMessage('${m.id}')" title="حذف الرسالة">🗑️</span>` : ''}
+            ${(m.room_id && canModerateRoom()) ? `<span style="cursor:pointer" onclick="event.stopPropagation();togglePinMessage('${m.id}', ${!m.is_pinned})" title="${m.is_pinned?'إلغاء التثبيت':'تثبيت'}">${m.is_pinned?'<i class="fa-solid fa-thumbtack"></i>':'<i class="fa-solid fa-location-dot"></i>'}</span>` : ''}
+            ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل"><i class="fa-solid fa-pencil"></i></span>` : ''}
+            ${canDeleteMessage(m) ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteMessage('${m.id}')" title="حذف الرسالة"><i class="fa-solid fa-trash"></i></span>` : ''}
           </span>` : ''}
         </div>
         ${m.is_removed ? `<i style="color:var(--ink-faint)">تم حذف هذه الرسالة</i>` : `
@@ -1915,7 +2041,7 @@ function renderOneMessage(m, username, avatarFileId){
 
 function renderMessageBody(m){
   if(m.message_type==='voice'){
-    return `<div class="msg-voice" id="msgmedia-${m.id}">🎤 <span style="font-size:12px;color:var(--ink-faint)">${m.duration_seconds?formatDuration(m.duration_seconds):''}</span></div>`;
+    return `<div class="msg-voice" id="msgmedia-${m.id}"><i class="fa-solid fa-microphone"></i> <span style="font-size:12px;color:var(--ink-faint)">${m.duration_seconds?formatDuration(m.duration_seconds):''}</span></div>`;
   }
   if(m.message_type==='image'){
     return `<div class="msg-media" id="msgmedia-${m.id}">${escapeHtml(m.content||'')}</div>`;
@@ -1924,7 +2050,7 @@ function renderMessageBody(m){
     return `<div class="msg-media" id="msgmedia-${m.id}">${escapeHtml(m.content||'')}</div>`;
   }
   if(m.message_type==='document'){
-    return `<div id="msgmedia-${m.id}">📎 ${escapeHtml(m.content||'ملف')}</div>`;
+    return `<div id="msgmedia-${m.id}"><i class="fa-solid fa-paperclip"></i> ${escapeHtml(m.content||'ملف')}</div>`;
   }
   return escapeHtml(m.content||'');
 }
@@ -1963,14 +2089,14 @@ async function togglePinMessage(msgId, pinTo){
 }
 
 async function editMessage(msgId, currentContent){
-  const newContent = prompt('عدّل رسالتك:', currentContent);
+  const newContent = await customPrompt('عدّل رسالتك:', currentContent);
   if(newContent===null || !newContent.trim() || newContent===currentContent) return;
   const { error } = await sb.from('chat_messages').update({ content: newContent.trim(), edited_at: new Date().toISOString() }).eq('id', msgId);
   if(error){ toast('تعذر التعديل: '+error.message, 'error'); }
 }
 
 async function deleteMessage(msgId){
-  if(!confirm('تحذف الرسالة دي؟')) return;
+  if(!await customConfirm('تحذف الرسالة دي؟', true)) return;
   const { error } = await sb.from('chat_messages').update({ is_removed: true }).eq('id', msgId);
   if(error){ toast('تعذر الحذف: '+error.message, 'error'); }
 }
@@ -2063,7 +2189,7 @@ async function refreshPinnedBanner(roomId){
   if(!pinned?.length){ banner.innerHTML=''; return; }
   const last = pinned[0];
   banner.innerHTML = `<div style="padding:8px 20px;background:rgba(79,143,255,.08);border-bottom:1px solid var(--border);font-size:12px;display:flex;align-items:center;gap:8px">
-    <span>📌</span><span style="flex:1">${escapeHtml((last.content||'').slice(0,80))}</span>
+    <span><i class="fa-solid fa-thumbtack"></i></span><span style="flex:1">${escapeHtml((last.content||'').slice(0,80))}</span>
     <span style="cursor:pointer;color:var(--ink-faint)" onclick="togglePinMessage('${last.id}', false)">إلغاء التثبيت</span>
   </div>`;
 }
@@ -2242,7 +2368,7 @@ async function renderProfile(container, userId){
     <div class="view">
       <div class="profile-header">
         <div class="profile-cover" id="profileCover" ${isOwn?'onclick="document.getElementById(\'coverUploadInput\').click()"':''}>
-          ${isOwn ? `<span class="cover-hint">📷 غيّر صورة الغلاف</span><input type="file" id="coverUploadInput" accept="image/*" style="display:none" onchange="uploadCover(this)">` : ''}
+          ${isOwn ? `<span class="cover-hint"><i class="fa-solid fa-camera"></i> غيّر صورة الغلاف</span><input type="file" id="coverUploadInput" accept="image/*" style="display:none" onchange="uploadCover(this)">` : ''}
         </div>
         <div class="profile-body">
           <div class="profile-top">
@@ -2266,7 +2392,7 @@ async function renderProfile(container, userId){
           ${isOwn
             ? `<button class="btn btn-sm" style="margin-top:16px" onclick="editProfile()">تعديل الملف الشخصي</button>`
             : `<button class="btn btn-sm ${isFollowing?'':'btn-primary'}" style="margin-top:16px" onclick="toggleFollow('${p.id}', ${isFollowing})">${isFollowing?'إلغاء المتابعة':'متابعة'}</button>
-               <button class="btn btn-sm" style="margin-top:16px" onclick="openDmConversation('${p.id}','${escapeHtml(p.username)}')">✉️ رسالة</button>`}
+               <button class="btn btn-sm" style="margin-top:16px" onclick="openDmConversation('${p.id}','${escapeHtml(p.username)}')"><i class="fa-solid fa-envelope"></i> رسالة</button>`}
         </div>
       </div>
       <div class="profile-tabs">
@@ -2323,7 +2449,7 @@ async function switchProfileTab(tab, userId, isOwn){
         <div class="portfolio-card">
           <h4>${escapeHtml(it.title)}</h4>
           <p>${escapeHtml(it.description||'')}</p>
-          ${it.project_url?`<a href="${escapeHtml(it.project_url)}" target="_blank">عرض المشروع ↗</a>`:''}
+          ${it.project_url?`<a href="${escapeHtml(it.project_url)}" target="_blank">عرض المشروع <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`:''}
           ${isOwn?`<div style="margin-top:8px"><span style="font-size:11px;color:var(--red);cursor:pointer" onclick="deletePortfolioItem('${it.id}','${userId}')">حذف</span></div>`:''}
         </div>`).join('') || '<div class="empty-state">لسه مفيش مشاريع مضافة</div>'}</div>`;
 
@@ -2344,16 +2470,16 @@ async function switchProfileTab(tab, userId, isOwn){
     ].sort((a,b)=>new Date(b.time)-new Date(a.time));
     el.innerHTML = events.length ? events.map(e=>`
       <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px">
-        <span>${e.type==='post'?'📝':'📰'}</span><div style="flex:1">${escapeHtml(e.text)}</div><span style="color:var(--ink-faint);font-size:11px;font-family:var(--font-mono)">${timeAgo(e.time)}</span>
+        <span>${e.type==='post'?'<i class="fa-solid fa-pen-to-square"></i>':'<i class="fa-solid fa-newspaper"></i>'}</span><div style="flex:1">${escapeHtml(e.text)}</div><span style="color:var(--ink-faint);font-size:11px;font-family:var(--font-mono)">${timeAgo(e.time)}</span>
       </div>`).join('') : `<div class="empty-state">لسه مفيش نشاط</div>`;
   }
 }
 
 async function addPortfolioItem(userId){
-  const title = prompt('اسم المشروع:');
+  const title = await customPrompt('اسم المشروع:');
   if(!title) return;
-  const description = prompt('وصف قصير:') || '';
-  const project_url = prompt('رابط المشروع (اختياري):') || null;
+  const description = await customPrompt('وصف قصير:') || '';
+  const project_url = await customPrompt('رابط المشروع (اختياري):') || null;
   const { error } = await sb.from('portfolio_items').insert({ user_id: currentUser.id, title, description, project_url });
   if(error){ toast('خطأ: '+error.message, 'error'); return; }
   toast('تم إضافة المشروع', 'success');
@@ -2361,7 +2487,7 @@ async function addPortfolioItem(userId){
 }
 
 async function deletePortfolioItem(itemId, userId){
-  if(!confirm('تحذف المشروع ده؟')) return;
+  if(!await customConfirm('تحذف المشروع ده؟', true)) return;
   await sb.from('portfolio_items').delete().eq('id', itemId);
   switchProfileTab('portfolio', userId, true);
 }
@@ -2387,7 +2513,7 @@ async function loadGalleryThumb(itemId, fileId, isOwn){
 }
 
 async function deleteGalleryItem(itemId){
-  if(!confirm('تحذف الصورة دي؟')) return;
+  if(!await customConfirm('تحذف الصورة دي؟', true)) return;
   await sb.from('gallery_items').delete().eq('id', itemId);
   document.getElementById(`gal-${itemId}`)?.parentElement?.removeChild(document.getElementById(`gal-${itemId}`));
 }
@@ -2415,14 +2541,14 @@ async function toggleFollow(targetId, currentlyFollowing){
   renderProfile(document.getElementById('viewContainer'), targetId);
 }
 
-function editProfile(){
-  const bio = prompt('النبذة الشخصية:', currentProfile.bio||'');
+async function editProfile(){
+  const bio = await customPrompt('النبذة الشخصية:', currentProfile.bio||'');
   if(bio===null) return;
-  const skillsStr = prompt('مهاراتك (افصل بفاصلة):', (currentProfile.skills||[]).join(', ')) || '';
+  const skillsStr = await customPrompt('مهاراتك (افصل بفاصلة):', (currentProfile.skills||[]).join(', ')) || '';
   const skills = skillsStr.split(',').map(s=>s.trim()).filter(Boolean);
-  const github_url = prompt('رابط GitHub (اختياري):', currentProfile.github_url||'') || null;
-  const linkedin_url = prompt('رابط LinkedIn (اختياري):', currentProfile.linkedin_url||'') || null;
-  const portfolio_url = prompt('رابط Portfolio (اختياري):', currentProfile.portfolio_url||'') || null;
+  const github_url = await customPrompt('رابط GitHub (اختياري):', currentProfile.github_url||'') || null;
+  const linkedin_url = await customPrompt('رابط LinkedIn (اختياري):', currentProfile.linkedin_url||'') || null;
+  const portfolio_url = await customPrompt('رابط Portfolio (اختياري):', currentProfile.portfolio_url||'') || null;
   sb.from('profiles').update({ bio, skills, github_url, linkedin_url, portfolio_url }).eq('id', currentUser.id).then(({error})=>{
     if(error){ toast('خطأ: '+error.message, 'error'); return; }
     Object.assign(currentProfile, { bio, skills, github_url, linkedin_url, portfolio_url });
@@ -2440,7 +2566,7 @@ async function renderBookmarks(container){
   const { data: marks, error } = await sb.from('bookmarks').select('*').eq('user_id', currentUser.id).order('created_at', {ascending:false});
   const listEl = document.getElementById('bookmarksList');
   if(error){ listEl.innerHTML = `<div class="empty-state">تعذر التحميل: ${escapeHtml(error.message)}</div>`; return; }
-  if(!marks.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon">🔖</div>لسه مفيش حاجة محفوظة</div>`; return; }
+  if(!marks.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon"><i class="fa-solid fa-bookmark"></i></div>لسه مفيش حاجة محفوظة</div>`; return; }
 
   const postIds = marks.filter(m=>m.target_type==='post').map(m=>m.target_id);
   const articleIds = marks.filter(m=>m.target_type==='article').map(m=>m.target_id);
@@ -2467,11 +2593,11 @@ async function renderMessagesList(container){
     const otherId = m.sender_id===currentUser.id ? m.receiver_id : m.sender_id;
     if(!others.has(otherId)) others.set(otherId, m);
   }
-  if(!others.size){ listEl.innerHTML = `<div class="empty-state"><div class="icon">✉️</div>لسه مفيش محادثات — ابعت رسالة من بروفايل أي حد</div>`; return; }
+  if(!others.size){ listEl.innerHTML = `<div class="empty-state"><div class="icon"><i class="fa-solid fa-envelope"></i></div>لسه مفيش محادثات — ابعت رسالة من بروفايل أي حد</div>`; return; }
   const otherIds = [...others.keys()];
   const { data: profs } = await sb.from('profiles').select('id, username, full_name, avatar_file_id').in('id', otherIds);
   const profMap = new Map((profs||[]).map(p=>[p.id,p]));
-  const previewFor = (m)=> m.message_type==='voice' ? '🎤 رسالة صوتية' : m.message_type==='image' ? '📷 صورة' : m.message_type==='video' ? '🎬 فيديو' : m.message_type==='document' ? '📎 ملف' : (m.content||'');
+  const previewFor = (m)=> m.message_type==='voice' ? '<i class="fa-solid fa-microphone"></i> رسالة صوتية' : m.message_type==='image' ? '<i class="fa-solid fa-camera"></i> صورة' : m.message_type==='video' ? '<i class="fa-solid fa-clapperboard"></i> فيديو' : m.message_type==='document' ? '<i class="fa-solid fa-paperclip"></i> ملف' : (m.content||'');
   listEl.innerHTML = otherIds.map(oid=>{
     const p = profMap.get(oid); const lastMsg = others.get(oid);
     return `<div class="room-card" style="cursor:pointer;display:flex;align-items:center;gap:12px" onclick="openDmConversation('${oid}','${escapeHtml(p?.username||'')}')">
@@ -2492,7 +2618,7 @@ async function openDmConversation(otherId, otherUsername){
   c.innerHTML = `<div class="chat-view">
     <div style="flex:1;display:flex;flex-direction:column">
       <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:600;display:flex;align-items:center;gap:10px">
-        <button class="btn btn-sm" onclick="nav('messages')">→</button>
+        <button class="btn btn-sm" onclick="nav('messages')"><i class="fa-solid fa-arrow-right"></i></button>
         <span class="avatar" id="dmHeaderAvatar" style="width:28px;height:28px;font-size:12px;cursor:pointer" onclick="viewProfile('${otherId}')">${(otherUsername||'?')[0].toUpperCase()}</span>
         <span style="cursor:pointer" onclick="viewProfile('${otherId}')">@${escapeHtml(otherUsername)}</span>
       </div>
@@ -2501,15 +2627,15 @@ async function openDmConversation(otherId, otherUsername){
       <div id="dmTypingIndicator" style="padding:4px 20px;font-size:12px;color:var(--ink-faint);min-height:20px"></div>
       <div id="dmReplyBar" style="display:none;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border-top:1px solid var(--border);font-size:12px;color:var(--ink-dim)">
         <span id="dmReplyBarText" style="flex:1"></span>
-        <button class="icon-btn" style="width:24px;height:24px" onclick="cancelDmReply()">×</button>
+        <button class="icon-btn" style="width:24px;height:24px" onclick="cancelDmReply()"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div id="dmRecordBar" class="record-bar"><span class="record-dot"></span><span id="dmRecordTime">0:00</span> جاري التسجيل...
         <button class="btn btn-sm" onclick="cancelVoiceRecording('dm')">إلغاء</button>
         <button class="btn btn-primary btn-sm" onclick="stopVoiceRecording('dm')">إرسال</button>
       </div>
       <div class="chat-input-bar">
-        <label class="file-label">📎<input type="file" id="dmFile" style="display:none" onchange="sendDmFile(this)"></label>
-        <span class="mic-btn" id="dmMicBtn" onclick="startVoiceRecording('dm')">🎤</span>
+        <label class="file-label"><i class="fa-solid fa-paperclip"></i><input type="file" id="dmFile" style="display:none" onchange="sendDmFile(this)"></label>
+        <span class="mic-btn" id="dmMicBtn" onclick="startVoiceRecording('dm')"><i class="fa-solid fa-microphone"></i></span>
         <input type="text" id="dmInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter'){event.preventDefault();sendDmMessage();}">
         <button class="btn btn-primary btn-sm" onclick="sendDmMessage()">إرسال</button>
       </div>
@@ -2634,7 +2760,7 @@ async function loadDmMessages(){
     (m.sender_id===activeDmUserId && m.receiver_id===currentUser.id)
   );
   box.innerHTML = convo.length ? convo.map(m=>renderOneDmMessage(m)).join('')
-    : `<div class="empty-state" style="padding:20px">ابدأ المحادثة 👋</div>`;
+    : `<div class="empty-state" style="padding:20px">ابدأ المحادثة <i class="fa-solid fa-hand"></i></div>`;
   box.scrollTop = box.scrollHeight;
   convo.forEach(m=>{
     if(m.profiles?.avatar_file_id) loadAvatarInto(`msgav-${m.id}`, m.profiles.avatar_file_id);
@@ -2653,8 +2779,8 @@ function renderOneDmMessage(m){
       <div class="msg ${mine?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setDmReplyTarget('${m.id}', '${escapeHtml((username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||(m.message_type==='voice'?'رسالة صوتية':'')).slice(0,60)).replace(/'/g,"\\'")}')"`}>
         <div class="sender"><span style="color:var(--ink-faint);font-weight:400">${formatMsgTime(m.created_at)}${m.edited_at?" · (معدّلة)":""}</span>
           ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
-            ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editDmMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل">✏️</span>` : ''}
-            ${mine ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteDmMessage('${m.id}')" title="حذف الرسالة">🗑️</span>` : ''}
+            ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editDmMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل"><i class="fa-solid fa-pencil"></i></span>` : ''}
+            ${mine ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteDmMessage('${m.id}')" title="حذف الرسالة"><i class="fa-solid fa-trash"></i></span>` : ''}
           </span>` : ''}
         </div>
         ${m.is_removed ? `<i style="color:var(--ink-faint)">تم حذف هذه الرسالة</i>` : `
@@ -2666,14 +2792,14 @@ function renderOneDmMessage(m){
 }
 
 async function editDmMessage(msgId, currentContent){
-  const newContent = prompt('عدّل رسالتك:', currentContent);
+  const newContent = await customPrompt('عدّل رسالتك:', currentContent);
   if(newContent===null || !newContent.trim() || newContent===currentContent) return;
   const { error } = await sb.from('chat_messages').update({ content: newContent.trim(), edited_at: new Date().toISOString() }).eq('id', msgId);
   if(error){ toast('تعذر التعديل: '+error.message, 'error'); }
 }
 
 async function deleteDmMessage(msgId){
-  if(!confirm('تحذف الرسالة دي؟')) return;
+  if(!await customConfirm('تحذف الرسالة دي؟', true)) return;
   const { error } = await sb.from('chat_messages').update({ is_removed: true }).eq('id', msgId);
   if(error){ toast('تعذر الحذف: '+error.message, 'error'); }
 }
@@ -2747,7 +2873,7 @@ async function switchAdminTab(tab){
     el.innerHTML = (rooms&&rooms.length) ? rooms.map(r=>`
       <div class="room-card">
         <div class="room-info"><div class="name">${escapeHtml(r.name)} ${r.creator_id ? `<span id="pc-${r.id}"></span>`:''}</div><div class="desc">${escapeHtml(r.description||'')} — طلب بواسطة @${r.profiles?.username}</div></div>
-        <button class="btn btn-sm" onclick="viewRoomPasscode('${r.id}')">🔑 كلمة السر</button>
+        <button class="btn btn-sm" onclick="viewRoomPasscode('${r.id}')"><i class="fa-solid fa-key"></i> كلمة السر</button>
         <button class="btn btn-sm" style="background:var(--teal);border-color:var(--teal);color:#0B0E14" onclick="reviewRoom('${r.id}','approved')">قبول</button>
         <button class="btn btn-danger btn-sm" onclick="reviewRoom('${r.id}','rejected')">رفض</button>
       </div>`).join('') : `<div class="empty-state">مفيش طلبات جديدة</div>`;
@@ -2764,7 +2890,7 @@ async function switchAdminTab(tab){
           <div class="desc">${escapeHtml(r.description||'')} — بواسطة @${r.creator_username||'—'} · ${r.member_count} عضو</div>
         </div>
         <button class="btn btn-sm" onclick="adminEnterRoom('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">دخول</button>
-        <button class="btn btn-sm" onclick="adminEditRoomPrompt('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}','${escapeHtml(r.description||'').replace(/'/g,"\\'")}')">✏️ تعديل</button>
+        <button class="btn btn-sm" onclick="adminEditRoomPrompt('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}','${escapeHtml(r.description||'').replace(/'/g,"\\'")}')"><i class="fa-solid fa-pencil"></i> تعديل</button>
         <button class="btn btn-sm" onclick="adminToggleRoomDisabled('${r.id}', ${!r.is_disabled})">${r.is_disabled?'تفعيل':'تعطيل'}</button>
         <button class="btn btn-danger btn-sm" onclick="adminDeleteRoomConfirm('${r.id}','${escapeHtml(r.name).replace(/'/g,"\\'")}')">حذف نهائي</button>
       </div>`).join('') : `<div class="empty-state">مفيش غرف خالص</div>`;
@@ -2810,9 +2936,9 @@ async function adminEnterRoom(roomId, roomName){
 }
 
 async function adminEditRoomPrompt(roomId, currentName, currentDesc){
-  const newName = prompt('اسم الغرفة:', currentName);
+  const newName = await customPrompt('اسم الغرفة:', currentName);
   if(newName === null || !newName.trim()) return;
-  const newDesc = prompt('وصف الغرفة:', currentDesc);
+  const newDesc = await customPrompt('وصف الغرفة:', currentDesc);
   if(newDesc === null) return;
   const { error } = await sb.rpc('admin_edit_room', { p_room_id: roomId, p_name: newName.trim(), p_description: newDesc.trim() });
   if(error){ toast('خطأ: '+error.message, 'error'); return; }
@@ -2821,7 +2947,7 @@ async function adminEditRoomPrompt(roomId, currentName, currentDesc){
 }
 
 async function adminToggleRoomDisabled(roomId, disable){
-  if(disable && !confirm('تعطّل الغرفة دي؟ الأعضاء مش هيقدروا يبعتوا رسايل فيها لحد ما تفعّلها تاني')) return;
+  if(disable && !await customConfirm('تعطّل الغرفة دي؟ الأعضاء مش هيقدروا يبعتوا رسايل فيها لحد ما تفعّلها تاني')) return;
   const { error } = await sb.rpc('admin_set_room_disabled', { p_room_id: roomId, p_disabled: disable });
   if(error){ toast('خطأ: '+error.message, 'error'); return; }
   toast(disable ? 'تم تعطيل الغرفة' : 'تم تفعيل الغرفة', 'success');
@@ -2829,7 +2955,7 @@ async function adminToggleRoomDisabled(roomId, disable){
 }
 
 async function adminDeleteRoomConfirm(roomId, roomName){
-  if(!confirm(`متأكد إنك عايز تمسح غرفة "${roomName}" نهائيًا؟ هيتمسح كل رسايلها وأعضاءها. الإجراء ده مينفعش يترجع.`)) return;
+  if(!await customConfirm(`متأكد إنك عايز تمسح غرفة "${roomName}" نهائيًا؟ هيتمسح كل رسايلها وأعضاءها. الإجراء ده مينفعش يترجع.`, true)) return;
   const { error } = await sb.rpc('admin_delete_room', { p_room_id: roomId });
   if(error){ toast('خطأ: '+error.message, 'error'); return; }
   toast('تم حذف الغرفة', 'success');
@@ -2844,7 +2970,7 @@ async function toggleBanUser(userId, currentlyBanned){
 }
 
 async function deleteUserAccount(userId, username){
-  if(!confirm(`متأكد إنك عايز تمسح حساب @${username} نهائيًا؟ الإجراء ده مينفعش يترجع.`)) return;
+  if(!await customConfirm(`متأكد إنك عايز تمسح حساب @${username} نهائيًا؟ الإجراء ده مينفعش يترجع.`, true)) return;
   try{
     const { data:{ session } } = await sb.auth.getSession();
     const res = await fetch(`${SUPABASE_URL}/functions/v1/admin-user-actions`, {
@@ -2875,7 +3001,7 @@ async function reviewReport(reportId, status){
 }
 
 async function removeReportedContent(reportId, targetType, targetId){
-  if(!confirm('هتحذف المحتوى المُبلّغ عنه ده نهائيًا من الموقع؟')) return;
+  if(!await customConfirm('هتحذف المحتوى المُبلّغ عنه ده نهائيًا من الموقع؟', true)) return;
   const { error: rpcError } = await sb.rpc('admin_remove_reported_content', { p_target_type: targetType, p_target_id: targetId });
   if(rpcError){ toast('خطأ: '+rpcError.message, 'error'); return; }
   await sb.from('reports').update({ status:'actioned', reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() }).eq('id', reportId);
@@ -3098,7 +3224,7 @@ async function requestNotificationPermission(){
   if(!reg) return;
   const ok = await subscribeToPush(reg);
   if(ok){
-    toast('تم تفعيل الإشعارات 🔔', 'success');
+    toast('تم تفعيل الإشعارات', 'success');
     openNotifGuide();
   }
   updateNotifToggleUI();
@@ -3158,7 +3284,7 @@ function updateNotifToggleUI(){
     if(!btn) continue;
     if(!supported){ btn.style.display = 'none'; continue; }
     btn.style.display = 'block';
-    btn.textContent = granted ? '🔔 الإشعارات مفعّلة (اضغط لخطوات الإعداد)' : '🔕 فعّل الإشعارات';
+    btn.innerHTML = granted ? '<i class="fa-solid fa-bell"></i> الإشعارات مفعّلة (اضغط لخطوات الإعداد)' : '<i class="fa-solid fa-bell-slash"></i> فعّل الإشعارات';
     btn.classList.toggle('active', granted);
   }
 }
@@ -3168,17 +3294,17 @@ function updateNotifToggleUI(){
 function toggleTheme(){
   const isLight = document.body.classList.toggle('light-mode');
   try{ localStorage.setItem('dv-theme', isLight ? 'light' : 'dark'); }catch(e){}
-  const icon = isLight ? '☀️' : '🌙';
-  const btn1 = document.getElementById('themeToggleBtn'); if(btn1) btn1.textContent = icon;
-  const btn2 = document.getElementById('themeToggleBtnLanding'); if(btn2) btn2.textContent = icon;
+  const icon = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+  const btn1 = document.getElementById('themeToggleBtn'); if(btn1) btn1.innerHTML = icon;
+  const btn2 = document.getElementById('themeToggleBtnLanding'); if(btn2) btn2.innerHTML = icon;
 }
 (function applySavedTheme(){
   let saved = null;
   try{ saved = localStorage.getItem('dv-theme'); }catch(e){}
   if(saved === 'light'){
     document.body.classList.add('light-mode');
-    const btn1 = document.getElementById('themeToggleBtn'); if(btn1) btn1.textContent = '☀️';
-    const btn2 = document.getElementById('themeToggleBtnLanding'); if(btn2) btn2.textContent = '☀️';
+    const btn1 = document.getElementById('themeToggleBtn'); if(btn1) btn1.innerHTML = '<i class="fa-solid fa-sun"></i>';
+    const btn2 = document.getElementById('themeToggleBtnLanding'); if(btn2) btn2.innerHTML = '<i class="fa-solid fa-sun"></i>';
   }
 })();
 
