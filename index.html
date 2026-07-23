@@ -341,6 +341,9 @@ button{font-family:var(--font-body); cursor:pointer;}
 .chat-messages{flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; background:
   radial-gradient(circle at 20% 10%, rgba(79,143,255,.04), transparent 40%),
   radial-gradient(circle at 80% 90%, rgba(184,196,217,.03), transparent 40%);}
+.no-select{ user-select:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; }
+.copy-btn{cursor:pointer; opacity:.7; transition:opacity .15s;}
+.copy-btn:hover{opacity:1;}
 .msg{
   max-width:66%; padding:9px 13px; font-size:14px; background:var(--surface);
   border:1px solid var(--border); box-shadow:0 2px 6px rgba(0,0,0,.15);
@@ -1062,8 +1065,7 @@ async function initSession(){
     document.getElementById('adminNavItemMobile').style.display = 'block';
   }
   await loadCategories();
-  nav('feed');
-  checkUrlPostHash();
+  if(!checkUrlPostHash()) nav('feed');
   checkNotifications();
   if(['owner','super_admin','admin','moderator'].includes(profile.role)) checkAdminBadge();
   checkUnreadBadges();
@@ -1438,7 +1440,7 @@ async function loadPosts(singlePostId){
       </div>
       ${p.repost_of ? '<div style="font-size:12px;color:var(--ink-faint);margin-bottom:8px"><i class="fa-solid fa-retweet"></i> أعاد نشر منشور</div>' : ''}
       ${repostHtml}
-      ${p.content ? `<div class="post-content ${p.post_type==='code'?'code':''}">${escapeHtml(p.content||'')}</div>` : ''}
+      ${p.content ? `<div class="post-content no-select ${p.post_type==='code'?'code':''}">${escapeHtml(p.content||'')}</div>` : ''}
       ${tagsHtml}
       ${p.post_type==='poll' ? `<div id="poll-${p.id}"><div class="empty-state" style="padding:16px">جاري تحميل الاستطلاع...</div></div>` : ''}
       ${p.telegram_file_id ? `<div class="post-file" id="file-${p.id}" data-lazy-file="${p.id}" data-lazy-type="${p.post_type}" data-lazy-fileid="${escapeHtml(p.telegram_file_id)}"><div style="padding:20px;text-align:center;color:var(--ink-faint);font-size:12px"><i class="fa-solid fa-paperclip"></i> هيتحمّل لما توصله</div></div>` : ''}
@@ -1448,6 +1450,7 @@ async function loadPosts(singlePostId){
         <div class="act ${bookmarkedSet.has(p.id)?'liked':''}" onclick="toggleBookmark('${p.id}', this)"><i class="fa-solid fa-bookmark"></i> حفظ</div>
         <div class="act" onclick="repostPost('${p.id}')"><i class="fa-solid fa-retweet"></i> إعادة نشر</div>
         <div class="act" onclick="sharePost('${p.id}')"><i class="fa-solid fa-share-nodes"></i> مشاركة</div>
+        ${p.content ? `<div class="act copy-btn" onclick="copyText(${JSON.stringify(p.content)})"><i class="fa-solid fa-copy"></i> نسخ</div>` : ''}
         ${(p.author_id===currentUser.id || ['owner','super_admin','admin','moderator'].includes(currentProfile.role)) ? `<div class="act" style="color:var(--red)" onclick="deletePost('${p.id}')"><i class="fa-solid fa-trash"></i> حذف</div>` : ''}
       </div>
       <div class="comments-box" id="comments-${p.id}"></div>`;
@@ -1487,6 +1490,16 @@ async function toggleBookmark(postId, el){
     const { error } = await sb.from('bookmarks').insert({ user_id: currentUser.id, target_type:'post', target_id: postId });
     if(error){ toast('خطأ: '+error.message, 'error'); return; }
     el.classList.add('liked'); toast('اتحفظ', 'success');
+  }
+}
+
+async function copyText(text){
+  if(!text){ toast('مفيش نص يتنسخ', 'error'); return; }
+  try{
+    await navigator.clipboard.writeText(text);
+    toast('تم النسخ', 'success');
+  }catch(e){
+    await customPrompt('انسخ النص:', text);
   }
 }
 
@@ -2162,6 +2175,7 @@ function renderOneMessage(m, username, avatarFileId){
       <div class="msg ${mine?'mine':''}" style="position:relative" ${longPressAttrs} ${m.is_removed?'':`onclick="setReplyTarget('${m.id}', '${escapeHtml((username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||(m.message_type==='voice'?'رسالة صوتية':m.content)||'').slice(0,60)).replace(/'/g,"\\'")}')"`}>
         <div class="sender"><span style="cursor:pointer" onclick="event.stopPropagation();viewProfile('${m.sender_id}')">@${username||''}</span> <span style="color:var(--ink-faint);font-weight:400">· ${formatMsgTime(m.created_at)}${m.edited_at?" · (معدّلة)":""}</span>
           ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
+            ${m.message_type==='text' ? `<span class="copy-btn" style="cursor:pointer" onclick="event.stopPropagation();copyText(${JSON.stringify(m.content||'')})" title="نسخ"><i class="fa-solid fa-copy"></i></span>` : ''}
             ${m.room_id ? `<span style="cursor:pointer" onclick="event.stopPropagation();openMessageInfo('${m.id}')" title="معلومات الرسالة"><i class="fa-solid fa-circle-info"></i></span>` : ''}
             ${(m.room_id && canModerateRoom()) ? `<span style="cursor:pointer" onclick="event.stopPropagation();togglePinMessage('${m.id}', ${!m.is_pinned})" title="${m.is_pinned?'إلغاء التثبيت':'تثبيت'}">${m.is_pinned?'<i class="fa-solid fa-thumbtack"></i>':'<i class="fa-solid fa-location-dot"></i>'}</span>` : ''}
             ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل"><i class="fa-solid fa-pencil"></i></span>` : ''}
@@ -2170,7 +2184,7 @@ function renderOneMessage(m, username, avatarFileId){
         </div>
         ${m.is_removed ? `<i style="color:var(--ink-faint)">تم حذف هذه الرسالة</i>` : `
           ${m.reply ? `<div style="border-right:3px solid var(--amber);padding-right:8px;margin-bottom:6px;opacity:.75;font-size:12px">@${m.reply.profiles?.username||''}: ${escapeHtml((m.reply.content||'').slice(0,50))}</div>` : ''}
-          ${renderMessageBody(m)}
+          <div class="no-select">${renderMessageBody(m)}</div>
         `}
       </div>
     </div>`;
@@ -2996,13 +3010,14 @@ function renderOneDmMessage(m){
       <div class="msg ${mine?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setDmReplyTarget('${m.id}', '${escapeHtml((username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||(m.message_type==='voice'?'رسالة صوتية':'')).slice(0,60)).replace(/'/g,"\\'")}')"`}>
         <div class="sender"><span style="color:var(--ink-faint);font-weight:400">${receiptIcon}${formatMsgTime(m.created_at)}${m.edited_at?" · (معدّلة)":""}</span>
           ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
+            ${m.message_type==='text' ? `<span class="copy-btn" style="cursor:pointer" onclick="event.stopPropagation();copyText(${JSON.stringify(m.content||'')})" title="نسخ"><i class="fa-solid fa-copy"></i></span>` : ''}
             ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editDmMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل"><i class="fa-solid fa-pencil"></i></span>` : ''}
             ${mine ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteDmMessage('${m.id}')" title="حذف الرسالة"><i class="fa-solid fa-trash"></i></span>` : ''}
           </span>` : ''}
         </div>
         ${m.is_removed ? `<i style="color:var(--ink-faint)">تم حذف هذه الرسالة</i>` : `
           ${m.reply ? `<div style="border-right:3px solid var(--amber);padding-right:8px;margin-bottom:6px;opacity:.75;font-size:12px">@${m.reply.profiles?.username||''}: ${escapeHtml((m.reply.content||'').slice(0,50))}</div>` : ''}
-          ${renderMessageBody(m)}
+          <div class="no-select">${renderMessageBody(m)}</div>
         `}
       </div>
     </div>`;

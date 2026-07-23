@@ -1,5 +1,9 @@
 // DevVerse Service Worker
-const CACHE_NAME = "devverse-v1";
+// IMPORTANT: bump CACHE_NAME on every deploy that changes cached files. The old
+// cache name is what the activate handler uses to detect and purge stale caches
+// — if this string never changes, old cached pages/assets can keep being served
+// indefinitely on devices where the service worker stays alive across sessions.
+const CACHE_NAME = "devverse-v2";
 const APP_SHELL = ["/", "/index.html", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
@@ -13,38 +17,42 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// Network-first for navigation/HTML, cache-first fallback for everything else.
-// Keeps the app fresh (important since this is a fast-moving chat app) while
-// still giving something to show if the network drops.
+// Always try the network first for everything. Only fall back to cache when
+// truly offline (fetch throws). This trades a little offline resilience for
+// guaranteeing that logged-in users always see the latest deployed code —
+// important for a fast-moving app where stale cached JS can silently break
+// features that depend on matching frontend/backend versions.
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
 
   if (req.mode === "navigate") {
     event.respondWith(
-      fetch(req).catch(() => caches.match("/index.html"))
+      fetch(req, { cache: "no-store" })
+        .then((res) => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+          return res;
+        })
+        .catch(() => caches.match("/index.html"))
     );
     return;
   }
 
   event.respondWith(
-    caches.match(req).then((cached) => {
-      const fetchPromise = fetch(req)
-        .then((res) => {
-          if (res && res.status === 200 && req.url.startsWith(self.location.origin)) {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
-          }
-          return res;
-        })
-        .catch(() => cached);
-      return cached || fetchPromise;
-    })
+    fetch(req)
+      .then((res) => {
+        if (res && res.status === 200 && req.url.startsWith(self.location.origin)) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+        }
+        return res;
+      })
+      .catch(() => caches.match(req))
   );
 });
 
