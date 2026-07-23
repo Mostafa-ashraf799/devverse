@@ -266,6 +266,13 @@ button{font-family:var(--font-body); cursor:pointer;}
 .composer textarea:focus{outline:none;}
 .composer-bar{display:flex; align-items:center; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border);}
 .chip-select{background:var(--surface); border:1px solid var(--border); color:var(--ink-dim); font-size:12px; padding:6px 10px; border-radius:6px;}
+.dropdown-menu{
+  position:absolute; top:calc(100% + 4px); left:0; z-index:50; min-width:180px;
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.3); overflow:hidden;
+}
+.dropdown-item{padding:10px 14px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:8px; color:var(--ink);}
+.dropdown-item:hover{background:var(--surface-hover);}
 .chip-select.active{background:var(--amber); border-color:var(--amber); color:#0B0E14; font-weight:600;}
 .file-label{font-size:12px; color:var(--ink-faint); cursor:pointer; padding:6px 10px;}
 .file-label:hover{color:var(--amber);}
@@ -283,6 +290,12 @@ button{font-family:var(--font-body); cursor:pointer;}
 .post-content{font-size:14.5px; margin-bottom:12px; white-space:pre-wrap;}
 .post-content.code{background:var(--surface); padding:12px; border-radius:8px; font-family:var(--font-mono); font-size:13px; overflow-x:auto;}
 .post-file{margin-bottom:12px; border-radius:8px; overflow:hidden; border:1px solid var(--border);}
+.video-play-placeholder{
+  height:220px; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg, var(--surface), var(--bg-elevated)); cursor:pointer;
+}
+.video-play-placeholder i{font-size:48px; color:var(--amber); opacity:.85; transition:transform .15s, opacity .15s;}
+.video-play-placeholder:hover i{transform:scale(1.1); opacity:1;}
 .post-file img, .post-file video{width:100%; display:block;}
 .post-actions{display:flex; gap:18px; font-size:13px; color:var(--ink-dim);}
 .post-actions .act{display:flex; align-items:center; gap:5px; cursor:pointer;}
@@ -645,6 +658,17 @@ button{font-family:var(--font-body); cursor:pointer;}
       <button class="icon-btn" onclick="closeRoomMembersModal()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div id="roomMembersModalList" style="max-height:60vh;overflow-y:auto"><div class="empty-state">جاري التحميل...</div></div>
+  </div>
+</div>
+
+<!-- ============ MESSAGE INFO MODAL (read receipts) ============ -->
+<div class="modal-overlay" id="messageInfoOverlay">
+  <div class="modal" style="max-width:380px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="margin:0"><i class="fa-solid fa-eye"></i> شاف الرسالة</h2>
+      <button class="icon-btn" onclick="closeMessageInfo()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="messageInfoList" style="max-height:60vh;overflow-y:auto"><div class="empty-state">جاري التحميل...</div></div>
   </div>
 </div>
 
@@ -1039,6 +1063,7 @@ async function initSession(){
   }
   await loadCategories();
   nav('feed');
+  checkUrlPostHash();
   checkNotifications();
   if(['owner','super_admin','admin','moderator'].includes(profile.role)) checkAdminBadge();
   checkUnreadBadges();
@@ -1197,7 +1222,39 @@ async function renderFeed(container){
     </div>`;
   loadPosts();
 }
+async function renderSinglePost(container, postId){
+  container.innerHTML = `
+    <div class="view">
+      <div class="view-header">
+        <div><h1>منشور</h1><div class="sub">بتشوف منشور واحد بس من لينك المشاركة</div></div>
+        <button class="btn btn-sm" onclick="clearSinglePostView()">← رجوع لكل المنشورات</button>
+      </div>
+      <div id="postsList"><div class="empty-state">جاري التحميل...</div></div>
+    </div>`;
+  loadPosts(postId);
+}
+
+function clearSinglePostView(){
+  const url = new URL(window.location.href);
+  url.hash = '';
+  window.history.replaceState({}, '', url.toString());
+  nav('feed');
+}
+
+// Checks the URL hash for #post-<id> (set by the share-link button) and, if present,
+// opens that single post instead of the normal feed — this is what makes shared
+// post links actually land on the specific post rather than the general feed.
 let activeTagFilter = null;
+
+function checkUrlPostHash(){
+  const match = window.location.hash.match(/^#post-(.+)$/);
+  if(match){
+    const c = document.getElementById('viewContainer');
+    renderSinglePost(c, match[1]);
+    return true;
+  }
+  return false;
+}
 function filterByTag(tag){ activeTagFilter = tag; activeCategoryFilter = null; nav('feed'); }
 
 let pendingPostFile = null;
@@ -1222,10 +1279,15 @@ function hideUploadProgress(){
   document.getElementById('uploadOverlay').classList.remove('active');
 }
 
-async function uploadToTelegram(file, kind){
+async function uploadToTelegram(file, kind, context){
   const form = new FormData();
   form.append('file', file);
   form.append('kind', kind);
+  if(context?.type){
+    form.append('context_type', context.type);
+    if(context.roomId) form.append('context_room_id', context.roomId);
+    if(context.otherUserId) form.append('context_other_user_id', context.otherUserId);
+  }
   const { data:{ session } } = await sb.auth.getSession();
   showUploadProgress(file);
   try{
@@ -1267,6 +1329,17 @@ async function getTelegramFileBlobUrl(file_id){
   return URL.createObjectURL(blob);
 }
 
+// For video/audio: returns a plain streamable URL (GET, with the session token as a
+// query param) instead of buffering the whole file into a blob first. The browser's
+// <video>/<audio> element then makes its own ranged requests against this URL —
+// so playback starts immediately and only the bytes actually watched are downloaded,
+// instead of pulling the entire file up front.
+async function getTelegramStreamUrl(file_id){
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session) return null;
+  return `${SUPABASE_URL}/functions/v1/telegram-file-url?file_id=${encodeURIComponent(file_id)}&access_token=${encodeURIComponent(session.access_token)}`;
+}
+
 async function submitPost(){
   const content = document.getElementById('postContent').value.trim();
   const category_id = document.getElementById('postCategory').value || null;
@@ -1305,7 +1378,7 @@ async function submitPost(){
   try{
     if(pendingPostFile){
       const kind = pendingPostFile.type.startsWith('video') ? 'video' : 'photo';
-      const up = await uploadToTelegram(pendingPostFile, kind);
+      const up = await uploadToTelegram(pendingPostFile, kind, { type:'post' });
       telegram_file_id = up.file_id;
       finalType = kind === 'video' ? 'video' : 'image';
     }
@@ -1324,14 +1397,20 @@ async function submitPost(){
   }catch(e){ toast('خطأ: '+e.message, 'error'); }
 }
 
-async function loadPosts(){
+async function loadPosts(singlePostId){
   let q = sb.from('posts').select('*, profiles!posts_author_id_fkey(username, full_name, role, avatar_file_id), categories(name_ar), repost:repost_of(id, content, post_type, telegram_file_id, created_at, profiles!posts_author_id_fkey(username, full_name))').eq('is_removed', false).order('created_at', {ascending:false}).limit(30);
-  if(activeCategoryFilter) q = q.eq('category_id', activeCategoryFilter);
-  if(activeTagFilter) q = q.contains('tags', [activeTagFilter]);
+  if(singlePostId) q = sb.from('posts').select('*, profiles!posts_author_id_fkey(username, full_name, role, avatar_file_id), categories(name_ar), repost:repost_of(id, content, post_type, telegram_file_id, created_at, profiles!posts_author_id_fkey(username, full_name))').eq('is_removed', false).eq('id', singlePostId);
+  else if(activeCategoryFilter) q = q.eq('category_id', activeCategoryFilter);
+  else if(activeTagFilter) q = q.contains('tags', [activeTagFilter]);
   const { data: posts, error } = await q;
   const listEl = document.getElementById('postsList');
   if(error){ listEl.innerHTML = `<div class="empty-state">تعذر تحميل المنشورات: ${escapeHtml(error.message)}</div>`; return; }
-  if(!posts.length){ listEl.innerHTML = `<div class="empty-state"><div class="icon"><i class="fa-solid fa-inbox"></i></div>لسه مفيش منشورات — كن أول من ينشر!</div>`; return; }
+  if(!posts.length){
+    listEl.innerHTML = singlePostId
+      ? `<div class="empty-state"><div class="icon"><i class="fa-solid fa-triangle-exclamation"></i></div>المنشور ده مش موجود، أو اتحذف</div>`
+      : `<div class="empty-state"><div class="icon"><i class="fa-solid fa-inbox"></i></div>لسه مفيش منشورات — كن أول من ينشر!</div>`;
+    return;
+  }
 
   const { data: likes } = await sb.from('post_likes').select('post_id').eq('user_id', currentUser.id);
   const likedSet = new Set((likes||[]).map(l=>l.post_id));
@@ -1495,22 +1574,38 @@ async function loadAvatarInto(elId, fileId){
 async function loadPostFile(postId, type, fileId){
   const holder = document.getElementById(`file-${postId}`);
   if(!holder) return;
+
+  if(type==='video'){
+    // Don't fetch anything yet — just wire up a click-to-play button. The actual
+    // video bytes only start streaming once the user presses play, and even then
+    // only progressively (via Range requests), never as one big eager download.
+    holder.innerHTML = `<div class="video-play-placeholder" onclick="playStreamedVideo('${postId}', '${escapeHtml(fileId)}')">
+      <i class="fa-solid fa-circle-play"></i>
+    </div>`;
+    return;
+  }
+
   const cached = getCachedFile(fileId);
   if(cached){
-    holder.innerHTML = type==='video' ? `<video src="${cached}" controls></video>` : `<img src="${cached}">`;
+    holder.innerHTML = `<img src="${cached}">`;
     return;
   }
   const url = await getTelegramFileBlobUrl(fileId);
   if(!url){ holder.innerHTML = `<div style="padding:16px;color:var(--ink-faint);font-size:12px">تعذر تحميل الملف</div>`; return; }
-  holder.innerHTML = type==='video' ? `<video src="${url}" controls></video>` : `<img src="${url}">`;
-  // Cache images (small enough for localStorage); skip videos to avoid blowing the quota.
-  if(type!=='video'){
-    try{
-      const res = await fetch(url); const blob = await res.blob();
-      const dataUrl = await blobToDataURL(blob);
-      setCachedFile(fileId, dataUrl);
-    }catch(e){ /* best-effort caching only */ }
-  }
+  holder.innerHTML = `<img src="${url}">`;
+  try{
+    const res = await fetch(url); const blob = await res.blob();
+    const dataUrl = await blobToDataURL(blob);
+    setCachedFile(fileId, dataUrl);
+  }catch(e){ /* best-effort caching only */ }
+}
+
+async function playStreamedVideo(holderId, fileId){
+  const holder = document.getElementById(`file-${holderId}`);
+  if(!holder) return;
+  const streamUrl = await getTelegramStreamUrl(fileId);
+  if(!streamUrl){ toast('تعذر تشغيل الفيديو', 'error'); return; }
+  holder.innerHTML = `<video src="${streamUrl}" controls autoplay playsinline></video>`;
 }
 
 async function loadLikeCount(postId){
@@ -1838,9 +1933,18 @@ async function openRoomChat(roomId, roomName){
       <div style="flex:1;display:flex;flex-direction:column">
         <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:600;display:flex;align-items:center;gap:10px">
           <button class="btn btn-sm" onclick="nav('rooms')"><i class="fa-solid fa-arrow-right"></i></button>
-          <span style="cursor:pointer" onclick="openRoomMembersModal('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')">${escapeHtml(roomName)} <span class="room-number-tag">#${roomInfo?.room_number ?? ''}</span> <i class="fa-solid fa-users"></i></span>
-          <button class="btn btn-sm" style="margin-right:auto" id="roomMuteBtn" onclick="toggleRoomMute('${roomId}')">${isMuted ? '<i class="fa-solid fa-bell-slash"></i> مكتومة' : '<i class="fa-solid fa-bell"></i> إشعارات مفعّلة'}</button>
-          ${isRoomAdmin ? `<button class="btn btn-sm" onclick="openRoomAdminPanel('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')"><i class="fa-solid fa-gear"></i> إدارة الغرفة</button>` : ''}
+          <span style="cursor:pointer;flex:1" onclick="openRoomMembersModal('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')">${escapeHtml(roomName)} <span class="room-number-tag">#${roomInfo?.room_number ?? ''}</span> <i class="fa-solid fa-users"></i></span>
+          ${isRoomAdmin ? `<button class="btn btn-sm" onclick="openRoomAdminPanel('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')"><i class="fa-solid fa-gear"></i> إدارة</button>` : ''}
+          <div style="position:relative">
+            <button class="btn btn-sm" onclick="toggleRoomOptionsMenu()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <div id="roomOptionsMenu" class="dropdown-menu" style="display:none">
+              <div class="dropdown-item" id="roomMuteBtn" onclick="toggleRoomMute('${roomId}')">${isMuted ? '<i class="fa-solid fa-bell-slash"></i> إلغاء كتم الإشعارات' : '<i class="fa-solid fa-bell"></i> كتم الإشعارات'}</div>
+              ${isRoomAdmin
+                ? `<div class="dropdown-item" style="color:var(--red)" onclick="hideRoomOptionsMenu();confirmDeleteRoom('${roomId}','${escapeHtml(roomName).replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i> حذف الغرفة</div>`
+                : `<div class="dropdown-item" style="color:var(--red)" onclick="hideRoomOptionsMenu();confirmLeaveRoom('${roomId}')"><i class="fa-solid fa-right-from-bracket"></i> مغادرة الغرفة</div>`
+              }
+            </div>
+          </div>
         </div>
         ${roomInfo?.is_disabled ? `<div style="padding:8px 20px;background:rgba(232,93,93,.1);color:var(--red);font-size:12px">هذه الغرفة معطّلة من الإدارة — الأعضاء العاديين مايقدروش يبعتوا رسايل فيها</div>` : ''}
         <div id="pinnedBanner"></div>
@@ -1869,12 +1973,43 @@ async function openRoomChat(roomId, roomName){
   sb.rpc('mark_room_read', { p_room_id: roomId }).then(()=>checkUnreadBadges());
 }
 
+function toggleRoomOptionsMenu(){
+  const menu = document.getElementById('roomOptionsMenu');
+  if(menu) menu.style.display = menu.style.display==='none' ? 'block' : 'none';
+}
+function hideRoomOptionsMenu(){
+  const menu = document.getElementById('roomOptionsMenu');
+  if(menu) menu.style.display = 'none';
+}
+document.addEventListener('click', (e)=>{
+  const menu = document.getElementById('roomOptionsMenu');
+  if(!menu || menu.style.display==='none') return;
+  if(!menu.contains(e.target) && !e.target.closest('button[onclick="toggleRoomOptionsMenu()"]')) hideRoomOptionsMenu();
+});
+
 async function toggleRoomMute(roomId){
   const btn = document.getElementById('roomMuteBtn');
-  const currentlyMuted = btn?.textContent.includes('مكتومة');
+  const currentlyMuted = btn?.textContent.includes('إلغاء كتم');
   const { error } = await sb.rpc('toggle_room_mute', { p_room_id: roomId, p_muted: !currentlyMuted });
   if(error){ toast('خطأ: '+error.message, 'error'); return; }
-  if(btn) btn.innerHTML = currentlyMuted ? '<i class="fa-solid fa-bell"></i> إشعارات مفعّلة' : '<i class="fa-solid fa-bell-slash"></i> مكتومة';
+  if(btn) btn.innerHTML = currentlyMuted ? '<i class="fa-solid fa-bell"></i> كتم الإشعارات' : '<i class="fa-solid fa-bell-slash"></i> إلغاء كتم الإشعارات';
+  hideRoomOptionsMenu();
+}
+
+async function confirmLeaveRoom(roomId){
+  if(!await customConfirm('تغادر الغرفة دي؟ محتاج لينك دعوة جديد عشان ترجع تاني.', true)) return;
+  const { error } = await sb.rpc('leave_room', { p_room_id: roomId });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('غادرت الغرفة', 'success');
+  nav('rooms');
+}
+
+async function confirmDeleteRoom(roomId, roomName){
+  if(!await customConfirm(`تمسح غرفة "${roomName}" نهائيًا؟ هيتمسح كل رسايلها وأعضاءها. الإجراء ده مينفعش يترجع.`, true)) return;
+  const { error } = await sb.rpc('creator_delete_room', { p_room_id: roomId });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم حذف الغرفة', 'success');
+  nav('rooms');
 }
 
 async function loadRoomsRail(){
@@ -2020,12 +2155,14 @@ function renderMessages(msgs){
 function renderOneMessage(m, username, avatarFileId){
   const mine = m.sender_id===currentUser.id;
   const initials = (username||'?')[0]?.toUpperCase()||'?';
+  const longPressAttrs = m.is_removed ? '' : `onpointerdown="startMsgLongPress('${m.id}')" onpointerup="cancelMsgLongPress()" onpointerleave="cancelMsgLongPress()" onpointercancel="cancelMsgLongPress()"`;
   return `
     <div class="msg-row ${mine?'mine':''}">
       <div class="msg-avatar" id="msgav-${m.id}" onclick="viewProfile('${m.sender_id}')">${initials}</div>
-      <div class="msg ${mine?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setReplyTarget('${m.id}', '${escapeHtml((username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||(m.message_type==='voice'?'رسالة صوتية':m.content)||'').slice(0,60)).replace(/'/g,"\\'")}')"`}>
+      <div class="msg ${mine?'mine':''}" style="position:relative" ${longPressAttrs} ${m.is_removed?'':`onclick="setReplyTarget('${m.id}', '${escapeHtml((username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||(m.message_type==='voice'?'رسالة صوتية':m.content)||'').slice(0,60)).replace(/'/g,"\\'")}')"`}>
         <div class="sender"><span style="cursor:pointer" onclick="event.stopPropagation();viewProfile('${m.sender_id}')">@${username||''}</span> <span style="color:var(--ink-faint);font-weight:400">· ${formatMsgTime(m.created_at)}${m.edited_at?" · (معدّلة)":""}</span>
           ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
+            ${m.room_id ? `<span style="cursor:pointer" onclick="event.stopPropagation();openMessageInfo('${m.id}')" title="معلومات الرسالة"><i class="fa-solid fa-circle-info"></i></span>` : ''}
             ${(m.room_id && canModerateRoom()) ? `<span style="cursor:pointer" onclick="event.stopPropagation();togglePinMessage('${m.id}', ${!m.is_pinned})" title="${m.is_pinned?'إلغاء التثبيت':'تثبيت'}">${m.is_pinned?'<i class="fa-solid fa-thumbtack"></i>':'<i class="fa-solid fa-location-dot"></i>'}</span>` : ''}
             ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل"><i class="fa-solid fa-pencil"></i></span>` : ''}
             ${canDeleteMessage(m) ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteMessage('${m.id}')" title="حذف الرسالة"><i class="fa-solid fa-trash"></i></span>` : ''}
@@ -2037,6 +2174,36 @@ function renderOneMessage(m, username, avatarFileId){
         `}
       </div>
     </div>`;
+}
+
+/* ---------- Long-press → message info (read receipts for room messages) ---------- */
+let msgLongPressTimer = null;
+function startMsgLongPress(msgId){
+  clearTimeout(msgLongPressTimer);
+  msgLongPressTimer = setTimeout(()=>{ openMessageInfo(msgId); }, 550);
+}
+function cancelMsgLongPress(){
+  clearTimeout(msgLongPressTimer);
+}
+
+async function openMessageInfo(msgId){
+  document.getElementById('messageInfoOverlay')?.classList.add('active');
+  const listEl = document.getElementById('messageInfoList');
+  if(listEl) listEl.innerHTML = `<div class="empty-state">جاري التحميل...</div>`;
+  const { data: readers, error } = await sb.rpc('get_message_read_by', { p_message_id: msgId });
+  if(!listEl) return;
+  if(error){ listEl.innerHTML = `<div class="empty-state" style="color:var(--red)">تعذر التحميل: ${escapeHtml(error.message)}</div>`; return; }
+  if(!readers?.length){ listEl.innerHTML = `<div class="empty-state">محدش شاف الرسالة دي لسه</div>`; return; }
+  listEl.innerHTML = readers.map(r=>`
+    <div class="member-row">
+      <div class="avatar" id="msginfo-av-${r.user_id}" style="width:28px;height:28px;font-size:12px;cursor:pointer" onclick="closeMessageInfo();viewProfile('${r.user_id}')">${(r.username||'?')[0].toUpperCase()}</div>
+      <div class="name" style="cursor:pointer;flex:1" onclick="closeMessageInfo();viewProfile('${r.user_id}')">${escapeHtml(r.full_name||r.username||'مستخدم')}</div>
+      <div class="meta" style="font-size:11px;color:var(--ink-faint)">${formatMsgTime(r.read_at)}</div>
+    </div>`).join('');
+  readers.forEach(r=>{ if(r.avatar_file_id) loadAvatarInto(`msginfo-av-${r.user_id}`, r.avatar_file_id); });
+}
+function closeMessageInfo(){
+  document.getElementById('messageInfoOverlay')?.classList.remove('active');
 }
 
 function renderMessageBody(m){
@@ -2063,23 +2230,43 @@ function formatDuration(sec){
 async function loadMessageMedia(m){
   const el = document.getElementById(`msgmedia-${m.id}`);
   if(!el) return;
+
+  if(m.message_type==='video'){
+    // Same click-to-play approach as feed posts — no bytes fetched until the
+    // user actually presses play, and then only streamed progressively.
+    el.innerHTML = `<div class="video-play-placeholder" style="height:160px" onclick="playStreamedMessageVideo('${m.id}', '${escapeHtml(m.telegram_file_id)}')">
+      <i class="fa-solid fa-circle-play"></i>
+    </div>`;
+    return;
+  }
+
+  if(m.message_type==='voice'){
+    const streamUrl = await getTelegramStreamUrl(m.telegram_file_id);
+    if(!streamUrl) return;
+    el.innerHTML = `<audio controls src="${streamUrl}"></audio> <span style="font-size:12px;color:var(--ink-faint)">${m.duration_seconds?formatDuration(m.duration_seconds):''}</span>`;
+    return;
+  }
+
+  // Images: small enough to keep the existing cached-blob approach.
   const cached = getCachedFile(m.telegram_file_id);
   const url = cached || await getTelegramFileBlobUrl(m.telegram_file_id);
   if(!url) return;
-  if(!cached && m.message_type!=='voice'){
+  if(!cached){
     try{
       const res = await fetch(url); const blob = await res.blob();
       const dataUrl = await blobToDataURL(blob);
       setCachedFile(m.telegram_file_id, dataUrl);
     }catch(e){ /* best-effort caching only */ }
   }
-  if(m.message_type==='voice'){
-    el.innerHTML = `<audio controls src="${url}"></audio> <span style="font-size:12px;color:var(--ink-faint)">${m.duration_seconds?formatDuration(m.duration_seconds):''}</span>`;
-  } else if(m.message_type==='image'){
-    el.innerHTML = `<img src="${url}" onclick="event.stopPropagation();window.open('${url}','_blank')">`;
-  } else if(m.message_type==='video'){
-    el.innerHTML = `<video controls src="${url}"></video>`;
-  }
+  el.innerHTML = `<img src="${url}" onclick="event.stopPropagation();window.open('${url}','_blank')">`;
+}
+
+async function playStreamedMessageVideo(msgId, fileId){
+  const el = document.getElementById(`msgmedia-${msgId}`);
+  if(!el) return;
+  const streamUrl = await getTelegramStreamUrl(fileId);
+  if(!streamUrl){ toast('تعذر تشغيل الفيديو', 'error'); return; }
+  el.innerHTML = `<video src="${streamUrl}" controls autoplay playsinline></video>`;
 }
 
 async function togglePinMessage(msgId, pinTo){
@@ -2247,7 +2434,7 @@ async function sendChatFile(input){
   if(!file || !activeRoomId) return;
   try{
     const kind = file.type.startsWith('image')?'photo':file.type.startsWith('video')?'video':'document';
-    const up = await uploadToTelegram(file, kind);
+    const up = await uploadToTelegram(file, kind, { type:'room', roomId: activeRoomId });
     await sb.from('chat_messages').insert({
       room_id: activeRoomId, sender_id: currentUser.id, message_type: kind==='photo'?'image':kind,
       telegram_file_id: up.file_id, content: file.name
@@ -2317,7 +2504,8 @@ async function stopVoiceRecording(context){
   if(durationSec < 1){ toast('التسجيل قصير جدًا', 'error'); return; }
   const file = new File([finalizedBlob], `voice-${Date.now()}.webm`, { type: finalizedBlob.type });
   try{
-    const up = await uploadToTelegram(file, 'voice');
+    const uploadContext = context==='room' ? { type:'room', roomId: activeRoomId } : { type:'dm', otherUserId: activeDmUserId };
+    const up = await uploadToTelegram(file, 'voice', uploadContext);
     if(context==='room'){
       if(!activeRoomId) return;
       await sb.from('chat_messages').insert({
@@ -2422,7 +2610,7 @@ async function uploadCover(input){
   const file = input.files[0];
   if(!file) return;
   try{
-    const up = await uploadToTelegram(file, 'photo');
+    const up = await uploadToTelegram(file, 'photo', { type:'profile' });
     const { error } = await sb.from('profiles').update({ cover_file_id: up.file_id }).eq('id', currentUser.id);
     if(error) throw error;
     currentProfile.cover_file_id = up.file_id;
@@ -2496,7 +2684,7 @@ async function addGalleryItem(input, userId){
   const file = input.files[0];
   if(!file) return;
   try{
-    const up = await uploadToTelegram(file, 'photo');
+    const up = await uploadToTelegram(file, 'photo', { type:'profile' });
     const { error } = await sb.from('gallery_items').insert({ user_id: currentUser.id, image_file_id: up.file_id });
     if(error) throw error;
     toast('تمت الإضافة', 'success');
@@ -2522,7 +2710,7 @@ async function uploadAvatar(input){
   const file = input.files[0];
   if(!file) return;
   try{
-    const up = await uploadToTelegram(file, 'photo');
+    const up = await uploadToTelegram(file, 'photo', { type:'profile' });
     const { error } = await sb.from('profiles').update({ avatar_file_id: up.file_id }).eq('id', currentUser.id);
     if(error) throw error;
     currentProfile.avatar_file_id = up.file_id;
@@ -2620,8 +2808,16 @@ async function openDmConversation(otherId, otherUsername){
       <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:600;display:flex;align-items:center;gap:10px">
         <button class="btn btn-sm" onclick="nav('messages')"><i class="fa-solid fa-arrow-right"></i></button>
         <span class="avatar" id="dmHeaderAvatar" style="width:28px;height:28px;font-size:12px;cursor:pointer" onclick="viewProfile('${otherId}')">${(otherUsername||'?')[0].toUpperCase()}</span>
-        <span style="cursor:pointer" onclick="viewProfile('${otherId}')">@${escapeHtml(otherUsername)}</span>
+        <span style="cursor:pointer;flex:1" onclick="viewProfile('${otherId}')">@${escapeHtml(otherUsername)}</span>
+        <div style="position:relative">
+          <button class="btn btn-sm" onclick="toggleDmOptionsMenu()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+          <div id="dmOptionsMenu" class="dropdown-menu" style="display:none">
+            <div class="dropdown-item" onclick="hideDmOptionsMenu();confirmBlockDmUser('${otherId}','${escapeHtml(otherUsername).replace(/'/g,"\\'")}')"><i class="fa-solid fa-ban"></i> حظر المستخدم</div>
+            <div class="dropdown-item" style="color:var(--red)" onclick="hideDmOptionsMenu();confirmDeleteDmConversation('${otherId}')"><i class="fa-solid fa-trash"></i> حذف المحادثة</div>
+          </div>
+        </div>
       </div>
+      <div id="dmBlockBanner"></div>
       <div id="dmPinnedBanner"></div>
       <div class="chat-messages" id="dmMessages"><div class="empty-state">جاري التحميل...</div></div>
       <div id="dmTypingIndicator" style="padding:4px 20px;font-size:12px;color:var(--ink-faint);min-height:20px"></div>
@@ -2633,7 +2829,7 @@ async function openDmConversation(otherId, otherUsername){
         <button class="btn btn-sm" onclick="cancelVoiceRecording('dm')">إلغاء</button>
         <button class="btn btn-primary btn-sm" onclick="stopVoiceRecording('dm')">إرسال</button>
       </div>
-      <div class="chat-input-bar">
+      <div class="chat-input-bar" id="dmInputBar">
         <label class="file-label"><i class="fa-solid fa-paperclip"></i><input type="file" id="dmFile" style="display:none" onchange="sendDmFile(this)"></label>
         <span class="mic-btn" id="dmMicBtn" onclick="startVoiceRecording('dm')"><i class="fa-solid fa-microphone"></i></span>
         <input type="text" id="dmInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter'){event.preventDefault();sendDmMessage();}">
@@ -2641,6 +2837,7 @@ async function openDmConversation(otherId, otherUsername){
       </div>
     </div>
   </div>`;
+  checkDmBlockStatus(otherId);
   const { data: p } = await sb.from('profiles').select('avatar_file_id').eq('id', otherId).single();
   if(p?.avatar_file_id) loadAvatarInto('dmHeaderAvatar', p.avatar_file_id);
   await loadDmMessages();
@@ -2710,6 +2907,7 @@ async function patchDmMessage(msgId){
 
 async function pollDmMessages(otherId){
   if(otherId !== activeDmUserId) return;
+  refreshDmReadReceipts(otherId);
   const since = lastSeenDmMsgAt[otherId];
   if(!since) return;
   const { data: rows } = await sb.from('chat_messages')
@@ -2719,11 +2917,22 @@ async function pollDmMessages(otherId){
     .gt('created_at', since)
     .order('created_at', { ascending: true })
     .limit(50);
-  if(!rows?.length) return;
-  for(const row of rows){
-    const belongsHere = (row.sender_id===currentUser.id && row.receiver_id===otherId) || (row.sender_id===otherId && row.receiver_id===currentUser.id);
-    if(belongsHere) await appendDmMessageIfNew(row.id);
+  if(rows?.length){
+    for(const row of rows){
+      const belongsHere = (row.sender_id===currentUser.id && row.receiver_id===otherId) || (row.sender_id===otherId && row.receiver_id===currentUser.id);
+      if(belongsHere) await appendDmMessageIfNew(row.id);
+    }
   }
+}
+
+async function refreshDmReadReceipts(otherId){
+  const { data: lastRead } = await sb.rpc('get_dm_last_read', { p_other_user_id: otherId });
+  if(lastRead === dmOtherLastRead) return; // nothing changed — skip the re-render
+  dmOtherLastRead = lastRead || null;
+  // Read status changed (the other person opened the conversation) — re-render so
+  // tick marks on my own messages update. This only fires when something actually
+  // changed, not on every poll tick, so it stays cheap.
+  loadDmMessages();
 }
 
 function broadcastDmTyping(){
@@ -2744,6 +2953,10 @@ function cancelDmReply(){
 }
 
 async function loadDmMessages(){
+  if(activeDmUserId){
+    const { data: lastRead } = await sb.rpc('get_dm_last_read', { p_other_user_id: activeDmUserId });
+    dmOtherLastRead = lastRead || null;
+  }
   // Fetch all of my DMs (simple, reliable filter) then filter client-side to this conversation —
   // avoids fragile nested or()/and() filter strings that can silently fail server-side.
   const { data: msgs, error } = await sb.from('chat_messages')
@@ -2769,15 +2982,19 @@ async function loadDmMessages(){
   if(activeDmUserId) lastSeenDmMsgAt[activeDmUserId] = convo.length ? convo[convo.length-1].created_at : new Date(0).toISOString();
 }
 
+let dmOtherLastRead = null; // ISO timestamp of when the other person last read this conversation
+
 function renderOneDmMessage(m){
   const mine = m.sender_id===currentUser.id;
   const username = m.profiles?.username || (mine ? currentProfile.username : activeDmUsername);
   const initials = (username||'?')[0]?.toUpperCase()||'?';
+  const seen = mine && dmOtherLastRead && new Date(m.created_at) <= new Date(dmOtherLastRead);
+  const receiptIcon = mine ? `<i class="fa-solid ${seen?'fa-check-double':'fa-check'}" style="font-size:11px;margin-right:4px;color:${seen?'var(--teal)':'var(--ink-faint)'}" title="${seen?'اتشافت':'اتبعتت'}"></i>` : '';
   return `
     <div class="msg-row ${mine?'mine':''}">
       <div class="msg-avatar" id="msgav-${m.id}" onclick="viewProfile('${m.sender_id}')">${initials}</div>
       <div class="msg ${mine?'mine':''}" style="position:relative" ${m.is_removed?'':`onclick="setDmReplyTarget('${m.id}', '${escapeHtml((username||'')).replace(/'/g,"\\'")}', '${escapeHtml((m.content||(m.message_type==='voice'?'رسالة صوتية':'')).slice(0,60)).replace(/'/g,"\\'")}')"`}>
-        <div class="sender"><span style="color:var(--ink-faint);font-weight:400">${formatMsgTime(m.created_at)}${m.edited_at?" · (معدّلة)":""}</span>
+        <div class="sender"><span style="color:var(--ink-faint);font-weight:400">${receiptIcon}${formatMsgTime(m.created_at)}${m.edited_at?" · (معدّلة)":""}</span>
           ${!m.is_removed ? `<span style="float:left;display:flex;gap:8px">
             ${(mine && m.message_type==='text') ? `<span style="cursor:pointer" onclick="event.stopPropagation();editDmMessage('${m.id}', ${JSON.stringify(m.content||'')})" title="تعديل"><i class="fa-solid fa-pencil"></i></span>` : ''}
             ${mine ? `<span style="cursor:pointer;color:var(--red)" onclick="event.stopPropagation();deleteDmMessage('${m.id}')" title="حذف الرسالة"><i class="fa-solid fa-trash"></i></span>` : ''}
@@ -2804,6 +3021,68 @@ async function deleteDmMessage(msgId){
   if(error){ toast('تعذر الحذف: '+error.message, 'error'); }
 }
 
+/* ---------- DM: block / delete conversation / read receipts ---------- */
+function toggleDmOptionsMenu(){
+  const menu = document.getElementById('dmOptionsMenu');
+  if(menu) menu.style.display = menu.style.display==='none' ? 'block' : 'none';
+}
+function hideDmOptionsMenu(){
+  const menu = document.getElementById('dmOptionsMenu');
+  if(menu) menu.style.display = 'none';
+}
+document.addEventListener('click', (e)=>{
+  const menu = document.getElementById('dmOptionsMenu');
+  if(!menu || menu.style.display==='none') return;
+  if(!menu.contains(e.target) && !e.target.closest('button[onclick="toggleDmOptionsMenu()"]')) hideDmOptionsMenu();
+});
+
+async function checkDmBlockStatus(otherId){
+  const { data, error } = await sb.rpc('get_dm_block_status', { p_other_user_id: otherId });
+  const banner = document.getElementById('dmBlockBanner');
+  const inputBar = document.getElementById('dmInputBar');
+  if(error || !banner || !inputBar) return;
+  const status = Array.isArray(data) ? data[0] : data;
+  if(status?.i_blocked_them){
+    banner.innerHTML = `<div style="padding:8px 20px;background:rgba(232,93,93,.1);color:var(--red);font-size:12px;display:flex;align-items:center;gap:8px">
+      <span style="flex:1">انت حاظر المستخدم ده — مش هيوصلك رسايل منه</span>
+      <span style="cursor:pointer;text-decoration:underline" onclick="confirmUnblockDmUser('${otherId}')">إلغاء الحظر</span>
+    </div>`;
+    inputBar.style.display = 'none';
+  } else if(status?.they_blocked_me){
+    banner.innerHTML = `<div style="padding:8px 20px;background:rgba(232,93,93,.1);color:var(--red);font-size:12px">مينفعش تبعت رسالة للمستخدم ده</div>`;
+    inputBar.style.display = 'none';
+  } else {
+    banner.innerHTML = '';
+    inputBar.style.display = 'flex';
+  }
+}
+
+async function confirmBlockDmUser(otherId, otherUsername){
+  if(!await customConfirm(`تحظر @${otherUsername}؟ مش هيقدر يبعتلك رسايل تاني.`, true)) return;
+  const wipeAlso = await customConfirm('تمسح المحادثة القديمة معاه كمان؟');
+  const { error } = await sb.rpc('block_dm_user', { p_user_id: otherId, p_delete_conversation: !!wipeAlso });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم الحظر', 'success');
+  if(wipeAlso) nav('messages');
+  else checkDmBlockStatus(otherId);
+}
+
+async function confirmUnblockDmUser(otherId){
+  if(!await customConfirm('تلغي الحظر عن المستخدم ده؟')) return;
+  const { error } = await sb.rpc('unblock_dm_user', { p_user_id: otherId });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم إلغاء الحظر', 'success');
+  checkDmBlockStatus(otherId);
+}
+
+async function confirmDeleteDmConversation(otherId){
+  if(!await customConfirm('تمسح المحادثة دي بالكامل؟ الإجراء ده مينفعش يترجع.', true)) return;
+  const { error } = await sb.rpc('delete_dm_conversation', { p_other_user_id: otherId });
+  if(error){ toast('خطأ: '+error.message, 'error'); return; }
+  toast('تم حذف المحادثة', 'success');
+  nav('messages');
+}
+
 async function sendDmMessage(){
   const input = document.getElementById('dmInput');
   const content = input.value.trim();
@@ -2822,7 +3101,7 @@ async function sendDmFile(input){
   if(!file || !activeDmUserId) return;
   try{
     const kind = file.type.startsWith('image')?'photo':file.type.startsWith('video')?'video':'document';
-    const up = await uploadToTelegram(file, kind);
+    const up = await uploadToTelegram(file, kind, { type:'dm', otherUserId: activeDmUserId });
     await sb.from('chat_messages').insert({
       sender_id: currentUser.id, receiver_id: activeDmUserId, message_type: kind==='photo'?'image':kind,
       telegram_file_id: up.file_id, content: file.name
