@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevVerse — أكبر مجتمع عربي للتقنية</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#07090F">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DevVerse">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<link rel="stylesheet" href="assets/css/main.min.css">
+
+
+</head>
+<body>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ============ LANDING ============ -->
+<div id="landing">
+  <nav class="landing-nav" id="landingNav">
+    <div class="logo">Dev<span class="bracket">::</span>Verse</div>
+    <div class="landing-nav-actions">
+      <button class="icon-btn" id="themeToggleBtnLanding" onclick="toggleTheme()" title="الوضع الفاتح/الليلي"><i class="fa-solid fa-moon"></i></button>
+      <button class="btn" onclick="openAuth('login')">تسجيل الدخول</button>
+      <button class="btn btn-primary" onclick="openAuth('signup')">إنشاء حساب</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">مجتمع عربي · تقنية · مفتوح المصدر</div>
+      <h1>مكان واحد لكل <span>مبرمج عربي</span> يتعلم، يبني، ويتواصل</h1>
+      <p>انضم لمجتمع يجمع مطوري الويب، مهندسي الذكاء الاصطناعي، خبراء الأمن السيبراني، والمصممين — شارك مشاريعك، اسأل، وابنِ اسمك التقني.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="openAuth('signup')">ابدأ الآن مجانًا</button>
+        <button class="btn" onclick="document.getElementById('sectionsPreview').scrollIntoView({behavior:'smooth'})">استكشف الأقسام</button>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="num" id="statUsers">—</div><div class="label">مستخدم</div></div>
+        <div class="stat"><div class="num" id="statPosts">—</div><div class="label">منشور</div></div>
+        <div class="stat"><div class="num" id="statArticles">—</div><div class="label">مقال</div></div>
+        <div class="stat"><div class="num" id="statRooms">—</div><div class="label">غرفة دردشة</div></div>
+      </div>
+    </div>
+    <div class="terminal">
+      <div class="terminal-head">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="terminal-title">activity.log</div>
+      </div>
+      <div class="terminal-body" id="terminalBody"></div>
+    </div>
+  </section>
+
+  <section class="sections-preview" id="sectionsPreview">
+    <div class="eyebrow" style="text-align:center">15 قسم تقني</div>
+    <h2>أقسام المجتمع</h2>
+    <div class="section-grid" id="sectionGrid"></div>
+  </section>
+
+  <section class="features-section">
+    <div class="eyebrow" style="text-align:center">كل حاجة محتاجها في مكان واحد</div>
+    <h2>مبني عشان تشتغل فعليًا، مش مجرد واجهة</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-comment-dots"></i></div>
+        <h3>غرف دردشة حقيقية</h3>
+        <p>شات لايف بالرد على الرسائل، مراجعة الأدمن قبل التفعيل، وحماية اختيارية بكلمة سر لأي غرفة.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+        <h3>مقالات ومنشورات</h3>
+        <p>انشر مقال تقني أو سؤال سريع، مع دعم كامل للبحث العربي والتصنيف حسب القسم.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <h3>مساعد ذكاء اصطناعي</h3>
+        <p>شرح كود، إصلاح أخطاء، أو تلخيص مقال — مساعد مدمج في الموقع يفهم اللي محتاجه.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <h3>إدارة ومراجعة حقيقية</h3>
+        <p>لوحة تحكم كاملة: مراجعة الغرف والبلاغات، إدارة الصلاحيات، وحماية من السبام.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-user"></i></div>
+        <h3>ملف شخصي احترافي</h3>
+        <p>اعرض مهاراتك، تابع مبرمجين تانيين، واتابع نشاطك من مكان واحد.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <h3>بحث ذكي</h3>
+        <p>دور على مستخدمين، منشورات، أو مقالات بالعربي في ثواني.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps-section">
+    <div class="eyebrow" style="text-align:center">ابدأ في 3 خطوات</div>
+    <h2>من التسجيل لأول منشور في دقيقة</h2>
+    <div class="steps-row">
+      <div class="step"><div class="step-num">01</div><h4>اعمل حساب</h4><p>سجّل بإيميلك أو بجوجل، وأكّد حسابك من الإيميل.</p></div>
+      <div class="step"><div class="step-num">02</div><h4>اختار قسمك</h4><p>من 15 قسم تقني، من الذكاء الاصطناعي لتطوير الويب للأمن السيبراني.</p></div>
+      <div class="step"><div class="step-num">03</div><h4>شارك وابنِ اسمك</h4><p>انشر، ادخل غرفة دردشة، أو اسأل المساعد الذكي.</p></div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="eyebrow" style="text-align:center">جاهز تنضم؟</div>
+    <h2>مجتمع بيتبني فعليًا، مش شعارات.</h2>
+    <p>انضم لآلاف المطورين العرب اللي بيوصلوا يوميًا.</p>
+    <button class="btn btn-primary" onclick="openAuth('signup')">إنشاء حساب مجاني</button>
+  </section>
+
+  <div style="text-align:center;padding:24px 20px;font-size:12px;color:var(--ink-faint);font-family:var(--font-mono)">
+    Product of <span style="color:var(--accent-3);font-weight:600">Binary Beast</span>
+  </div>
+</div>
+
+<!-- ============ AUTH MODAL ============ -->
+<div class="modal-overlay" id="authOverlay">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeAuth()"><i class="fa-solid fa-xmark"></i></button>
+    <div id="loginForm">
+      <h2>تسجيل الدخول</h2>
+      <div class="sub">أهلاً بيك تاني في المجتمع</div>
+      <div class="modal-error" id="loginError"></div>
+      <div class="field"><label>البريد الإلكتروني</label><input type="email" id="loginEmail"></div>
+      <div class="field"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-dim);margin-bottom:14px;cursor:pointer">
+        <input type="checkbox" id="rememberEmailCheck" style="width:auto"> افتكر إيميلي في المتصفح ده
+      </label>
+      <button class="btn btn-primary" style="width:100%" onclick="doLogin()">دخول</button>
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--border)"></div>أو<div style="flex:1;height:1px;background:var(--border)"></div></div>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGoogleAuth()"><i class="fa-brands fa-google"></i> الدخول بحساب جوجل</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGithubAuth()"><i class="fa-brands fa-github"></i> الدخول بحساب GitHub</button>
+      <button class="btn" style="width:100%" onclick="openAuth('magic')"><i class="fa-solid fa-envelope"></i> الدخول بلينك سحري (بدون باسورد)</button>
+      <div class="modal-switch">مش عندك حساب؟ <a onclick="openAuth('signup')">إنشاء حساب</a></div>
+    </div>
+    <div id="magicForm" style="display:none">
+      <h2>الدخول بلينك سحري</h2>
+      <div class="sub">هنبعتلك لينك دخول على إيميلك، من غير باسورد</div>
+      <div class="modal-error" id="magicError"></div>
+      <div class="field"><label>اسم المستخدم</label><input type="text" id="magicUsername" placeholder="بدون مسافات (لأول مرة بس)"></div>
+      <div class="field"><label>البريد الإلكتروني</label><input type="email" id="magicEmail"></div>
+      <button class="btn btn-primary" style="width:100%" onclick="doMagicLink()">ابعت اللينك</button>
+      <div class="modal-switch">رجوع لـ <a onclick="openAuth('login')">تسجيل الدخول</a></div>
+    </div>
+    <div id="signupForm" style="display:none">
+      <h2>إنشاء حساب</h2>
+      <div class="sub">انضم للمجتمع في ثواني</div>
+      <div class="modal-error" id="signupError"></div>
+      <div class="field"><label>اسم المستخدم</label><input type="text" id="signupUsername" placeholder="بدون مسافات"></div>
+      <div class="field"><label>الاسم الكامل</label><input type="text" id="signupFullname"></div>
+      <div class="field"><label>البريد الإلكتروني</label><input type="email" id="signupEmail"></div>
+      <div class="field"><label>كلمة المرور</label><input type="password" id="signupPassword" placeholder="6 أحرف على الأقل"></div>
+      <button class="btn btn-primary" style="width:100%" onclick="doSignup()">إنشاء الحساب</button>
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--border)"></div>أو<div style="flex:1;height:1px;background:var(--border)"></div></div>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGoogleAuth()"><i class="fa-brands fa-google"></i> التسجيل بحساب جوجل</button>
+      <button class="btn" style="width:100%;margin-bottom:8px" onclick="doGithubAuth()"><i class="fa-brands fa-github"></i> التسجيل بحساب GitHub</button>
+      <button class="btn" style="width:100%" onclick="openAuth('magic')"><i class="fa-solid fa-envelope"></i> التسجيل بلينك سحري (بدون باسورد)</button>
+      <div class="modal-switch">عندك حساب؟ <a onclick="openAuth('login')">تسجيل الدخول</a></div>
+    </div>
+    <div id="confirmForm" style="display:none">
+      <h2>تحقق من إيميلك <i class="fa-solid fa-envelope-open-text"></i></h2>
+      <div class="sub" id="confirmSub">بعتنالك لينك تأكيد</div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px; font-size:13px; color:var(--ink-dim); margin-bottom:16px">
+        دوس على اللينك اللي وصلك في الإيميل عشان تفعّل حسابك، وبعدها ارجع سجّل دخول عادي.
+      </div>
+      <button class="btn" style="width:100%" onclick="resendConfirmCode()">إعادة إرسال اللينك</button>
+      <div class="modal-switch">فعّلت حسابك؟ <a onclick="openAuth('login')">تسجيل الدخول</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ UPLOAD PROGRESS MODAL ============ -->
+<div class="modal-overlay" id="uploadOverlay">
+  <div class="upload-modal">
+    <div class="fname" id="uploadFileName"></div>
+    <div class="upload-progress-track"><div class="upload-progress-fill" id="uploadProgressFill"></div></div>
+    <div class="upload-progress-pct" id="uploadProgressPct">0%</div>
+    <div class="upload-progress-status" id="uploadProgressStatus">جاري الرفع...</div>
+  </div>
+</div>
+
+<!-- ============ ROOM MEMBERS MODAL ============ -->
+<div class="modal-overlay" id="roomMembersOverlay">
+  <div class="modal" style="max-width:380px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 id="roomMembersModalTitle" style="margin:0">أعضاء الغرفة</h2>
+      <button class="icon-btn" onclick="closeRoomMembersModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="roomMembersModalList" style="max-height:60vh;overflow-y:auto"><div class="empty-state">جاري التحميل...</div></div>
+  </div>
+</div>
+
+<!-- ============ MESSAGE INFO MODAL ============ -->
+<div class="modal-overlay" id="messageInfoOverlay">
+  <div class="modal" style="max-width:380px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="margin:0"><i class="fa-solid fa-eye"></i> شاف الرسالة</h2>
+      <button class="icon-btn" onclick="closeMessageInfo()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="messageInfoList" style="max-height:60vh;overflow-y:auto"><div class="empty-state">جاري التحميل...</div></div>
+  </div>
+</div>
+
+<!-- ============ FORWARD MESSAGE MODAL ============ -->
+<div class="modal-overlay" id="forwardMsgOverlay">
+  <div class="modal" style="max-width:400px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h2 style="margin:0"><i class="fa-solid fa-share"></i> إعادة توجيه</h2>
+      <button class="icon-btn" onclick="closeForwardModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <input type="text" id="forwardSearchInput" placeholder="دور على غرفة أو شخص..." oninput="filterForwardTargets(this.value)" style="width:100%;margin-bottom:10px">
+    <div id="forwardTargetsList" style="max-height:50vh;overflow-y:auto"><div class="empty-state"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<!-- ============ NOTIFICATION SETUP GUIDANCE MODAL ============ -->
+<div class="modal-overlay" id="notifGuideOverlay">
+  <div class="modal" style="max-width:420px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <h2 style="margin:0"><i class="fa-solid fa-bell"></i> خطوة أخيرة مهمة</h2>
+      <button class="icon-btn" onclick="closeNotifGuide()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="sub" style="margin-bottom:16px">الإشعارات اشتغلت، لكن بعض الموبايلات بتقفل التطبيقات في الخلفية توفيرًا للبطارية — لو مفعّلتش الإعداد ده، الإشعارات ممكن توصلك بس وانت فاتح الموقع.</div>
+    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="chip-select" style="cursor:pointer" onclick="showNotifGuideFor('samsung')" id="notifTabSamsung">Samsung</button>
+      <button class="chip-select" style="cursor:pointer" onclick="showNotifGuideFor('xiaomi')" id="notifTabXiaomi">Xiaomi / Redmi</button>
+      <button class="chip-select" style="cursor:pointer" onclick="showNotifGuideFor('huawei')" id="notifTabHuawei">Huawei / Honor</button>
+      <button class="chip-select" style="cursor:pointer" onclick="showNotifGuideFor('other')" id="notifTabOther">أندرويد تاني</button>
+      <button class="chip-select" style="cursor:pointer" onclick="showNotifGuideFor('ios')" id="notifTabIos">iPhone</button>
+    </div>
+    <div id="notifGuideContent" style="font-size:13px;line-height:2;color:var(--ink-dim)"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="closeNotifGuide()">تمام، فهمت</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="promptModalOverlay" onclick="if(event.target===this)closePromptModal(false)">
+  <div class="modal" style="width:400px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <span class="toast-ic" id="promptModalIcon" style="width:36px;height:36px;font-size:16px;flex-shrink:0"><i class="fa-solid fa-circle-question"></i></span>
+      <h2 id="promptModalTitle" style="margin:0;font-size:16px;font-family:var(--font-body);font-weight:600;line-height:1.6"></h2>
+    </div>
+    <div class="field" id="promptModalFieldWrap" style="margin-bottom:6px">
+      <input type="text" id="promptModalInput" onkeydown="if(event.key==='Enter'){event.preventDefault();closePromptModal(true);}if(event.key==='Escape'){closePromptModal(false);}">
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:22px">
+      <button class="btn" onclick="closePromptModal(false)">إلغاء</button>
+      <button class="btn btn-primary" id="promptModalOk" onclick="closePromptModal(true)">تأكيد</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============ APP SHELL ============ -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-scroll">
+      <div class="sidebar-logo"><div class="logo" style="font-size:18px">Dev<span class="bracket">::</span>Verse</div></div>
+      <div class="nav-section">
+        <div class="nav-item active" data-view="feed" onclick="nav('feed')"><i class="fa-solid fa-house"></i> الرئيسية</div>
+        <div class="nav-item" data-view="articles" onclick="nav('articles')"><i class="fa-solid fa-pen-to-square"></i> المقالات</div>
+        <div class="nav-item" data-view="rooms" onclick="nav('rooms')"><i class="fa-solid fa-comment-dots"></i> غرف الدردشة <span class="badge" id="roomsBadge" style="display:none">0</span></div>
+        <div class="nav-item" data-view="messages" onclick="nav('messages')"><i class="fa-solid fa-envelope"></i> الرسائل الخاصة <span class="badge" id="dmBadge" style="display:none">0</span></div>
+        <div class="nav-item" data-view="bookmarks" onclick="nav('bookmarks')"><i class="fa-solid fa-bookmark"></i> المحفوظات</div>
+        <div class="nav-item" data-view="profile" onclick="nav('profile')"><i class="fa-solid fa-user"></i> ملفي الشخصي</div>
+        <div class="nav-item" data-view="ctrl-x9k2" id="adminNavItem" onclick="nav('ctrl-x9k2')" style="display:none"><i class="fa-solid fa-shield-halved"></i> لوحة التحكم <span class="badge" id="adminBadge" style="display:none">0</span></div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">الأقسام</div>
+        <div class="categories-list" id="sidebarCategories"></div>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="mini-profile" onclick="nav('profile')">
+        <div class="avatar" id="miniAvatar">؟</div>
+        <div><div class="name" id="miniName">—</div><div class="role" id="miniRole">member</div></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="notifToggleBtn" style="width:100%; margin-bottom:8px; display:none" onclick="handleNotifBtnClick()"><i class="fa-solid fa-bell-slash"></i> فعّل الإشعارات</button>
+      <button class="btn btn-ghost btn-sm" style="width:100%" onclick="doLogout()">تسجيل الخروج</button>
+      <div style="text-align:center;font-size:10px;color:var(--ink-faint);margin-top:10px;font-family:var(--font-mono);letter-spacing:.3px">
+        Product of <span style="color:var(--accent-3);font-weight:600">Binary Beast</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="search-box">
+        <span class="icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+        <input type="text" id="searchInput" placeholder="ابحث عن منشورات، مقالات، مستخدمين..." oninput="handleSearch(this.value)" onblur="setTimeout(()=>document.getElementById('searchResults').style.display='none', 200)">
+        <div id="searchResults" style="display:none; position:absolute; top:110%; right:0; left:0; background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; max-height:400px; overflow-y:auto; z-index:50; box-shadow:0 12px 30px rgba(0,0,0,.4)"></div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="الوضع الفاتح/الليلي"><i class="fa-solid fa-moon"></i></button>
+        <div style="position:relative">
+          <button class="icon-btn" onclick="toggleNotifications()"><i class="fa-solid fa-bell"></i><span class="notif-dot" id="notifDot" style="display:none"></span></button>
+          <div id="notifPanel" style="display:none; position:absolute; top:110%; left:0; width:320px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; max-height:420px; overflow-y:auto; z-index:60; box-shadow:0 12px 30px rgba(0,0,0,.4)"></div>
+        </div>
+      </div>
+    </div>
+    <div id="viewContainer"></div>
+  </main>
+</div>
+
+<nav class="island-nav">
+  <div class="island-item nav-item active" data-view="feed" onclick="nav('feed')"><span class="ic"><i class="fa-solid fa-house"></i></span>الرئيسية</div>
+  <div class="island-item nav-item" data-view="rooms" onclick="nav('rooms')"><span class="ic"><i class="fa-solid fa-comment-dots"></i></span>غرف<span class="badge" id="roomsBadgeMobile" style="display:none">0</span></div>
+  <div class="island-item nav-item" data-view="articles" onclick="nav('articles')"><span class="ic"><i class="fa-solid fa-pen-to-square"></i></span>مقالات</div>
+  <div class="island-item nav-item" data-view="profile" onclick="nav('profile')"><span class="ic"><i class="fa-solid fa-user"></i></span>ملفي</div>
+  <div class="island-item" onclick="toggleMoreSheet()"><span class="ic"><i class="fa-solid fa-ellipsis"></i></span>المزيد<span class="dot" id="moreDot"></span></div>
+</nav>
+
+<div class="modal-overlay" id="moreSheetOverlay" onclick="if(event.target===this)toggleMoreSheet()">
+  <div class="modal" style="width:320px; max-height:70vh; overflow-y:auto">
+    <h2 style="font-size:18px; margin-bottom:14px">المزيد</h2>
+    <div class="nav-item" onclick="toggleMoreSheet(); toggleAiPanel()" style="margin-bottom:6px"><i class="fa-solid fa-wand-magic-sparkles"></i> المساعد الذكي</div>
+    <div class="nav-item" id="adminNavItemMobile" onclick="toggleMoreSheet(); nav('ctrl-x9k2')" style="display:none; margin-bottom:6px"><i class="fa-solid fa-shield-halved"></i> لوحة التحكم</div>
+    <div class="nav-item" onclick="toggleMoreSheet(); nav('messages')" style="margin-bottom:6px"><i class="fa-solid fa-envelope"></i> الرسائل الخاصة <span class="badge" id="dmBadgeMobile" style="display:none">0</span></div>
+    <div class="nav-item" onclick="toggleMoreSheet(); nav('bookmarks')" style="margin-bottom:6px"><i class="fa-solid fa-bookmark"></i> المحفوظات</div>
+    <button class="btn btn-ghost btn-sm" id="notifToggleBtnMobile" style="width:100%; margin-bottom:14px; display:none" onclick="toggleMoreSheet(); handleNotifBtnClick()"><i class="fa-solid fa-bell-slash"></i> فعّل الإشعارات</button>
+    <div class="nav-label" style="margin-top:10px">الأقسام</div>
+    <div id="mobileCategories" style="max-height:220px; overflow-y:auto; margin-bottom:14px"></div>
+    <button class="btn btn-ghost btn-sm" style="width:100%" onclick="doLogout()">تسجيل الخروج</button>
+  </div>
+</div>
+
+<button class="ai-fab" id="aiFab" title="مساعد الذكاء الاصطناعي — اسحبني لمكان تاني"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-head">
+    <b><i class="fa-solid fa-robot"></i> المساعد الذكي</b>
+    <select class="ai-mode" id="aiMode">
+      <option value="general">عام</option>
+      <option value="explain">شرح كود</option>
+      <option value="fix">إصلاح خطأ</option>
+      <option value="summarize">تلخيص</option>
+    </select>
+    <button class="icon-btn" style="width:28px;height:28px" onclick="toggleAiPanel()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="ai-body" id="aiBody"><div class="ai-msg">أهلاً! اسألني أي حاجة عن البرمجة أو التقنية <i class="fa-solid fa-hand"></i></div></div>
+  <div class="ai-input-bar">
+    <textarea id="aiInput" placeholder="اكتب سؤالك..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMessage();}"></textarea>
+    <button class="btn btn-primary btn-sm" onclick="sendAiMessage()">إرسال</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/js/part1.min.js"></script>
+<script src="assets/js/part2.min.js"></script>
+<script src="assets/js/part3.min.js"></script>
+<script src="assets/js/part4.min.js"></script>
+
+</body>
+</html>
