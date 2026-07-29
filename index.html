@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="google-adsense-account" content="ca-pub-4582911784447967">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com 'unsafe-inline'; style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://ccshmpaejvwpsthbvsww.supabase.co wss://ccshmpaejvwpsthbvsww.supabase.co wss://devverse-at9d8f9t.livekit.cloud https://devverse-at9d8f9t.livekit.cloud https://*.daily.co wss://*.daily.co https://api.daily.co; base-uri 'self'; form-action 'self';">
 <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -20,7 +19,8 @@
 <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-<link rel="stylesheet" href="assets/css/main.min.css?v=1785196790">
+<link rel="stylesheet" href="assets/css/main.min.css?v=1785358017">
+<link rel="stylesheet" href="assets/css/meeting-features.css?v=1785358017">
 
 
 </head>
@@ -242,7 +242,20 @@
       <input type="checkbox" id="meetingRequireApprovalCheck" checked style="width:18px;height:18px">
       لازم أوافق على أي حد قبل ما يدخل
     </label>
-    <button class="btn btn-primary" style="width:100%" onclick="submitStartMeeting()"><i class="fa-solid fa-video"></i> ابدأ الميتنج</button>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="submitStartMeeting()"><i class="fa-solid fa-video"></i> ابدأ الميتنج دلوقتي</button>
+    <button class="btn btn-ghost" style="width:100%;margin-bottom:8px" onclick="closeStartMeetingModal(); openScheduleMeetingModal()"><i class="fa-solid fa-calendar-clock"></i> جدولة لوقت لاحق</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closeStartMeetingModal(); openMyMeetingsModal()"><i class="fa-solid fa-list"></i> ميتنجاتي</button>
+  </div>
+</div>
+
+<!-- ============ MY MEETINGS MODAL (حالة/عدد المشاركين/المدة) ============ -->
+<div class="modal-overlay" id="myMeetingsOverlay">
+  <div class="modal" style="max-width:460px;max-height:75vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="margin:0"><i class="fa-solid fa-list"></i> ميتنجاتي</h2>
+      <button class="icon-btn" onclick="closeMyMeetingsModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="myMeetingsList" style="overflow-y:auto;flex:1"><div class="empty-state"><div class="spinner"></div></div></div>
   </div>
 </div>
 
@@ -287,6 +300,80 @@
     <button class="btn btn-primary" style="width:100%" onclick="confirmPreJoinAndEnter()">دخول الميتنج</button>
   </div>
 </div>
+
+<!-- ============ SCHEDULE MEETING MODAL ============ -->
+<div class="modal-overlay" id="scheduleMeetingOverlay">
+  <div class="modal" style="max-width:400px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="margin:0"><i class="fa-solid fa-calendar-clock"></i> جدولة ميتنج</h2>
+      <button class="icon-btn" onclick="closeScheduleMeetingModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <label style="font-size:13px;color:var(--ink-faint);display:block;margin-bottom:6px">عنوان الميتنج</label>
+    <input type="text" id="scheduleMeetingTitleInput" placeholder="مثلاً: اجتماع الفريق" style="width:100%;margin-bottom:16px">
+    <label style="font-size:13px;color:var(--ink-faint);display:block;margin-bottom:6px">معاد الميتنج</label>
+    <input type="datetime-local" id="scheduleMeetingTimeInput" style="width:100%;margin-bottom:16px">
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:20px;font-size:14px">
+      <input type="checkbox" id="scheduleMeetingRequireApprovalCheck" checked style="width:18px;height:18px">
+      لازم أوافق على أي حد قبل ما يدخل
+    </label>
+    <button class="btn btn-primary" style="width:100%" onclick="submitScheduleMeeting()"><i class="fa-solid fa-calendar-check"></i> جدولة</button>
+  </div>
+</div>
+
+<!-- ============ MEETING STATS MODAL ============ -->
+<div class="modal-overlay" id="meetingStatsOverlay">
+  <div class="modal" style="max-width:420px;max-height:70vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="margin:0"><i class="fa-solid fa-chart-simple"></i> إحصائيات الاجتماع</h2>
+      <button class="icon-btn" onclick="closeMeetingStatsModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="meeting-stats-list" id="meetingStatsList"><div class="empty-state"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<!-- ============ BREAKOUT ROOMS MODAL ============ -->
+<div class="modal-overlay" id="breakoutRoomsOverlay">
+  <div class="modal" style="max-width:440px;max-height:75vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="margin:0"><i class="fa-solid fa-diagram-project"></i> غرف جانبية</h2>
+      <button class="icon-btn" onclick="closeBreakoutRoomsModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <button class="btn btn-sm" style="margin-bottom:14px" onclick="promptCreateBreakoutRoom()"><i class="fa-solid fa-plus"></i> غرفة جديدة</button>
+    <div id="breakoutRoomsList" style="overflow-y:auto;flex:1"><div class="empty-state" style="padding:20px;font-size:12px">مفيش غرف جانبية لسه</div></div>
+  </div>
+</div>
+
+<!-- ============ MEETING BACKGROUND MODAL ============ -->
+<div class="modal-overlay" id="meetingBgOverlay">
+  <div class="modal" style="max-width:360px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="margin:0"><i class="fa-solid fa-palette"></i> خلفية موحدة</h2>
+      <button class="icon-btn" onclick="closeMeetingBgModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div style="font-size:13px;color:var(--ink-faint);margin-bottom:6px">اختار لون خلفية موحد لكل المشاركين في شاشة الميتنج</div>
+    <div class="bg-color-swatches" id="meetingBgSwatches"></div>
+  </div>
+</div>
+
+<!-- ============ MEETING SIDE CHAT PANEL ============ -->
+<div class="meeting-side-panel" id="meetingChatPanel">
+  <div class="meeting-side-header">
+    <span><i class="fa-solid fa-comment-dots"></i> شات الميتنج</span>
+    <button class="icon-btn" onclick="toggleMeetingChatPanel()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="meeting-chat-messages" id="meetingChatMessages"></div>
+  <div class="meeting-chat-input-bar">
+    <input type="text" id="meetingChatInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendMeetingChatMessage()">
+    <button class="icon-btn" onclick="sendMeetingChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<!-- ============ SCREEN SHARE INDICATOR ============ -->
+<div class="screenshare-indicator" id="screenshareIndicator">
+  <i class="fa-solid fa-desktop"></i> بتشارك شاشتك
+  <button class="btn btn-sm" style="background:#000;color:#fff;padding:2px 10px" onclick="stopScreenShare()">إيقاف</button>
+</div>
+
 
 <!-- ============ LOCAL SETTINGS MODAL ============ -->
 <div class="modal-overlay" id="localSettingsOverlay">
@@ -454,12 +541,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.umd.min.js"></script>
 <script src="https://unpkg.com/@daily-co/daily-js"></script>
-<script src="assets/js/part1.min.js?v=1785196790"></script>
-<script src="assets/js/part2.min.js?v=1785196790"></script>
-<script src="assets/js/part3.min.js?v=1785196790"></script>
-<script src="assets/js/part4.min.js?v=1785196790"></script>
-<script src="assets/js/part5.min.js?v=1785196790"></script>
-<script src="assets/js/part6.min.js?v=1785196790"></script>
+<script src="assets/js/part1.min.js?v=1785358017"></script>
+<script src="assets/js/part2.min.js?v=1785358017"></script>
+<script src="assets/js/part3.min.js?v=1785358017"></script>
+<script src="assets/js/part4.min.js?v=1785358017"></script>
+<script src="assets/js/part5.min.js?v=1785358017"></script>
+<script src="assets/js/part6.min.js?v=1785358017"></script>
 
 </body>
 </html>
