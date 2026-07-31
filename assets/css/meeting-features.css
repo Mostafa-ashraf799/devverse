@@ -1,0 +1,147 @@
+/* ============ MEETING FEATURES (مشاركة شاشة / رفع يد / شات / إحصائيات / جدولة / غرف جانبية) ============ */
+
+/* --- روابط النصوص القابلة للضغط (linkify) --- */
+.msg-link{color:var(--accent-3, #6366f1);text-decoration:underline;word-break:break-all;cursor:pointer}
+.msg-link:hover{opacity:.8}
+
+/* --- الهيدر: أزرار جديدة --- */
+.meeting-header{flex-wrap:wrap; row-gap:8px;}
+.meeting-header-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.meeting-timer{font-family:var(--font-mono);font-size:12px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.06);padding:4px 10px;border-radius:999px;display:flex;align-items:center;gap:6px}
+.meeting-timer .dot{width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;animation:pulse 2s infinite}
+
+/* --- Grid محسّن + Responsive --- */
+.meeting-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;
+  padding:16px;
+  align-content:start;
+  transition:grid-template-columns .25s var(--ease);
+}
+.meeting-grid.spotlight-mode{grid-template-columns:1fr;grid-auto-rows:min-content}
+.meeting-grid.spotlight-mode .meeting-tile.is-spotlight{
+  grid-column:1/-1;
+  aspect-ratio:16/9;
+  max-height:60vh;
+}
+.meeting-grid.spotlight-mode .meeting-tile:not(.is-spotlight){
+  max-width:160px;
+}
+.meeting-tile{
+  position:relative;aspect-ratio:4/3;background:#151a28;border-radius:12px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid transparent;transition:border-color .2s, transform .2s;
+}
+.meeting-tile.is-speaking{border-color:#22c55e;box-shadow:0 0 0 2px rgba(34,197,94,.25)}
+.meeting-tile.is-spotlight{border-color:var(--accent);box-shadow:0 0 20px rgba(99,102,241,.35)}
+.meeting-tile-badges{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:2}
+.meeting-tile-badge{width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;backdrop-filter:blur(4px)}
+.meeting-tile-badge.hand{background:var(--amber);color:#000;animation:handWave 1s ease-in-out infinite}
+@keyframes handWave{0%,100%{transform:rotate(0)}25%{transform:rotate(-15deg)}75%{transform:rotate(15deg)}}
+.meeting-tile-badge.muted{color:var(--red)}
+.meeting-tile-menu-btn{position:absolute;top:8px;left:8px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;cursor:pointer;z-index:2;opacity:0;transition:opacity .2s}
+.meeting-tile:hover .meeting-tile-menu-btn{opacity:1}
+.meeting-tile-name{position:absolute;bottom:8px;right:8px;left:auto;background:rgba(0,0,0,.5);color:#fff;font-size:11px;padding:3px 8px;border-radius:999px;max-width:calc(100% - 60px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meeting-tile-screenshare{border-color:var(--teal)!important}
+
+/* --- شريط التحكم السفلي: مرن ويتلف لصف تاني في الموبايل --- */
+.meeting-controls{
+  padding:14px;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;
+  flex-shrink:0;background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.08);
+}
+.meeting-controls .voice-ctrl-btn{width:50px;height:50px;font-size:18px;position:relative}
+.meeting-controls .voice-ctrl-btn.raised{background:var(--amber);color:#000}
+.meeting-controls .voice-ctrl-btn.on{background:var(--accent);color:#fff}
+.meeting-ctrl-badge{position:absolute;top:-2px;left:-2px;background:var(--red);color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+
+/* --- عناصر التحكم الإضافية (Host tools dropdown) --- */
+.meeting-host-menu{position:relative;display:inline-block}
+.meeting-host-dropdown{
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  min-width:200px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--shadow-lg);overflow:hidden;display:none;z-index:50;
+}
+.meeting-host-dropdown.active{display:block;animation:scaleIn .15s var(--ease-out)}
+.meeting-host-dropdown .dropdown-item{padding:11px 14px;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--ink);cursor:pointer;transition:background .15s}
+.meeting-host-dropdown .dropdown-item:hover{background:var(--surface-hover)}
+.meeting-host-dropdown .dropdown-item.danger{color:var(--red)}
+
+/* --- شات الميتنج الجانبي --- */
+.meeting-side-panel{
+  position:fixed;top:0;left:-340px;width:320px;max-width:88vw;height:100vh;
+  background:var(--bg-elevated);border-right:1px solid var(--border);z-index:600;
+  transition:left .25s var(--ease-out);display:flex;flex-direction:column;
+}
+.meeting-side-panel.active{left:0}
+.meeting-side-header{padding:16px;display:flex;align-items:center;justify-content:space-between;font-weight:700;border-bottom:1px solid var(--border);flex-shrink:0}
+.meeting-chat-messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.meeting-chat-msg{font-size:13px;line-height:1.5}
+.meeting-chat-msg .who{font-weight:700;font-size:12px;color:var(--accent);margin-bottom:2px}
+.meeting-chat-msg .txt{color:var(--ink);word-break:break-word}
+.meeting-chat-msg.mine .who{color:var(--teal)}
+.meeting-chat-input-bar{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);flex-shrink:0}
+.meeting-chat-input-bar input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:9px 16px;color:var(--ink);font-size:13px}
+.meeting-chat-input-bar input:focus{outline:0;border-color:var(--accent)}
+
+/* --- إحصائيات الاجتماع --- */
+.meeting-stats-list{padding:8px 16px;overflow-y:auto;flex:1}
+.meeting-stats-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.meeting-stats-row .n{flex:1;font-weight:600}
+.meeting-stats-row .d{font-family:var(--font-mono);color:var(--ink-faint);font-size:12px}
+
+/* --- غرف جانبية (Breakout Rooms) --- */
+.breakout-room-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.breakout-room-card .title{font-weight:700;font-size:13.5px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.breakout-room-members{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:24px}
+.breakout-member-chip{display:flex;align-items:center;gap:6px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:999px;padding:4px 10px 4px 6px;font-size:12px}
+.breakout-member-chip .avatar{width:18px;height:18px;font-size:9px}
+
+/* --- خلفية موحدة (بديل بسيط للخلفية الافتراضية) --- */
+.bg-color-swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.bg-color-swatch{width:34px;height:34px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s, border-color .15s}
+.bg-color-swatch:hover{transform:scale(1.1)}
+.bg-color-swatch.active{border-color:var(--ink)}
+
+/* --- مؤقت / جدولة الميتنج --- */
+.scheduled-meeting-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.scheduled-meeting-card .info{flex:1;min-width:0}
+.scheduled-meeting-card .info .t{font-weight:600;font-size:14px;margin-bottom:2px}
+.scheduled-meeting-card .info .d{font-size:12px;color:var(--ink-faint);font-family:var(--font-mono)}
+
+/* --- Screen share indicator --- */
+.screenshare-indicator{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--teal);color:#000;font-size:12px;font-weight:700;padding:6px 16px;border-radius:999px;z-index:700;display:none;align-items:center;gap:8px;box-shadow:var(--shadow-md)}
+.screenshare-indicator.active{display:flex}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:900px){
+  .meeting-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;padding:10px}
+  .meeting-grid.spotlight-mode .meeting-tile:not(.is-spotlight){max-width:110px}
+  .meeting-controls{padding:10px;gap:6px}
+  .meeting-controls .voice-ctrl-btn{width:44px;height:44px;font-size:16px}
+  .meeting-header{padding:10px 12px}
+  .meeting-header .name{font-size:13px}
+  .meeting-header-actions .btn-sm{padding:6px 10px;font-size:12px}
+  .meeting-side-panel{width:100%;max-width:100%;left:-100%}
+  .meeting-timer{font-size:11px;padding:3px 8px}
+}
+@media (max-width:480px){
+  .meeting-grid{grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:6px;padding:8px}
+  .meeting-tile-name{font-size:10px;padding:2px 6px}
+  .meeting-controls .voice-ctrl-btn{width:42px;height:42px;font-size:15px}
+  .meeting-header .desc{display:none}
+}
+
+/* ===== PixelAi / PixelCode picker (Binary Beast) ===== */
+.ai-picker-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:120;animation:modalOverlay .25s var(--ease) both}
+.ai-picker-overlay.active{display:flex}
+.ai-picker-modal{background:linear-gradient(180deg,var(--bg-elevated),var(--surface));border:1px solid var(--border);border-radius:var(--r-md);padding:24px;width:min(420px,92vw);box-shadow:var(--shadow-lg),0 0 100px rgba(99,102,241,.15);animation:modalPop .3s var(--ease-spring) both}
+.ai-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.ai-picker-head b{font-family:var(--font-display);font-size:19px}
+.ai-picker-sub{color:var(--ink-faint);font-size:12px;font-family:var(--font-mono);margin-bottom:20px}
+.ai-picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ai-picker-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);text-align:center;transition:all .25s var(--ease);cursor:pointer}
+.ai-picker-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 12px 28px rgba(99,102,241,.25);background:var(--surface-hover)}
+.ai-picker-logo{width:56px;height:56px;border-radius:16px;object-fit:cover;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.ai-picker-name{font-weight:700;font-size:14.5px;color:var(--ink)}
+.ai-picker-desc{font-size:11.5px;color:var(--ink-faint)}
